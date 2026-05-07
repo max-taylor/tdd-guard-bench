@@ -1,0 +1,3 @@
+Implement the project specified in README.md.
+
+Source code goes in src/, tests go in tests/. The project is pre-configured with vitest. Install dependencies and run the test suite to verify your implementation passes before finishing.

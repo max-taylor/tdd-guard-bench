@@ -1,0 +1,14 @@
+{"type":"session","id":"d9c43325-fe8a-4eaa-b30c-2e960ae15f7a","started_at":"2026-05-07T04:48:33.023Z","transcript_path":"/Users/maxtaylor/.claude/projects/-Users-maxtaylor-Documents-Code-tdd-guard-testing/d9c43325-fe8a-4eaa-b30c-2e960ae15f7a.jsonl"}
+{"type":"change","file_path":"templates/_base/package.json","session_id":"d9c43325-fe8a-4eaa-b30c-2e960ae15f7a","timestamp":"2026-05-07T04:48:33.024Z","tool_name":"Write"}
+{"type":"session","id":"d9c43325-fe8a-4eaa-b30c-2e960ae15f7a","started_at":"2026-05-07T04:48:36.405Z","transcript_path":"/Users/maxtaylor/.claude/projects/-Users-maxtaylor-Documents-Code-tdd-guard-testing/d9c43325-fe8a-4eaa-b30c-2e960ae15f7a.jsonl"}
+{"type":"change","file_path":"templates/_base/tsconfig.json","session_id":"d9c43325-fe8a-4eaa-b30c-2e960ae15f7a","timestamp":"2026-05-07T04:48:36.405Z","tool_name":"Write"}
+{"type":"session","id":"d9c43325-fe8a-4eaa-b30c-2e960ae15f7a","started_at":"2026-05-07T04:49:26.217Z","transcript_path":"/Users/maxtaylor/.claude/projects/-Users-maxtaylor-Documents-Code-tdd-guard-testing/d9c43325-fe8a-4eaa-b30c-2e960ae15f7a.jsonl"}
+{"type":"change","file_path":"template/package.json","session_id":"d9c43325-fe8a-4eaa-b30c-2e960ae15f7a","timestamp":"2026-05-07T04:49:26.220Z","tool_name":"Write"}
+{"type":"session","id":"d9c43325-fe8a-4eaa-b30c-2e960ae15f7a","started_at":"2026-05-07T04:49:31.494Z","transcript_path":"/Users/maxtaylor/.claude/projects/-Users-maxtaylor-Documents-Code-tdd-guard-testing/d9c43325-fe8a-4eaa-b30c-2e960ae15f7a.jsonl"}
+{"type":"change","file_path":"template/tsconfig.json","session_id":"d9c43325-fe8a-4eaa-b30c-2e960ae15f7a","timestamp":"2026-05-07T04:49:31.494Z","tool_name":"Write"}
+{"type":"session","id":"d9c43325-fe8a-4eaa-b30c-2e960ae15f7a","started_at":"2026-05-07T04:49:35.198Z","transcript_path":"/Users/maxtaylor/.claude/projects/-Users-maxtaylor-Documents-Code-tdd-guard-testing/d9c43325-fe8a-4eaa-b30c-2e960ae15f7a.jsonl"}
+{"type":"change","file_path":"template/vitest.config.ts","session_id":"d9c43325-fe8a-4eaa-b30c-2e960ae15f7a","timestamp":"2026-05-07T04:49:35.198Z","tool_name":"Write"}
+{"type":"session","id":"d9c43325-fe8a-4eaa-b30c-2e960ae15f7a","started_at":"2026-05-07T04:49:38.052Z","transcript_path":"/Users/maxtaylor/.claude/projects/-Users-maxtaylor-Documents-Code-tdd-guard-testing/d9c43325-fe8a-4eaa-b30c-2e960ae15f7a.jsonl"}
+{"type":"change","file_path":"template/.gitignore","session_id":"d9c43325-fe8a-4eaa-b30c-2e960ae15f7a","timestamp":"2026-05-07T04:49:38.052Z","tool_name":"Write"}
+{"type":"session","id":"d9c43325-fe8a-4eaa-b30c-2e960ae15f7a","started_at":"2026-05-07T04:49:46.592Z","transcript_path":"/Users/maxtaylor/.claude/projects/-Users-maxtaylor-Documents-Code-tdd-guard-testing/d9c43325-fe8a-4eaa-b30c-2e960ae15f7a.jsonl"}
+{"type":"change","file_path":"template/README.md","session_id":"d9c43325-fe8a-4eaa-b30c-2e960ae15f7a","timestamp":"2026-05-07T04:49:46.592Z","tool_name":"Write"}

@@ -64,9 +64,25 @@ TIMESTAMP="$( date +%Y%m%d-%H%M%S )"
 RUN_ROOT="$ROOT/runs/$SPEC_NAME-$TIMESTAMP"
 
 # ------------------------------------------------------------------ preflight
-command -v claude >/dev/null 2>&1 || { echo "error: 'claude' CLI not on PATH" >&2; exit 1; }
-command -v jq     >/dev/null 2>&1 || { echo "error: 'jq' not on PATH" >&2; exit 1; }
-command -v node   >/dev/null 2>&1 || { echo "error: 'node' not on PATH" >&2; exit 1; }
+# Resolve `claude` binary. The user's interactive zsh aliases `claude` to
+# ~/.claude/local/claude; bash scripts don't see zsh aliases, and a stale
+# PATH entry (e.g. broken nvm shim) can shadow the real install. Resolve
+# explicitly. Override with CLAUDE_BIN=/path/to/claude.
+resolve_claude_bin() {
+  if [[ -n "${CLAUDE_BIN:-}" ]]; then
+    [[ -x "$CLAUDE_BIN" ]] || { echo "error: CLAUDE_BIN set but not executable: $CLAUDE_BIN" >&2; exit 1; }
+    echo "$CLAUDE_BIN"; return
+  fi
+  if [[ -x "$HOME/.claude/local/claude" ]]; then echo "$HOME/.claude/local/claude"; return; fi
+  local found; found="$( command -v claude 2>/dev/null || true )"
+  if [[ -n "$found" && -x "$found" ]]; then echo "$found"; return; fi
+  echo "error: 'claude' CLI not found. Install it, or set CLAUDE_BIN=/path/to/claude" >&2
+  exit 1
+}
+CLAUDE="$( resolve_claude_bin )"
+
+command -v jq   >/dev/null 2>&1 || { echo "error: 'jq' not on PATH" >&2; exit 1; }
+command -v node >/dev/null 2>&1 || { echo "error: 'node' not on PATH" >&2; exit 1; }
 
 [[ -d "$TEMPLATE_DIR" ]] || { echo "error: template/ not found at $TEMPLATE_DIR" >&2; exit 1; }
 [[ -f "$HARNESS_DIR/prompt.txt" ]] || { echo "error: harness/prompt.txt missing" >&2; exit 1; }
@@ -79,6 +95,7 @@ mkdir -p "$RUN_ROOT"
 echo "==> run root: $RUN_ROOT"
 echo "==> spec:     $SPEC_ABS"
 echo "==> model:    $MODEL"
+echo "==> claude:   $CLAUDE"
 echo "==> mode:     $([[ $SEQUENTIAL -eq 1 ]] && echo sequential || echo parallel)"
 
 # ------------------------------------------------------------------ stage a condition directory
@@ -123,7 +140,7 @@ run_condition() {
   # Run Claude in fully autonomous mode. stream-json gives us hook events,
   # token usage, tool calls, and the final result message.
   set +e
-  ( cd "$dest" && claude \
+  ( cd "$dest" && "$CLAUDE" \
       --print \
       --output-format stream-json \
       --include-hook-events \
@@ -152,7 +169,13 @@ run_condition() {
   fi
 
   # Aggregate stream-json metrics.
+  # CC may emit more than one `result` event (a brief follow-up wrap-up turn is
+  # common). Cost is monotonic so take the max; turns/tokens are per-segment so
+  # sum them; permission_denials are per-segment lists so concatenate.
+  local hook_fires=0
   local hook_denials=0
+  local hook_denied_tools="[]"
+  local n_result_events=0
   local total_cost="null"
   local input_tokens="null"
   local output_tokens="null"
@@ -160,26 +183,44 @@ run_condition() {
   local cache_create="null"
   local stop_reason="null"
   local num_turns="null"
+  local duration_api_ms="null"
 
   if [[ -s "$stream" ]]; then
-    # Hook denials: any hook event with decision == "deny" or "block".
-    hook_denials="$( jq -s '
-      [ .[] | select(.type=="system" and (.subtype // "")=="hook_event")
-            | .hook_result.decision // .hook_response.decision // empty ]
-      | map(select(. == "deny" or . == "block"))
-      | length
+    # Hook fires: every hook_response = one tdd-guard invocation (allowed or not).
+    hook_fires="$( jq -s '
+      [ .[] | select(.type=="system" and (.subtype // "")=="hook_response") ] | length
     ' "$stream" 2>/dev/null || echo 0 )"
 
-    # Final result event carries usage/cost.
-    local result_obj
-    result_obj="$( jq -s 'map(select(.type=="result")) | last // {}' "$stream" 2>/dev/null || echo '{}' )"
-    total_cost="$( echo "$result_obj"   | jq '.total_cost_usd // null' )"
-    input_tokens="$( echo "$result_obj" | jq '.usage.input_tokens // null' )"
-    output_tokens="$( echo "$result_obj"| jq '.usage.output_tokens // null' )"
-    cache_read="$( echo "$result_obj"   | jq '.usage.cache_read_input_tokens // null' )"
-    cache_create="$( echo "$result_obj" | jq '.usage.cache_creation_input_tokens // null' )"
-    stop_reason="$( echo "$result_obj"  | jq '.stop_reason // .subtype // null' )"
-    num_turns="$( echo "$result_obj"    | jq '.num_turns // null' )"
+    local agg
+    agg="$( jq -s '
+      ([.[] | select(.type=="result")]) as $rs |
+      ([$rs[].permission_denials // []] | add // []) as $denials |
+      {
+        n_result_events:    ($rs | length),
+        cost_usd:           ([$rs[].total_cost_usd // 0] | max // 0),
+        num_turns:          ([$rs[].num_turns       // 0] | add // 0),
+        duration_api_ms:    ([$rs[].duration_api_ms // 0] | add // 0),
+        input_tokens:       ([$rs[].usage.input_tokens                  // 0] | add // 0),
+        output_tokens:      ([$rs[].usage.output_tokens                 // 0] | add // 0),
+        cache_read:         ([$rs[].usage.cache_read_input_tokens       // 0] | add // 0),
+        cache_create:       ([$rs[].usage.cache_creation_input_tokens   // 0] | add // 0),
+        stop_reason:        ($rs[-1].stop_reason // $rs[-1].subtype // null),
+        denials_count:      ($denials | length),
+        denied_tools:       ($denials | map(.tool_name))
+      }
+    ' "$stream" 2>/dev/null || echo '{}' )"
+
+    n_result_events="$( echo "$agg" | jq '.n_result_events // 0' )"
+    total_cost="$(      echo "$agg" | jq '.cost_usd' )"
+    num_turns="$(       echo "$agg" | jq '.num_turns' )"
+    duration_api_ms="$( echo "$agg" | jq '.duration_api_ms' )"
+    input_tokens="$(    echo "$agg" | jq '.input_tokens' )"
+    output_tokens="$(   echo "$agg" | jq '.output_tokens' )"
+    cache_read="$(      echo "$agg" | jq '.cache_read' )"
+    cache_create="$(    echo "$agg" | jq '.cache_create' )"
+    stop_reason="$(     echo "$agg" | jq '.stop_reason' )"
+    hook_denials="$(    echo "$agg" | jq '.denials_count' )"
+    hook_denied_tools="$( echo "$agg" | jq -c '.denied_tools' )"
   fi
 
   jq -n \
@@ -188,7 +229,11 @@ run_condition() {
     --arg model "$MODEL" \
     --argjson exit_code "$exit_code" \
     --argjson elapsed_s "$elapsed" \
+    --argjson duration_api_ms "$duration_api_ms" \
+    --argjson n_result_events "$n_result_events" \
+    --argjson hook_fires "${hook_fires:-0}" \
     --argjson hook_denials "${hook_denials:-0}" \
+    --argjson hook_denied_tools "$hook_denied_tools" \
     --argjson cost_usd "$total_cost" \
     --argjson input_tokens "$input_tokens" \
     --argjson output_tokens "$output_tokens" \
@@ -198,13 +243,15 @@ run_condition() {
     --argjson stop_reason "$stop_reason" \
     --arg tests_pass "$tests_pass" \
     '{condition:$cond, label:$label, model:$model, exit_code:$exit_code,
-      elapsed_s:$elapsed_s, tests_pass:$tests_pass, hook_denials:$hook_denials,
+      elapsed_s:$elapsed_s, duration_api_ms:$duration_api_ms,
+      n_result_events:$n_result_events, tests_pass:$tests_pass,
+      hook_fires:$hook_fires, hook_denials:$hook_denials, hook_denied_tools:$hook_denied_tools,
       cost_usd:$cost_usd, input_tokens:$input_tokens, output_tokens:$output_tokens,
       cache_read_input_tokens:$cache_read, cache_creation_input_tokens:$cache_create,
       num_turns:$num_turns, stop_reason:$stop_reason}' \
     > "$meta"
 
-  echo "[$cond/$label] exit=$exit_code  elapsed=${elapsed}s  tests=$tests_pass  denials=$hook_denials"
+  echo "[$cond/$label] exit=$exit_code  elapsed=${elapsed}s  tests=$tests_pass  hook_fires=$hook_fires  denials=$hook_denials"
 }
 
 # ------------------------------------------------------------------ stage all three

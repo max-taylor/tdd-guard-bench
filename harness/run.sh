@@ -2,10 +2,11 @@
 # Run a single spec across three TDD-enforcement conditions, in parallel.
 #
 # Usage:
-#   ./harness/run.sh <spec-file> [--model <id>] [--seq] [--keep]
+#   ./harness/run.sh <spec-file> [--followup <prompt-file>] [--model <id>] [--seq] [--keep]
 #
-# Example:
+# Examples:
 #   ./harness/run.sh specs/rate-limiter.md
+#   ./harness/run.sh specs/csv-parser.md --followup followups/csv-crlf.md
 #   ./harness/run.sh specs/rate-limiter.md --model claude-opus-4-7 --seq
 #
 # Conditions:
@@ -14,25 +15,33 @@
 #   C = tdd-guard       : template + .claude/settings.json with tdd-guard PreToolUse hook
 #
 # Each run executes Claude Code in fully autonomous mode (bypassPermissions),
-# captures the full event stream, runs the test suite at the end, and writes a
-# summary.json. The user-global ~/.claude config is NOT loaded (--setting-sources
-# project) so results are reproducible across machines.
+# captures the full event stream, runs the test suite, and writes a summary.json.
+# The user-global ~/.claude config is NOT loaded (--setting-sources project) so
+# results are reproducible across machines.
+#
+# When --followup is supplied, after each condition's first round completes the
+# script invokes claude a second time in the same directory with the followup
+# prompt (no session resume — the agent reads the existing files and the new
+# requirement fresh, mirroring "come back next week, add a feature"). Round 2's
+# artefacts are written with a `round2-` prefix; round 1 paths are unchanged.
 
 set -euo pipefail
 
 # ------------------------------------------------------------------ args
 SPEC_PATH=""
+FOLLOWUP_PATH=""
 MODEL="claude-opus-4-7"
 SEQUENTIAL=0
 KEEP=0
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
-    --model) MODEL="$2"; shift 2 ;;
-    --seq)   SEQUENTIAL=1; shift ;;
-    --keep)  KEEP=1; shift ;;
+    --followup) FOLLOWUP_PATH="$2"; shift 2 ;;
+    --model)    MODEL="$2"; shift 2 ;;
+    --seq)      SEQUENTIAL=1; shift ;;
+    --keep)     KEEP=1; shift ;;
     -h|--help)
-      sed -n '2,20p' "$0"
+      sed -n '2,26p' "$0"
       exit 0
       ;;
     -*)
@@ -46,11 +55,15 @@ done
 
 if [[ -z "$SPEC_PATH" ]]; then
   echo "error: spec file path required" >&2
-  echo "usage: $0 <spec-file> [--model ID] [--seq] [--keep]" >&2
+  echo "usage: $0 <spec-file> [--followup PATH] [--model ID] [--seq] [--keep]" >&2
   exit 2
 fi
 if [[ ! -f "$SPEC_PATH" ]]; then
   echo "error: spec file not found: $SPEC_PATH" >&2
+  exit 2
+fi
+if [[ -n "$FOLLOWUP_PATH" && ! -f "$FOLLOWUP_PATH" ]]; then
+  echo "error: followup file not found: $FOLLOWUP_PATH" >&2
   exit 2
 fi
 
@@ -62,6 +75,13 @@ SPEC_ABS="$( cd "$( dirname "$SPEC_PATH" )" && pwd )/$( basename "$SPEC_PATH" )"
 SPEC_NAME="$( basename "${SPEC_PATH%.*}" )"
 TIMESTAMP="$( date +%Y%m%d-%H%M%S )"
 RUN_ROOT="$ROOT/runs/$SPEC_NAME-$TIMESTAMP"
+
+FOLLOWUP_ABS=""
+FOLLOWUP_NAME=""
+if [[ -n "$FOLLOWUP_PATH" ]]; then
+  FOLLOWUP_ABS="$( cd "$( dirname "$FOLLOWUP_PATH" )" && pwd )/$( basename "$FOLLOWUP_PATH" )"
+  FOLLOWUP_NAME="$( basename "${FOLLOWUP_PATH%.*}" )"
+fi
 
 # ------------------------------------------------------------------ preflight
 # Resolve `claude` binary. The user's interactive zsh aliases `claude` to
@@ -88,15 +108,27 @@ command -v node >/dev/null 2>&1 || { echo "error: 'node' not on PATH" >&2; exit 
 [[ -f "$HARNESS_DIR/prompt.txt" ]] || { echo "error: harness/prompt.txt missing" >&2; exit 1; }
 [[ -f "$HARNESS_DIR/claude-md-tdd.md" ]] || { echo "error: harness/claude-md-tdd.md missing" >&2; exit 1; }
 [[ -f "$HARNESS_DIR/settings-tdd-guard.json" ]] || { echo "error: harness/settings-tdd-guard.json missing" >&2; exit 1; }
+if [[ -n "$FOLLOWUP_PATH" ]]; then
+  [[ -f "$HARNESS_DIR/followup-prompt.txt" ]] || { echo "error: harness/followup-prompt.txt missing (wraps the followup spec)" >&2; exit 1; }
+fi
 
 PROMPT="$( cat "$HARNESS_DIR/prompt.txt" )"
+FOLLOWUP_PROMPT=""
+if [[ -n "$FOLLOWUP_PATH" ]]; then
+  # The wrapper prompt (followup-prompt.txt) gets concatenated with the
+  # followup spec content so the agent sees instructions + new requirement.
+  FOLLOWUP_PROMPT="$( cat "$HARNESS_DIR/followup-prompt.txt" )
+
+$( cat "$FOLLOWUP_ABS" )"
+fi
 
 mkdir -p "$RUN_ROOT"
-echo "==> run root: $RUN_ROOT"
-echo "==> spec:     $SPEC_ABS"
-echo "==> model:    $MODEL"
-echo "==> claude:   $CLAUDE"
-echo "==> mode:     $([[ $SEQUENTIAL -eq 1 ]] && echo sequential || echo parallel)"
+echo "==> run root:  $RUN_ROOT"
+echo "==> spec:      $SPEC_ABS"
+[[ -n "$FOLLOWUP_PATH" ]] && echo "==> followup:  $FOLLOWUP_ABS"
+echo "==> model:     $MODEL"
+echo "==> claude:    $CLAUDE"
+echo "==> mode:      $([[ $SEQUENTIAL -eq 1 ]] && echo sequential || echo parallel)"
 
 # ------------------------------------------------------------------ stage a condition directory
 stage_condition() {
@@ -121,24 +153,32 @@ stage_condition() {
   echo "$dest"
 }
 
-# ------------------------------------------------------------------ run a single condition
-run_condition() {
+# ------------------------------------------------------------------ run one round of one condition
+# Args: cond, label, dest, round_number, prompt_text
+# Round 1 writes to .harness/{stream,stderr,meta,test-output}; round N>1 prefixes "roundN-".
+run_round() {
   local cond="$1"
   local label="$2"
   local dest="$3"
+  local round="$4"
+  local prompt="$5"
   local logdir="$dest/.harness"
   mkdir -p "$logdir"
 
-  local stream="$logdir/stream.jsonl"
-  local stderr="$logdir/stderr.log"
-  local meta="$logdir/meta.json"
-  local test_out="$logdir/test-output.txt"
+  local prefix=""
+  [[ "$round" -gt 1 ]] && prefix="round${round}-"
+
+  local stream="$logdir/${prefix}stream.jsonl"
+  local stderr="$logdir/${prefix}stderr.log"
+  local meta="$logdir/${prefix}meta.json"
+  local test_out="$logdir/${prefix}test-output.txt"
 
   local started ended elapsed exit_code
   started="$( date +%s )"
 
   # Run Claude in fully autonomous mode. stream-json gives us hook events,
-  # token usage, tool calls, and the final result message.
+  # token usage, tool calls, and the final result message. No --resume — the
+  # agent comes in fresh, sees the existing files, follows the new prompt.
   set +e
   ( cd "$dest" && "$CLAUDE" \
       --print \
@@ -149,7 +189,7 @@ run_condition() {
       --setting-sources project \
       --no-session-persistence \
       --model "$MODEL" \
-      "$PROMPT" \
+      "$prompt" \
       >"$stream" 2>"$stderr"
   )
   exit_code=$?
@@ -227,6 +267,7 @@ run_condition() {
     --arg cond "$cond" \
     --arg label "$label" \
     --arg model "$MODEL" \
+    --argjson round "$round" \
     --argjson exit_code "$exit_code" \
     --argjson elapsed_s "$elapsed" \
     --argjson duration_api_ms "$duration_api_ms" \
@@ -242,7 +283,7 @@ run_condition() {
     --argjson num_turns "$num_turns" \
     --argjson stop_reason "$stop_reason" \
     --arg tests_pass "$tests_pass" \
-    '{condition:$cond, label:$label, model:$model, exit_code:$exit_code,
+    '{condition:$cond, label:$label, round:$round, model:$model, exit_code:$exit_code,
       elapsed_s:$elapsed_s, duration_api_ms:$duration_api_ms,
       n_result_events:$n_result_events, tests_pass:$tests_pass,
       hook_fires:$hook_fires, hook_denials:$hook_denials, hook_denied_tools:$hook_denied_tools,
@@ -251,7 +292,20 @@ run_condition() {
       num_turns:$num_turns, stop_reason:$stop_reason}' \
     > "$meta"
 
-  echo "[$cond/$label] exit=$exit_code  elapsed=${elapsed}s  tests=$tests_pass  hook_fires=$hook_fires  denials=$hook_denials"
+  echo "[$cond/$label r$round] exit=$exit_code  elapsed=${elapsed}s  tests=$tests_pass  hook_fires=$hook_fires  denials=$hook_denials"
+}
+
+# ------------------------------------------------------------------ run a condition end-to-end (round 1, then optional round 2)
+run_condition() {
+  local cond="$1"
+  local label="$2"
+  local dest="$3"
+
+  run_round "$cond" "$label" "$dest" 1 "$PROMPT"
+
+  if [[ -n "$FOLLOWUP_PROMPT" ]]; then
+    run_round "$cond" "$label" "$dest" 2 "$FOLLOWUP_PROMPT"
+  fi
 }
 
 # ------------------------------------------------------------------ stage all three
@@ -275,11 +329,25 @@ fi
 
 # ------------------------------------------------------------------ summary
 SUMMARY="$RUN_ROOT/summary.json"
-jq -s '{spec: $spec, timestamp: $ts, model: $model, runs: .}' \
+
+# Collect all per-round meta files (round 1 = meta.json, round N>1 = roundN-meta.json).
+# Sort by condition then round so the runs array reads top-to-bottom in execution order.
+shopt -s nullglob
+META_FILES=( "$RUN_ROOT"/*/.harness/meta.json "$RUN_ROOT"/*/.harness/round*-meta.json )
+shopt -u nullglob
+
+jq -s 'sort_by([.condition, .round]) | {
+        spec: $spec,
+        timestamp: $ts,
+        model: $model,
+        followup: $followup,
+        runs: .
+      }' \
    --arg spec "$SPEC_NAME" \
    --arg ts "$TIMESTAMP" \
    --arg model "$MODEL" \
-   "$RUN_ROOT"/*/.harness/meta.json > "$SUMMARY"
+   --arg followup "$FOLLOWUP_NAME" \
+   "${META_FILES[@]}" > "$SUMMARY"
 
 echo
 echo "==> summary: $SUMMARY"

@@ -1,0 +1,5 @@
+This project already has a working implementation in src/ and a passing test suite in tests/.
+
+Extend the project to satisfy the additional requirement below. All existing behaviour must continue to work — do not regress any current functionality. Run the test suite to verify your implementation passes before finishing.
+
+The new requirement:

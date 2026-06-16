@@ -204,6 +204,38 @@ All round-2 invocations passed all tests after the followup. None of the followu
 
 ---
 
+## Rubric scores (hidden-input evaluation)
+
+After all 54 runs completed, we built a canonical test suite per spec (`rubric/*.round2.test.ts`) and scored every impl against it. Each impl ran the rubric tests 3× with majority verdict per test. The rubric exercises both round-1 and round-2 behaviour; round-2 src is what's scored (round-1 src was overwritten by round 2 — no per-round snapshot was kept). Full per-test tables live in `rubric-<spec>.md`.
+
+### Headline (mean pass / total, n=3)
+
+| Spec | A | B | C |
+|------|---|---|---|
+| csv-parser | 19.00 / 19 (1.000) | 19.00 / 19 (1.000) | 19.00 / 19 (1.000) |
+| retry | 15.00 / 15 (1.000) | 15.00 / 15 (1.000) | 14.67 / 15 (0.978) |
+| rate-limiter | 24.67 / 26 (0.949) | 24.67 / 26 (0.949) | 24.67 / 26 (0.949) |
+
+### What the per-test divergence shows
+
+- **csv-parser**: every impl, every condition, every test — clean 100%. Total behavioural convergence across A/B/C. The cost premium bought nothing observable on the rubric.
+- **retry**: A and B 100%. C lost 1/9 on `5.5 NaN retryAfterMs falls back to backoff` — one TDD-guard run guarded against `undefined` but not `NaN`. The other 14 tests passed everywhere.
+- **rate-limiter**: every condition misses the same 2 tests:
+  - `2.1 zero allowance (mode=fixed)` — **0/9 impls** handle `max=0` correctly in fixed mode. Universal miss across all conditions.
+  - `3.3 modes produce different deny patterns` — 7/9 pass; 1 B run and 1 C run produced identical outputs for `fixed` and `sliding` under sustained load (mode parameter accepted but not meaningfully implemented).
+  - `2.1 zero allowance (mode=sliding)` — 8/9 pass; A misses it in one run.
+  - Boundary timing (test 6.1, informational): all 9 impls were internally consistent across 4 repeated probes — no flapping.
+
+### Reading
+
+The rubric **strongly validates the convergence claim**. After paying 2-4× the cost, conditions B and C produce implementations that score identically to A on a hidden test set covering the exact behaviour the spec asked for plus the followup. The single C miss (retry NaN) is within noise.
+
+What the rubric does *not* test, by design: concurrent calls, non-monotonic clock, memory bounds, integer overflow — these were excluded as not deterministically testable in JS. If the value of TDD lives in those dimensions, this rubric won't see it.
+
+The strongest signal is on rate-limiter `2.1 fixed zero allowance` — **none of the 9 impls handle it**. The spec is technically explicit (`max: 0` means deny everything), but every condition wrote a counter-and-window scheme that doesn't special-case zero. TDD discipline did not protect against this; nor did its absence reveal it.
+
+---
+
 ## Honest defensible claims
 
 These are claims the data supports at n=3:
@@ -228,6 +260,7 @@ These are claims the data supports at n=3:
 
 - **Spec rule honoured:** functional requirements only, no edge-case hints, no TDD framing in specs.
 - **Pre-registered before running:** the rate-limiter edge-case rubric (committed to repo with timestamp). The CSV/retry rubrics were not pre-registered and were assessed informally — claims based on those should be discounted accordingly.
+- **Post-hoc canonical rubrics (`rubric/*.round2.test.ts`)** were written after all runs completed. They derive directly from spec + followup text and don't introduce new requirements, but the convergence finding rests on tests authored knowing the impl shapes — discount accordingly.
 - **Same prompt across conditions:** wrapper prompt at `harness/prompt.txt` is identical for all three.
 - **Spec hash verified identical** at run-time for all three condition directories.
 - **Parallel execution within spec, sequential across specs.** The three conditions for a given spec share the 5-hour rate-limit budget; observed `rate_limit_event` is informational ("allowed") in all 54 runs, no active throttling.
@@ -242,4 +275,4 @@ These are claims the data supports at n=3:
 3. **Test multi-round iteration** (3+ rounds). The strongest TDD claim is "tests accumulate as the system grows." We've measured one extension; the curve over 5 rounds would be more diagnostic.
 4. **Larger specs** with enough surface area for design-quality dimensions to discriminate.
 5. **Different model families.** Sonnet 4.6 / Haiku 4.5 may differ in how they respond to TDD discipline — smaller models may follow the rules more literally.
-6. **Hidden-input evaluation** of final implementations against an independent test set, not just the agent's self-written tests.
+6. **Concurrency / non-monotonic clock / overflow probes** — the rubric explicitly skips these because they're not deterministic-test-able. Code-read evaluation against these dimensions could surface differentiation the behavioural rubric can't.

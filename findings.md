@@ -219,7 +219,7 @@ After all 54 runs completed, we built a canonical test suite per spec (`rubric/*
 ### What the per-test divergence shows
 
 - **csv-parser**: every impl, every condition, every test — clean 100%. Total behavioural convergence across A/B/C. The cost premium bought nothing observable on the rubric.
-- **retry**: A and B 100%. C lost 1/9 on `5.5 NaN retryAfterMs falls back to backoff` — one TDD-guard run guarded against `undefined` but not `NaN`. The other 14 tests passed everywhere.
+- **retry**: A and B 100%. C lost 1/9 on `5.3 falls back to backoff when retryAfterMs missing` — one TDD-guard run failed to apply exponential growth when the error carried no `retryAfterMs` (the second backoff gap wasn't sufficiently larger than the first). The other 14 tests passed everywhere.
 - **rate-limiter**: every condition misses the same 2 tests:
   - `2.1 zero allowance (mode=fixed)` — **0/9 impls** handle `max=0` correctly in fixed mode. Universal miss across all conditions.
   - `3.3 modes produce different deny patterns` — 7/9 pass; 1 B run and 1 C run produced identical outputs for `fixed` and `sliding` under sustained load (mode parameter accepted but not meaningfully implemented).

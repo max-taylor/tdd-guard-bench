@@ -50,3 +50,17 @@
 {"type":"change","file_path":"findings.md","session_id":"2e74b6ac-0bc0-4ef3-ae98-4b44b0384a87","timestamp":"2026-06-16T00:30:34.081Z","tool_name":"Edit"}
 {"type":"session","id":"2e74b6ac-0bc0-4ef3-ae98-4b44b0384a87","started_at":"2026-06-16T00:30:44.950Z","transcript_path":"/Users/maxtaylor/.claude/projects/-Users-maxtaylor-Documents-Code-tdd-guard-testing/2e74b6ac-0bc0-4ef3-ae98-4b44b0384a87.jsonl"}
 {"type":"change","file_path":"findings.md","session_id":"2e74b6ac-0bc0-4ef3-ae98-4b44b0384a87","timestamp":"2026-06-16T00:30:44.953Z","tool_name":"Edit"}
+{"type":"session","id":"2e74b6ac-0bc0-4ef3-ae98-4b44b0384a87","started_at":"2026-06-16T00:36:23.935Z","transcript_path":"/Users/maxtaylor/.claude/projects/-Users-maxtaylor-Documents-Code-tdd-guard-testing/2e74b6ac-0bc0-4ef3-ae98-4b44b0384a87.jsonl"}
+{"type":"change","file_path":"package.json","session_id":"2e74b6ac-0bc0-4ef3-ae98-4b44b0384a87","timestamp":"2026-06-16T00:36:23.937Z","tool_name":"Write"}
+{"type":"session","id":"2e74b6ac-0bc0-4ef3-ae98-4b44b0384a87","started_at":"2026-06-16T00:37:02.161Z","transcript_path":"/Users/maxtaylor/.claude/projects/-Users-maxtaylor-Documents-Code-tdd-guard-testing/2e74b6ac-0bc0-4ef3-ae98-4b44b0384a87.jsonl"}
+{"type":"change","file_path":"rubric/judge-rubric.md","session_id":"2e74b6ac-0bc0-4ef3-ae98-4b44b0384a87","timestamp":"2026-06-16T00:37:02.163Z","tool_name":"Write"}
+{"type":"session","id":"2e74b6ac-0bc0-4ef3-ae98-4b44b0384a87","started_at":"2026-06-16T00:37:50.797Z","transcript_path":"/Users/maxtaylor/.claude/projects/-Users-maxtaylor-Documents-Code-tdd-guard-testing/2e74b6ac-0bc0-4ef3-ae98-4b44b0384a87.jsonl"}
+{"type":"change","file_path":"harness/judge.ts","session_id":"2e74b6ac-0bc0-4ef3-ae98-4b44b0384a87","timestamp":"2026-06-16T00:37:50.798Z","tool_name":"Write"}
+{"type":"session","id":"2e74b6ac-0bc0-4ef3-ae98-4b44b0384a87","started_at":"2026-06-16T00:38:03.315Z","transcript_path":"/Users/maxtaylor/.claude/projects/-Users-maxtaylor-Documents-Code-tdd-guard-testing/2e74b6ac-0bc0-4ef3-ae98-4b44b0384a87.jsonl"}
+{"type":"change","file_path":"harness/judge.ts","session_id":"2e74b6ac-0bc0-4ef3-ae98-4b44b0384a87","timestamp":"2026-06-16T00:38:03.315Z","tool_name":"Edit"}
+{"type":"session","id":"d9c43325-fe8a-4eaa-b30c-2e960ae15f7a","started_at":"2026-06-20T04:50:05.711Z","transcript_path":"/Users/maxtaylor/.claude/projects/-Users-maxtaylor-Documents-Code-tdd-guard-testing/d9c43325-fe8a-4eaa-b30c-2e960ae15f7a.jsonl"}
+{"type":"change","file_path":"findings.md","session_id":"d9c43325-fe8a-4eaa-b30c-2e960ae15f7a","timestamp":"2026-06-20T04:50:05.713Z","tool_name":"Edit"}
+{"type":"session","id":"d9c43325-fe8a-4eaa-b30c-2e960ae15f7a","started_at":"2026-06-20T04:52:43.886Z","transcript_path":"/Users/maxtaylor/.claude/projects/-Users-maxtaylor-Documents-Code-tdd-guard-testing/d9c43325-fe8a-4eaa-b30c-2e960ae15f7a.jsonl"}
+{"type":"change","file_path":"harness/judge.ts","session_id":"d9c43325-fe8a-4eaa-b30c-2e960ae15f7a","timestamp":"2026-06-20T04:52:43.888Z","tool_name":"Edit"}
+{"type":"session","id":"d9c43325-fe8a-4eaa-b30c-2e960ae15f7a","started_at":"2026-06-20T04:52:50.766Z","transcript_path":"/Users/maxtaylor/.claude/projects/-Users-maxtaylor-Documents-Code-tdd-guard-testing/d9c43325-fe8a-4eaa-b30c-2e960ae15f7a.jsonl"}
+{"type":"change","file_path":"harness/judge.ts","session_id":"d9c43325-fe8a-4eaa-b30c-2e960ae15f7a","timestamp":"2026-06-20T04:52:50.766Z","tool_name":"Edit"}

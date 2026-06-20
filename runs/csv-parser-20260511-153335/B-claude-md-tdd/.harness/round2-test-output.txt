@@ -1,0 +1,18 @@
+
+ RUN  v3.2.4 /Users/maxtaylor/Documents/Code/tdd-guard/testing/runs/csv-parser-20260511-153335/B-claude-md-tdd
+
+ ✓ tests/parse.test.ts > parse > parses a single row of comma-separated fields 1ms
+ ✓ tests/parse.test.ts > parse > parses multiple rows separated by newlines 0ms
+ ✓ tests/parse.test.ts > parse > keeps commas inside a quoted field as part of the field 0ms
+ ✓ tests/parse.test.ts > parse > treats two consecutive double quotes inside a quoted field as a literal double quote 0ms
+ ✓ tests/parse.test.ts > parse > allows a quoted field to span multiple lines 0ms
+ ✓ tests/parse.test.ts > parse > treats CRLF as a row separator 0ms
+ ✓ tests/parse.test.ts > parse > preserves CRLF inside a quoted field 0ms
+ ✓ tests/parse.test.ts > parse > preserves a bare CR (not followed by LF) as field content 0ms
+ ✓ tests/parse.test.ts > parse > handles mixed CRLF and LF row separators 0ms
+
+ Test Files  1 passed (1)
+      Tests  9 passed (9)
+   Start at  15:37:39
+   Duration  289ms (transform 25ms, setup 0ms, collect 24ms, tests 3ms, environment 0ms, prepare 43ms)
+

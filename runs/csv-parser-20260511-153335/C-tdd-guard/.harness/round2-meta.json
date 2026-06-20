@@ -1,0 +1,23 @@
+{
+  "condition": "C",
+  "label": "tdd-guard",
+  "round": 2,
+  "model": "claude-opus-4-7",
+  "exit_code": 0,
+  "elapsed_s": 123,
+  "duration_api_ms": 85045,
+  "n_result_events": 1,
+  "tests_pass": "true",
+  "hook_fires": 8,
+  "hook_denials": 1,
+  "hook_denied_tools": [
+    "Edit"
+  ],
+  "cost_usd": 0.6978572499999999,
+  "input_tokens": 31,
+  "output_tokens": 5380,
+  "cache_read_input_tokens": 685174,
+  "cache_creation_input_tokens": 35177,
+  "num_turns": 21,
+  "stop_reason": "end_turn"
+}

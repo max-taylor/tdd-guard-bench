@@ -1,0 +1,180 @@
+{
+  "label": "runs/rate-limiter-20260511-143320/A-no-instruction",
+  "interface_compat": true,
+  "tests": [
+    {
+      "name": "informational 6.1 boundary behaviour (recorded, not scored)",
+      "passes": 3,
+      "runs": 3,
+      "verdict": "pass"
+    },
+    {
+      "name": "mode-specific 3.1 sliding — aged requests free up capacity",
+      "passes": 3,
+      "runs": 3,
+      "verdict": "pass"
+    },
+    {
+      "name": "mode-specific 3.2 fixed — full capacity restored at boundary",
+      "passes": 3,
+      "runs": 3,
+      "verdict": "pass"
+    },
+    {
+      "name": "mode-specific 3.3 modes produce different deny patterns under sustained load",
+      "passes": 2,
+      "runs": 3,
+      "verdict": "pass"
+    },
+    {
+      "name": "mode-specific 4.1 progressive restoration (sliding)",
+      "passes": 3,
+      "runs": 3,
+      "verdict": "pass"
+    },
+    {
+      "name": "mode=fixed 1.1 first call returns true",
+      "passes": 3,
+      "runs": 3,
+      "verdict": "pass"
+    },
+    {
+      "name": "mode=fixed 1.2 allow up to max",
+      "passes": 3,
+      "runs": 3,
+      "verdict": "pass"
+    },
+    {
+      "name": "mode=fixed 1.3 deny beyond max",
+      "passes": 3,
+      "runs": 3,
+      "verdict": "pass"
+    },
+    {
+      "name": "mode=fixed 1.4 independent keys",
+      "passes": 3,
+      "runs": 3,
+      "verdict": "pass"
+    },
+    {
+      "name": "mode=fixed 2.1 zero allowance",
+      "passes": 0,
+      "runs": 3,
+      "verdict": "fail"
+    },
+    {
+      "name": "mode=fixed 2.2 max=1",
+      "passes": 3,
+      "runs": 3,
+      "verdict": "pass"
+    },
+    {
+      "name": "mode=fixed 5.1 empty string key",
+      "passes": 3,
+      "runs": 3,
+      "verdict": "pass"
+    },
+    {
+      "name": "mode=fixed 5.2 long key",
+      "passes": 3,
+      "runs": 3,
+      "verdict": "pass"
+    },
+    {
+      "name": "mode=fixed 5.3 many keys",
+      "passes": 3,
+      "runs": 3,
+      "verdict": "pass"
+    },
+    {
+      "name": "mode=fixed 7.1 reset(key) clears state for that key",
+      "passes": 3,
+      "runs": 3,
+      "verdict": "pass"
+    },
+    {
+      "name": "mode=fixed 7.2 reset(key) doesn't affect other keys",
+      "passes": 3,
+      "runs": 3,
+      "verdict": "pass"
+    },
+    {
+      "name": "mode=sliding 1.1 first call returns true",
+      "passes": 3,
+      "runs": 3,
+      "verdict": "pass"
+    },
+    {
+      "name": "mode=sliding 1.2 allow up to max",
+      "passes": 3,
+      "runs": 3,
+      "verdict": "pass"
+    },
+    {
+      "name": "mode=sliding 1.3 deny beyond max",
+      "passes": 3,
+      "runs": 3,
+      "verdict": "pass"
+    },
+    {
+      "name": "mode=sliding 1.4 independent keys",
+      "passes": 3,
+      "runs": 3,
+      "verdict": "pass"
+    },
+    {
+      "name": "mode=sliding 2.1 zero allowance",
+      "passes": 3,
+      "runs": 3,
+      "verdict": "pass"
+    },
+    {
+      "name": "mode=sliding 2.2 max=1",
+      "passes": 3,
+      "runs": 3,
+      "verdict": "pass"
+    },
+    {
+      "name": "mode=sliding 5.1 empty string key",
+      "passes": 3,
+      "runs": 3,
+      "verdict": "pass"
+    },
+    {
+      "name": "mode=sliding 5.2 long key",
+      "passes": 3,
+      "runs": 3,
+      "verdict": "pass"
+    },
+    {
+      "name": "mode=sliding 5.3 many keys",
+      "passes": 3,
+      "runs": 3,
+      "verdict": "pass"
+    },
+    {
+      "name": "mode=sliding 7.1 reset(key) clears state for that key",
+      "passes": 3,
+      "runs": 3,
+      "verdict": "pass"
+    },
+    {
+      "name": "mode=sliding 7.2 reset(key) doesn't affect other keys",
+      "passes": 3,
+      "runs": 3,
+      "verdict": "pass"
+    }
+  ],
+  "passed": 26,
+  "total": 26,
+  "pass_count": 25,
+  "info": {
+    "boundary": [
+      true,
+      true,
+      true,
+      true
+    ],
+    "consistent": true
+  }
+}

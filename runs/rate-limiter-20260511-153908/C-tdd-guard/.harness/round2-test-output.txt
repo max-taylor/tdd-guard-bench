@@ -1,0 +1,21 @@
+
+ RUN  v3.2.4 /Users/maxtaylor/Documents/Code/tdd-guard/testing/runs/rate-limiter-20260511-153908/C-tdd-guard
+
+ ✓ tests/rate-limiter.test.ts > RateLimiter > allows the first request 2ms
+ ✓ tests/rate-limiter.test.ts > RateLimiter > blocks the request after max in fixed mode 1ms
+ ✓ tests/rate-limiter.test.ts > RateLimiter > honors a configurable max value 0ms
+ ✓ tests/rate-limiter.test.ts > RateLimiter > tracks each key independently 0ms
+ ✓ tests/rate-limiter.test.ts > RateLimiter > resets the count when the fixed window ends 0ms
+ ✓ tests/rate-limiter.test.ts > RateLimiter > blocks subsequent calls in sliding mode within the trailing window 0ms
+ ✓ tests/rate-limiter.test.ts > RateLimiter > blocks in sliding mode across a fixed-window boundary when calls have not aged out 0ms
+ ✓ tests/rate-limiter.test.ts > RateLimiter > allows again in sliding mode once the oldest call ages out 0ms
+ ✓ tests/rate-limiter.test.ts > RateLimiter > reset > restores full capacity for a key in fixed mode 0ms
+ ✓ tests/rate-limiter.test.ts > RateLimiter > reset > restores full capacity for a key in sliding mode 0ms
+ ✓ tests/rate-limiter.test.ts > RateLimiter > reset > only affects the named key 0ms
+ ✓ tests/rate-limiter.test.ts > RateLimiter > reset > is a no-op for an unknown key 1ms
+
+ Test Files  1 passed (1)
+      Tests  12 passed (12)
+   Start at  15:47:54
+   Duration  277ms (transform 27ms, setup 0ms, collect 26ms, tests 7ms, environment 0ms, prepare 51ms)
+

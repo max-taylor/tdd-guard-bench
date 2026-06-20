@@ -1,0 +1,16 @@
+
+ RUN  v3.2.4 /Users/maxtaylor/Documents/Code/tdd-guard/testing/runs/retry-20260511-152535/C-tdd-guard
+
+ ✓ tests/retry.test.ts > retry > resolves with the value returned by fn on first attempt 1ms
+ ✓ tests/retry.test.ts > retry > retries until fn succeeds 2ms
+ ✓ tests/retry.test.ts > retry > does not retry when shouldRetry returns false 0ms
+ ✓ tests/retry.test.ts > retry > propagates the final error after maxAttempts is exhausted 3ms
+ ✓ tests/retry.test.ts > retry > backoff > waits between retries with exponentially growing delays 2ms
+ ✓ tests/retry.test.ts > retry > backoff > applies jitter so two runs produce different delays 1ms
+ ✓ tests/retry.test.ts > retry > server-supplied retry delay > uses error.retryAfterMs verbatim instead of exponential backoff 0ms
+
+ Test Files  1 passed (1)
+      Tests  7 passed (7)
+   Start at  15:31:52
+   Duration  282ms (transform 27ms, setup 0ms, collect 27ms, tests 10ms, environment 0ms, prepare 45ms)
+

@@ -1,0 +1,18 @@
+
+ RUN  v3.2.4 /Users/maxtaylor/Documents/Code/tdd-guard/testing/runs/rate-limiter-20260511-153908/A-no-instruction
+
+ ✓ tests/RateLimiter.test.ts > RateLimiter — fixed mode > allows up to max within a window and blocks the next call 1ms
+ ✓ tests/RateLimiter.test.ts > RateLimiter — fixed mode > resets capacity at the next window boundary 0ms
+ ✓ tests/RateLimiter.test.ts > RateLimiter — fixed mode > tracks multiple keys independently 0ms
+ ✓ tests/RateLimiter.test.ts > RateLimiter — fixed mode > does NOT reset purely on elapsed-time since first call (window-aligned semantics) 0ms
+ ✓ tests/RateLimiter.test.ts > RateLimiter — sliding mode > allows up to max in trailing window and blocks excess 0ms
+ ✓ tests/RateLimiter.test.ts > RateLimiter — sliding mode > allows once the oldest call ages out 0ms
+ ✓ tests/RateLimiter.test.ts > RateLimiter — sliding mode > tracks multiple keys independently 0ms
+ ✓ tests/RateLimiter.test.ts > RateLimiter — sliding mode > only ages out calls that are strictly older than windowMs 0ms
+ ✓ tests/RateLimiter.test.ts > RateLimiter — construction > defaults to Date.now when no clock is provided 0ms
+
+ Test Files  1 passed (1)
+      Tests  9 passed (9)
+   Start at  15:40:32
+   Duration  299ms (transform 29ms, setup 0ms, collect 27ms, tests 4ms, environment 0ms, prepare 54ms)
+

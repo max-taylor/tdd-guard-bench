@@ -32,10 +32,12 @@ const CONDITION_DIRS: Record<Condition, string> = {
 
 const MODEL = 'gpt-5'
 const RUNS = 3
+const JUDGE_ATTEMPTS = 3
 
 const args = process.argv.slice(2)
-const ONLY_TASK = args.find((a) => !a.startsWith('--')) as Task | undefined
+const onlyTaskArg = args.find((a) => !a.startsWith('--'))
 const DRY = args.includes('--dry')
+const FINDINGS_DIR = path.join(ROOT, 'findings')
 
 // ---- output schema
 const Verdict = z.enum(['A', 'B', 'tie'])
@@ -54,12 +56,25 @@ const DIMENSIONS = ['test_quality', 'design_quality', 'spec_adherence', 'restrai
 type Dimension = (typeof DIMENSIONS)[number]
 
 // ---- helpers
+function isTask(value: string): value is Task {
+  return (TASKS as readonly string[]).includes(value)
+}
+
+function parseOnlyTask(value: string | undefined): Task | undefined {
+  if (!value) return undefined
+  if (isTask(value)) return value
+  console.error(`Unknown task "${value}". Expected one of: ${TASKS.join(', ')}`)
+  process.exit(2)
+}
+
+const ONLY_TASK = parseOnlyTask(onlyTaskArg)
+
 function readBundle(dir: string): string {
   const parts: string[] = []
   for (const sub of ['src', 'tests']) {
     const subdir = path.join(dir, sub)
     if (!fs.existsSync(subdir)) continue
-    const files = fs.readdirSync(subdir).filter((f) => f.endsWith('.ts')).sort()
+    const files = fs.readdirSync(subdir).filter((f) => f.endsWith('.ts') && !f.startsWith('_')).sort()
     for (const f of files) {
       const content = fs.readFileSync(path.join(subdir, f), 'utf8')
       parts.push(`=== ${sub}/${f} ===\n${content}`)
@@ -151,18 +166,23 @@ function generatePairs(task: Task): Array<{
   return pairs
 }
 
-async function callJudge(prompt: string): Promise<JudgeOutput | null> {
-  try {
-    const { object } = await generateObject({
-      model: openai(MODEL),
-      schema: JudgeOutput,
-      prompt,
-    })
-    return object
-  } catch (e: any) {
-    console.error('  judge error:', e?.message ?? e)
-    return null
+async function callJudge(prompt: string): Promise<JudgeOutput> {
+  let lastError: unknown
+  for (let attempt = 1; attempt <= JUDGE_ATTEMPTS; attempt++) {
+    try {
+      const { object } = await generateObject({
+        model: openai(MODEL),
+        schema: JudgeOutput,
+        prompt,
+      })
+      return object
+    } catch (e: unknown) {
+      lastError = e
+      const message = e instanceof Error ? e.message : String(e)
+      console.error(`  judge error (${attempt}/${JUDGE_ATTEMPTS}):`, message)
+    }
   }
+  throw lastError instanceof Error ? lastError : new Error(String(lastError))
 }
 
 // ---- judging one pair (3 calls, majority verdict per dimension)
@@ -172,11 +192,11 @@ async function judgePair(pair: ReturnType<typeof generatePairs>[number]): Promis
   condY: Condition
   // Resolved back to {condX, condY, tie} terms after position-flip decoding.
   results: Record<Dimension, { verdict: 'X' | 'Y' | 'tie'; reasons: string[] }>
-  raw: Array<{ slotAisX: boolean; out: JudgeOutput | null }>
+  raw: Array<{ slotAisX: boolean; out: JudgeOutput }>
 }> {
   const bundleX = readBundle(pair.pathX)
   const bundleY = readBundle(pair.pathY)
-  const raw: Array<{ slotAisX: boolean; out: JudgeOutput | null }> = []
+  const raw: Array<{ slotAisX: boolean; out: JudgeOutput }> = []
   for (let run = 0; run < RUNS; run++) {
     // Random slot assignment per call to control position bias.
     const slotAisX = Math.random() < 0.5
@@ -190,13 +210,12 @@ async function judgePair(pair: ReturnType<typeof generatePairs>[number]): Promis
   const results = Object.fromEntries(
     DIMENSIONS.map((d) => {
       const decoded = raw
-        .filter((r) => r.out)
         .map((r) => {
-          const v = r.out![d as Dimension] as 'A' | 'B' | 'tie'
-          if (v === 'tie') return { verdict: 'tie' as const, reason: r.out![`${d}_reason` as keyof JudgeOutput] as string }
+          const v = r.out[d as Dimension] as 'A' | 'B' | 'tie'
+          if (v === 'tie') return { verdict: 'tie' as const, reason: r.out[`${d}_reason` as keyof JudgeOutput] as string }
           // Decode slot back to X/Y.
           const isX = (v === 'A' && r.slotAisX) || (v === 'B' && !r.slotAisX)
-          return { verdict: isX ? ('X' as const) : ('Y' as const), reason: r.out![`${d}_reason` as keyof JudgeOutput] as string }
+          return { verdict: isX ? ('X' as const) : ('Y' as const), reason: r.out[`${d}_reason` as keyof JudgeOutput] as string }
         })
       const counts: Record<'X' | 'Y' | 'tie', number> = { X: 0, Y: 0, tie: 0 }
       decoded.forEach((d) => counts[d.verdict]++)
@@ -210,6 +229,18 @@ async function judgePair(pair: ReturnType<typeof generatePairs>[number]): Promis
 
 // ---- aggregation
 type PairResult = Awaited<ReturnType<typeof judgePair>>
+
+function rawPathForTask(task: Task): string {
+  return path.join(FINDINGS_DIR, `judge-${task}.raw.json`)
+}
+
+function loadCheckpoint(task: Task): PairResult[] {
+  const rawPath = rawPathForTask(task)
+  if (!fs.existsSync(rawPath)) return []
+  const parsed = JSON.parse(fs.readFileSync(rawPath, 'utf8')) as PairResult[]
+  console.log(`  resumed ${parsed.length} checkpointed pairs`)
+  return parsed
+}
 
 function aggregateForTask(task: Task, pairResults: PairResult[]): string {
   const condPairs: Array<[Condition, Condition]> = [
@@ -266,19 +297,22 @@ async function main() {
     console.log(`\n=== ${task}: ${pairs.length} pairs × ${RUNS} runs = ${pairs.length * RUNS} judge calls`)
     if (DRY) continue
 
-    const results: PairResult[] = []
+    const results: PairResult[] = loadCheckpoint(task)
+    const completedPairIds = new Set(results.map((r) => r.pairId))
     for (let i = 0; i < pairs.length; i++) {
       const p = pairs[i]
+      if (completedPairIds.has(p.pairId)) continue
       console.log(`  [${i + 1}/${pairs.length}] ${p.condX} vs ${p.condY}`)
       const r = await judgePair(p)
       results.push(r)
+      completedPairIds.add(r.pairId)
       // Checkpoint per pair so a crash doesn't lose everything.
-      fs.mkdirSync(path.join(ROOT, 'findings'), { recursive: true })
-      fs.writeFileSync(path.join(ROOT, 'findings', `judge-${task}.raw.json`), JSON.stringify(results, null, 2))
+      fs.mkdirSync(FINDINGS_DIR, { recursive: true })
+      fs.writeFileSync(rawPathForTask(task), JSON.stringify(results, null, 2))
     }
 
     const md = aggregateForTask(task, results)
-    fs.writeFileSync(path.join(ROOT, 'findings', `judge-${task}.md`), md)
+    fs.writeFileSync(path.join(FINDINGS_DIR, `judge-${task}.md`), md)
     console.log(`  wrote findings/judge-${task}.md`)
   }
 }

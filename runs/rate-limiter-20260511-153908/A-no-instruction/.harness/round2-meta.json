@@ -1,0 +1,21 @@
+{
+  "condition": "A",
+  "label": "no-instruction",
+  "round": 2,
+  "model": "claude-opus-4-7",
+  "exit_code": 0,
+  "elapsed_s": 123,
+  "duration_api_ms": 118263,
+  "n_result_events": 1,
+  "tests_pass": "true",
+  "hook_fires": 0,
+  "hook_denials": 0,
+  "hook_denied_tools": [],
+  "cost_usd": 0.29043225,
+  "input_tokens": 14,
+  "output_tokens": 2412,
+  "cache_read_input_tokens": 257643,
+  "cache_creation_input_tokens": 16071,
+  "num_turns": 9,
+  "stop_reason": "end_turn"
+}

@@ -1,0 +1,25 @@
+
+ RUN  v3.2.4 /Users/maxtaylor/Documents/Code/tdd-guard/testing/runs/rate-limiter-20260511-151731/A-no-instruction
+
+ ✓ tests/RateLimiter.test.ts > RateLimiter — construction > rejects non-positive max 1ms
+ ✓ tests/RateLimiter.test.ts > RateLimiter — construction > rejects non-positive windowMs 0ms
+ ✓ tests/RateLimiter.test.ts > RateLimiter — construction > rejects invalid mode 0ms
+ ✓ tests/RateLimiter.test.ts > RateLimiter — fixed mode > allows up to max calls within a window then denies 0ms
+ ✓ tests/RateLimiter.test.ts > RateLimiter — fixed mode > resets capacity after the window ends 0ms
+ ✓ tests/RateLimiter.test.ts > RateLimiter — fixed mode > does not reset early mid-window even if many calls come in 0ms
+ ✓ tests/RateLimiter.test.ts > RateLimiter — fixed mode > tracks keys independently 0ms
+ ✓ tests/RateLimiter.test.ts > RateLimiter — sliding mode > allows up to max calls within trailing window then denies 0ms
+ ✓ tests/RateLimiter.test.ts > RateLimiter — sliding mode > lets calls through as older ones age out 0ms
+ ✓ tests/RateLimiter.test.ts > RateLimiter — sliding mode > tracks sliding keys independently 0ms
+ ✓ tests/RateLimiter.test.ts > RateLimiter — sliding mode > fully restores capacity once all timestamps age out 0ms
+ ✓ tests/RateLimiter.test.ts > RateLimiter — reset > restores full capacity for a key in fixed mode 0ms
+ ✓ tests/RateLimiter.test.ts > RateLimiter — reset > restores full capacity for a key in sliding mode 0ms
+ ✓ tests/RateLimiter.test.ts > RateLimiter — reset > only affects the named key 0ms
+ ✓ tests/RateLimiter.test.ts > RateLimiter — reset > is a no-op on an unknown key 0ms
+ ✓ tests/RateLimiter.test.ts > RateLimiter — default clock > uses Date.now when no clock provided 0ms
+
+ Test Files  1 passed (1)
+      Tests  16 passed (16)
+   Start at  15:19:27
+   Duration  290ms (transform 31ms, setup 0ms, collect 30ms, tests 5ms, environment 0ms, prepare 46ms)
+

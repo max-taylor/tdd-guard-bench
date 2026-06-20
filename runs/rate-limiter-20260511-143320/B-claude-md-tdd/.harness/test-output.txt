@@ -1,0 +1,16 @@
+
+ RUN  v3.2.4 /Users/maxtaylor/Documents/Code/tdd-guard/testing/runs/rate-limiter-20260511-143320/B-claude-md-tdd
+
+ ✓ tests/rate-limiter.test.ts > RateLimiter > fixed mode > allows a request when under the max 1ms
+ ✓ tests/rate-limiter.test.ts > RateLimiter > fixed mode > denies the request after max requests in the same window 0ms
+ ✓ tests/rate-limiter.test.ts > RateLimiter > fixed mode > tracks separate keys independently 0ms
+ ✓ tests/rate-limiter.test.ts > RateLimiter > fixed mode > resets capacity at the next window boundary 0ms
+ ✓ tests/rate-limiter.test.ts > RateLimiter > sliding mode > denies a call when prior requests still fall in the trailing window 0ms
+ ✓ tests/rate-limiter.test.ts > RateLimiter > sliding mode > allows a call once the oldest request ages out 0ms
+ ✓ tests/rate-limiter.test.ts > RateLimiter > sliding mode > tracks separate keys independently in sliding mode 0ms
+
+ Test Files  1 passed (1)
+      Tests  7 passed (7)
+   Start at  14:36:54
+   Duration  268ms (transform 26ms, setup 0ms, collect 25ms, tests 3ms, environment 0ms, prepare 52ms)
+

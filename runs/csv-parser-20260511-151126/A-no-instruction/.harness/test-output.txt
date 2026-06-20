@@ -1,0 +1,26 @@
+
+ RUN  v3.2.4 /Users/maxtaylor/Documents/Code/tdd-guard/testing/runs/csv-parser-20260511-151126/A-no-instruction
+
+ ✓ tests/parse.test.ts > parse > parses a simple two-row CSV 1ms
+ ✓ tests/parse.test.ts > parse > returns an empty array for empty input 0ms
+ ✓ tests/parse.test.ts > parse > parses a single row with no trailing newline 0ms
+ ✓ tests/parse.test.ts > parse > parses a single field 0ms
+ ✓ tests/parse.test.ts > parse > parses empty fields 0ms
+ ✓ tests/parse.test.ts > parse > parses trailing empty field 0ms
+ ✓ tests/parse.test.ts > parse > parses leading empty field 0ms
+ ✓ tests/parse.test.ts > parse > treats trailing newline as end of last row, not a new empty row 0ms
+ ✓ tests/parse.test.ts > parse > handles quoted fields containing commas 0ms
+ ✓ tests/parse.test.ts > parse > handles escaped double quotes inside quoted fields 0ms
+ ✓ tests/parse.test.ts > parse > handles newlines inside quoted fields 0ms
+ ✓ tests/parse.test.ts > parse > handles quoted empty field 0ms
+ ✓ tests/parse.test.ts > parse > handles a fully quoted simple field 0ms
+ ✓ tests/parse.test.ts > parse > handles only escaped quotes in field 0ms
+ ✓ tests/parse.test.ts > parse > handles CRLF line endings 0ms
+ ✓ tests/parse.test.ts > parse > handles multiple newlines inside quoted field 0ms
+ ✓ tests/parse.test.ts > parse > handles consecutive escaped quotes 0ms
+
+ Test Files  1 passed (1)
+      Tests  17 passed (17)
+   Start at  15:12:40
+   Duration  283ms (transform 27ms, setup 0ms, collect 26ms, tests 4ms, environment 0ms, prepare 45ms)
+

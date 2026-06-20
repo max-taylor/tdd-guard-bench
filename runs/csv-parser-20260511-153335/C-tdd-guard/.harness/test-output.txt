@@ -1,0 +1,14 @@
+
+ RUN  v3.2.4 /Users/maxtaylor/Documents/Code/tdd-guard/testing/runs/csv-parser-20260511-153335/C-tdd-guard
+
+ ✓ tests/parse.test.ts > parse > parses a single row with comma-separated fields 1ms
+ ✓ tests/parse.test.ts > parse > splits rows on newlines 0ms
+ ✓ tests/parse.test.ts > parse > treats commas inside quoted fields as literal 0ms
+ ✓ tests/parse.test.ts > parse > unescapes doubled double-quotes inside quoted fields 0ms
+ ✓ tests/parse.test.ts > parse > keeps newlines inside quoted fields as part of the field 0ms
+
+ Test Files  1 passed (1)
+      Tests  5 passed (5)
+   Start at  15:37:03
+   Duration  273ms (transform 26ms, setup 0ms, collect 24ms, tests 3ms, environment 0ms, prepare 52ms)
+

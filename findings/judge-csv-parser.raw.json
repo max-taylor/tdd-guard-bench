@@ -1,0 +1,2162 @@
+[
+  {
+    "pairId": "csv-parser::AvsB::csv-parser-20260511-142614_vs_csv-parser-20260511-142614",
+    "condX": "A",
+    "condY": "B",
+    "results": {
+      "test_quality": {
+        "verdict": "X",
+        "reasons": [
+          "Condition [A] has a larger, more targeted test suite that covers empty input, trailing newline, tricky escaped-quote cases and multiple quoted-field patterns that would catch regressions [B]'s suite would miss.",
+          "Condition [A] has a broader, more diagnostic test suite (empty input, trailing newline, many edge cases like empty/escaped fields and multiple quoted fields) while [B]'s tests are fewer and miss important regressions (e.g. trailing-newline and empty-input cases).",
+          "[A]'s test suite is significantly more comprehensive—covering empty input, empty fields, leading/trailing empties, trailing newlines, multiple quoted-field cases and other edge cases—so it would catch many regressions that [[A]]'s narrower tests would miss."
+        ]
+      },
+      "design_quality": {
+        "verdict": "X",
+        "reasons": [
+          "Condition [A]'s parser is slightly more careful and defensive (correct final-state handling, avoids unneeded unconditional pushes) and its control flow prevents the subtle bug present in [B].",
+          "Condition [A]'s parser correctly handles final-state conditions and CRLF without an unconditional final push and its control flow is clear and explicit; [B]'s simpler loop contains a logic flaw (always pushing a final row) indicating weaker design.",
+          "[A]'s parser has clearer, more consistent control flow (early continues), correct end-of-input handling to avoid spurious rows, and generally cleaner logic for escaped quotes, making it easier to maintain than [[A]]'s simpler but slightly brittle loop."
+        ]
+      },
+      "spec_adherence": {
+        "verdict": "X",
+        "reasons": [
+          "Condition [A] correctly avoids producing spurious empty rows for empty input or trailing newlines while [B] unconditionally appends a final empty row, violating expected parsing behavior.",
+          "[A] implements the required behaviours (commas, quotes, escaped quotes, multiline quoted fields, CRLF handling) and correctly handles trailing newlines and empty input; [B] produces incorrect extra rows for trailing newlines and returns a non-empty row for empty input.",
+          "[A] more faithfully implements the spec and sensible boundary behaviour (CRLF handling, preserving bare CR, not emitting an extra row for empty input or trailing newlines), whereas [[A]] produces a spurious row on empty input and lacks tests for several edge cases."
+        ]
+      },
+      "restraint": {
+        "verdict": "X",
+        "reasons": [
+          "Condition [A] implements the required parsing behaviors without introducing extra surface area or surprising outputs, whereas [B]'s unconditional final push produces behavior outside the spec's intent.",
+          "Condition [A] stays close to the spec and implements only the needed behavior, whereas [B]'s unconditional final push introduces behavior outside the spec (extra empty row), reflecting less restraint.",
+          "[[A]] stays closer to the explicit spec and tests only the required behaviours, while [A] adds extra tests and a small index export that go beyond the minimal requirements."
+        ]
+      }
+    },
+    "raw": [
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "Candidate A has a larger, more targeted test suite that covers empty input, trailing newline, tricky escaped-quote cases and multiple quoted-field patterns that would catch regressions B's suite would miss.",
+          "design_quality": "A",
+          "design_quality_reason": "Candidate A's parser is slightly more careful and defensive (correct final-state handling, avoids unneeded unconditional pushes) and its control flow prevents the subtle bug present in B.",
+          "spec_adherence": "A",
+          "spec_adherence_reason": "Candidate A correctly avoids producing spurious empty rows for empty input or trailing newlines while B unconditionally appends a final empty row, violating expected parsing behavior.",
+          "restraint": "A",
+          "restraint_reason": "Candidate A implements the required parsing behaviors without introducing extra surface area or surprising outputs, whereas B's unconditional final push produces behavior outside the spec's intent."
+        }
+      },
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "Candidate A has a broader, more diagnostic test suite (empty input, trailing newline, many edge cases like empty/escaped fields and multiple quoted fields) while B's tests are fewer and miss important regressions (e.g. trailing-newline and empty-input cases).",
+          "design_quality": "A",
+          "design_quality_reason": "Candidate A's parser correctly handles final-state conditions and CRLF without an unconditional final push and its control flow is clear and explicit; B's simpler loop contains a logic flaw (always pushing a final row) indicating weaker design.",
+          "spec_adherence": "A",
+          "spec_adherence_reason": "A implements the required behaviours (commas, quotes, escaped quotes, multiline quoted fields, CRLF handling) and correctly handles trailing newlines and empty input; B produces incorrect extra rows for trailing newlines and returns a non-empty row for empty input.",
+          "restraint": "A",
+          "restraint_reason": "Candidate A stays close to the spec and implements only the needed behavior, whereas B's unconditional final push introduces behavior outside the spec (extra empty row), reflecting less restraint."
+        }
+      },
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "B's test suite is significantly more comprehensive—covering empty input, empty fields, leading/trailing empties, trailing newlines, multiple quoted-field cases and other edge cases—so it would catch many regressions that A's narrower tests would miss.",
+          "design_quality": "B",
+          "design_quality_reason": "B's parser has clearer, more consistent control flow (early continues), correct end-of-input handling to avoid spurious rows, and generally cleaner logic for escaped quotes, making it easier to maintain than A's simpler but slightly brittle loop.",
+          "spec_adherence": "B",
+          "spec_adherence_reason": "B more faithfully implements the spec and sensible boundary behaviour (CRLF handling, preserving bare CR, not emitting an extra row for empty input or trailing newlines), whereas A produces a spurious row on empty input and lacks tests for several edge cases.",
+          "restraint": "A",
+          "restraint_reason": "A stays closer to the explicit spec and tests only the required behaviours, while B adds extra tests and a small index export that go beyond the minimal requirements."
+        }
+      }
+    ]
+  },
+  {
+    "pairId": "csv-parser::AvsB::csv-parser-20260511-142614_vs_csv-parser-20260511-151126",
+    "condX": "A",
+    "condY": "B",
+    "results": {
+      "test_quality": {
+        "verdict": "X",
+        "reasons": [
+          "Condition [A]'s test suite is broader and more diagnostic — it covers empty input, trailing newlines, empty/leading/trailing fields and several quoted-edge cases that would catch regressions [B]'s tests miss.",
+          "Condition [A] has a much broader, more diagnostic test suite (empty input, leading/trailing empties, tricky escaped-quote cases, trailing newline, multiple quoted fields) that would catch more regressions than [B]'s smaller set.",
+          "Condition [A] ships a much broader test suite that covers many edge cases (empty input, leading/trailing empty fields, trailing newline, empty quoted field, weird escaped-quote-only case) and so is more likely to catch regressions."
+        ]
+      },
+      "design_quality": {
+        "verdict": "X",
+        "reasons": [
+          "Condition [B]'s parser has a simpler, flatter control flow (single for loop, fewer early-continues) and clearer branching which is easier for a maintainer to follow.",
+          "Condition [A]'s implementation is slightly more defensive and correct (careful end-of-input handling, explicit CRLF handling) and its control flow, while iterative, avoids the subtle final-row bug present in [B].",
+          "Condition [A]'s parser has clearer, explicit control flow and safer end-of-input handling (it avoids emitting a spurious empty row) and a small export separation, making the code easier to read and maintain."
+        ]
+      },
+      "spec_adherence": {
+        "verdict": "X",
+        "reasons": [
+          "Condition [A] more faithfully implements the spec (notably empty input and trailing-newline handling) while [B] produces spurious empty rows for empty input/trailing newlines.",
+          "Condition [A] more faithfully implements the spec examples and edge cases (quoted multiline, escaped quotes, CRLF and empty-input behavior) while [B] produces an extra [['']] for empty input.",
+          "Both implementations correctly implement the required behaviours (commas, newlines, quoted fields, doubled-quote escaping, multiline quoted fields and CRLF handling including preserving bare CR), and neither exhibits a clear violation of the spec."
+        ]
+      },
+      "restraint": {
+        "verdict": "X",
+        "reasons": [
+          "Condition [A] stays tightly focused on the CSV behaviours in the spec and its tests stay relevant; [B]'s unconditional final push yields behavior (an extra empty row) beyond what the spec implies.",
+          "Condition [A] sticks to the required behaviors without adding surprising behavior, whereas [B]'s unconditional final push introduces behavior (an extra empty row on empty input) not implied by the spec.",
+          "Condition [B] is more minimal and focused — it implements the required parsing behaviour and tests without adding extra exports or many additional test cases beyond the spec."
+        ]
+      }
+    },
+    "raw": [
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "Candidate A's test suite is broader and more diagnostic — it covers empty input, trailing newlines, empty/leading/trailing fields and several quoted-edge cases that would catch regressions B's tests miss.",
+          "design_quality": "B",
+          "design_quality_reason": "Candidate B's parser has a simpler, flatter control flow (single for loop, fewer early-continues) and clearer branching which is easier for a maintainer to follow.",
+          "spec_adherence": "A",
+          "spec_adherence_reason": "Candidate A more faithfully implements the spec (notably empty input and trailing-newline handling) while B produces spurious empty rows for empty input/trailing newlines.",
+          "restraint": "A",
+          "restraint_reason": "Candidate A stays tightly focused on the CSV behaviours in the spec and its tests stay relevant; B's unconditional final push yields behavior (an extra empty row) beyond what the spec implies."
+        }
+      },
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "Candidate A has a much broader, more diagnostic test suite (empty input, leading/trailing empties, tricky escaped-quote cases, trailing newline, multiple quoted fields) that would catch more regressions than B's smaller set.",
+          "design_quality": "A",
+          "design_quality_reason": "Candidate A's implementation is slightly more defensive and correct (careful end-of-input handling, explicit CRLF handling) and its control flow, while iterative, avoids the subtle final-row bug present in B.",
+          "spec_adherence": "A",
+          "spec_adherence_reason": "Candidate A more faithfully implements the spec examples and edge cases (quoted multiline, escaped quotes, CRLF and empty-input behavior) while B produces an extra [['']] for empty input.",
+          "restraint": "A",
+          "restraint_reason": "Candidate A sticks to the required behaviors without adding surprising behavior, whereas B's unconditional final push introduces behavior (an extra empty row on empty input) not implied by the spec."
+        }
+      },
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "Candidate A ships a much broader test suite that covers many edge cases (empty input, leading/trailing empty fields, trailing newline, empty quoted field, weird escaped-quote-only case) and so is more likely to catch regressions.",
+          "design_quality": "A",
+          "design_quality_reason": "Candidate A's parser has clearer, explicit control flow and safer end-of-input handling (it avoids emitting a spurious empty row) and a small export separation, making the code easier to read and maintain.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement the required behaviours (commas, newlines, quoted fields, doubled-quote escaping, multiline quoted fields and CRLF handling including preserving bare CR), and neither exhibits a clear violation of the spec.",
+          "restraint": "B",
+          "restraint_reason": "Candidate B is more minimal and focused — it implements the required parsing behaviour and tests without adding extra exports or many additional test cases beyond the spec."
+        }
+      }
+    ]
+  },
+  {
+    "pairId": "csv-parser::AvsB::csv-parser-20260511-142614_vs_csv-parser-20260511-153335",
+    "condX": "A",
+    "condY": "B",
+    "results": {
+      "test_quality": {
+        "verdict": "X",
+        "reasons": [
+          "Condition [A]'s test suite is larger and covers many useful edge cases (empty input, empty/trailing/leading fields, escaped-quote-only field, multiple quoted fields) while Condition [B]'s tests are narrower (mostly CRLF-focused) and omit important cases like empty input.",
+          "Condition [A]'s test suite is broader and more diagnostic (covers empty input, trailing/leading empty fields, escaped-quote-only edge case, multiple quoted fields, etc.), so it would catch more regressions than [B]'s narrower set.",
+          "Condition [A]'s tests cover a wider set of edge cases from the spec (empty input, empty/leading/trailing fields, trailing newline, escaped-quote edge case) while [B] omits several of those even though it adds some CR/CRLF checks."
+        ]
+      },
+      "design_quality": {
+        "verdict": "X",
+        "reasons": [
+          "Condition [A]'s implementation has clearer control flow and safer end-of-input handling (no mixing of for-loop increments and manual i++), whereas Condition [B] mutates the for-loop index and ends with a brittle unconditional push.",
+          "Condition [A]'s implementation is clearer and more robust (explicit end-of-input handling to avoid spurious empty rows, simpler control flow), while [B]'s loop-manipulation and unconditional final push are more error-prone.",
+          "Condition [A]'s implementation has clearer end-of-input handling and safer index management (avoids always pushing an extra empty row), making it easier to read and maintain than [B]'s for-loop with in-loop index mutation and guaranteed final push."
+        ]
+      },
+      "spec_adherence": {
+        "verdict": "X",
+        "reasons": [
+          "Condition [A] correctly implements the spec and follow-up (including returning [] for empty input and preserving CRLF inside quotes), while Condition [B] violates the spec by returning [['']] for empty input.",
+          "Condition [A] correctly implements the required behaviors (quoting, escaped quotes, multiline quoted fields, CRLF handling) and also returns [] for empty input, whereas [B] produces an extra empty row for empty input.",
+          "Condition [A] faithfully implements quoted fields, escaped quotes, multiline quoted fields and CRLF behavior and returns [] for empty input, whereas [B] incorrectly returns a row for empty input."
+        ]
+      },
+      "restraint": {
+        "verdict": "X",
+        "reasons": [
+          "Condition [A] stays close to the spec without adding unnecessary surface area; Condition [B] introduces an unintended behavior (always emitting a row for empty input) and mixes loop-index mutation that expands surface area unnecessarily.",
+          "Condition [A] stays focused on the CSV requirements without adding unnecessary surface area, while [B]'s unconditional final push effectively changes expected empty-input behaviour and is less disciplined.",
+          "Condition [A] sticks closely to the required behaviour without adding incorrect or unnecessary effects, while [B] introduces a non-spec behaviour (producing a row for empty input)."
+        ]
+      }
+    },
+    "raw": [
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "Candidate A's test suite is larger and covers many useful edge cases (empty input, empty/trailing/leading fields, escaped-quote-only field, multiple quoted fields) while Candidate B's tests are narrower (mostly CRLF-focused) and omit important cases like empty input.",
+          "design_quality": "A",
+          "design_quality_reason": "Candidate A's implementation has clearer control flow and safer end-of-input handling (no mixing of for-loop increments and manual i++), whereas Candidate B mutates the for-loop index and ends with a brittle unconditional push.",
+          "spec_adherence": "A",
+          "spec_adherence_reason": "Candidate A correctly implements the spec and follow-up (including returning [] for empty input and preserving CRLF inside quotes), while Candidate B violates the spec by returning [['']] for empty input.",
+          "restraint": "A",
+          "restraint_reason": "Candidate A stays close to the spec without adding unnecessary surface area; Candidate B introduces an unintended behavior (always emitting a row for empty input) and mixes loop-index mutation that expands surface area unnecessarily."
+        }
+      },
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "Candidate A's test suite is broader and more diagnostic (covers empty input, trailing/leading empty fields, escaped-quote-only edge case, multiple quoted fields, etc.), so it would catch more regressions than B's narrower set.",
+          "design_quality": "A",
+          "design_quality_reason": "Candidate A's implementation is clearer and more robust (explicit end-of-input handling to avoid spurious empty rows, simpler control flow), while B's loop-manipulation and unconditional final push are more error-prone.",
+          "spec_adherence": "A",
+          "spec_adherence_reason": "Candidate A correctly implements the required behaviors (quoting, escaped quotes, multiline quoted fields, CRLF handling) and also returns [] for empty input, whereas B produces an extra empty row for empty input.",
+          "restraint": "A",
+          "restraint_reason": "Candidate A stays focused on the CSV requirements without adding unnecessary surface area, while B's unconditional final push effectively changes expected empty-input behaviour and is less disciplined."
+        }
+      },
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "Candidate A's tests cover a wider set of edge cases from the spec (empty input, empty/leading/trailing fields, trailing newline, escaped-quote edge case) while B omits several of those even though it adds some CR/CRLF checks.",
+          "design_quality": "A",
+          "design_quality_reason": "Candidate A's implementation has clearer end-of-input handling and safer index management (avoids always pushing an extra empty row), making it easier to read and maintain than B's for-loop with in-loop index mutation and guaranteed final push.",
+          "spec_adherence": "A",
+          "spec_adherence_reason": "Candidate A faithfully implements quoted fields, escaped quotes, multiline quoted fields and CRLF behavior and returns [] for empty input, whereas B incorrectly returns a row for empty input.",
+          "restraint": "A",
+          "restraint_reason": "Candidate A sticks closely to the required behaviour without adding incorrect or unnecessary effects, while B introduces a non-spec behaviour (producing a row for empty input)."
+        }
+      }
+    ]
+  },
+  {
+    "pairId": "csv-parser::AvsB::csv-parser-20260511-151126_vs_csv-parser-20260511-142614",
+    "condX": "A",
+    "condY": "B",
+    "results": {
+      "test_quality": {
+        "verdict": "X",
+        "reasons": [
+          "[A] has a much broader, more diagnostic test suite (empty input, empty/leading/trailing fields, quoted-empty, fully-quoted fields, multiple newlines inside quotes, escaped-quote edge cases) that exercises many plausible failure modes [[A]]'s suite misses.",
+          "[A]'s test suite is much more comprehensive and exercises many edge cases (empty input, empty/leading/trailing fields, trailing-newline behavior, multiple escaped quotes) with precise assertions while [[A]]'s tests cover the core examples but miss several plausible failure modes.",
+          "Condition [A] provides a much more comprehensive and targeted test suite (empty input, trailing newline behavior, empty fields, fully-quoted fields, consecutive-escaped-quotes, etc.) that would catch regressions [B]'s narrower suite would miss."
+        ]
+      },
+      "design_quality": {
+        "verdict": "X",
+        "reasons": [
+          "[A]'s implementation has clearer, more consistent control flow (while loop with explicit index management, early continues, and a guarded final push) and avoids the end-of-input push bug present in [[A]]; [[A]] is simpler but less robust.",
+          "[A]'s implementation has clearer control flow, deliberate index management and avoids the unconditional final push bug that causes extra empty rows in [[A]], making it easier to maintain and reason about.",
+          "Condition [A]'s implementation has clearer control flow and correct end-of-input handling (it avoids adding spurious rows), while [B]'s simpler loop unconditionally appends a final row and therefore contains a correctness-affecting oversight."
+        ]
+      },
+      "spec_adherence": {
+        "verdict": "X",
+        "reasons": [
+          "[A] more faithfully implements the spec and reasonable implied behaviors (correct handling of empty input, trailing newline not creating an extra row, varied quoted-field edge cases) while [[A]] can produce spurious empty rows for empty input or trailing newlines.",
+          "[A] more faithfully implements the spec and extension (commas, quoted fields, escaped quotes, multi-line quoted fields, CRLF) and also handles trailing-newline and empty-input cases correctly, whereas [[A]] produces an extra empty row for trailing newlines/empty input.",
+          "Condition [A] faithfully implements the spec including empty input and trailing-newline semantics, CRLF handling, escaped quotes and multiline quoted fields; Condition [B] produces extra rows for empty input/trailing newlines so it does not fully adhere."
+        ]
+      },
+      "restraint": {
+        "verdict": "Y",
+        "reasons": [
+          "[[A]] stays closer to the explicit spec and doesn't add many extra behaviors or test cases beyond the requirements, whereas [A] expands scope with many additional cases and behaviors not strictly required. ",
+          "[[A]] sticks closer to the minimal spec without adding extra exports or broader test-driven behaviours; [A] adds more features/tests and an index re-export (useful but beyond the strict minimal requirements).",
+          "Condition [B] is slightly more minimal (no unnecessary re-export file) and stays closer to the exact required surface area, whereas Condition [A] added a small extra index re-export outside the core parse implementation."
+        ]
+      }
+    },
+    "raw": [
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "B has a much broader, more diagnostic test suite (empty input, empty/leading/trailing fields, quoted-empty, fully-quoted fields, multiple newlines inside quotes, escaped-quote edge cases) that exercises many plausible failure modes A's suite misses.",
+          "design_quality": "B",
+          "design_quality_reason": "B's implementation has clearer, more consistent control flow (while loop with explicit index management, early continues, and a guarded final push) and avoids the end-of-input push bug present in A; A is simpler but less robust.",
+          "spec_adherence": "B",
+          "spec_adherence_reason": "B more faithfully implements the spec and reasonable implied behaviors (correct handling of empty input, trailing newline not creating an extra row, varied quoted-field edge cases) while A can produce spurious empty rows for empty input or trailing newlines.",
+          "restraint": "A",
+          "restraint_reason": "A stays closer to the explicit spec and doesn't add many extra behaviors or test cases beyond the requirements, whereas B expands scope with many additional cases and behaviors not strictly required. "
+        }
+      },
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "B's test suite is much more comprehensive and exercises many edge cases (empty input, empty/leading/trailing fields, trailing-newline behavior, multiple escaped quotes) with precise assertions while A's tests cover the core examples but miss several plausible failure modes.",
+          "design_quality": "B",
+          "design_quality_reason": "B's implementation has clearer control flow, deliberate index management and avoids the unconditional final push bug that causes extra empty rows in A, making it easier to maintain and reason about.",
+          "spec_adherence": "B",
+          "spec_adherence_reason": "B more faithfully implements the spec and extension (commas, quoted fields, escaped quotes, multi-line quoted fields, CRLF) and also handles trailing-newline and empty-input cases correctly, whereas A produces an extra empty row for trailing newlines/empty input.",
+          "restraint": "A",
+          "restraint_reason": "A sticks closer to the minimal spec without adding extra exports or broader test-driven behaviours; B adds more features/tests and an index re-export (useful but beyond the strict minimal requirements)."
+        }
+      },
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "Candidate A provides a much more comprehensive and targeted test suite (empty input, trailing newline behavior, empty fields, fully-quoted fields, consecutive-escaped-quotes, etc.) that would catch regressions B's narrower suite would miss.",
+          "design_quality": "A",
+          "design_quality_reason": "Candidate A's implementation has clearer control flow and correct end-of-input handling (it avoids adding spurious rows), while B's simpler loop unconditionally appends a final row and therefore contains a correctness-affecting oversight.",
+          "spec_adherence": "A",
+          "spec_adherence_reason": "Candidate A faithfully implements the spec including empty input and trailing-newline semantics, CRLF handling, escaped quotes and multiline quoted fields; Candidate B produces extra rows for empty input/trailing newlines so it does not fully adhere.",
+          "restraint": "B",
+          "restraint_reason": "Candidate B is slightly more minimal (no unnecessary re-export file) and stays closer to the exact required surface area, whereas Candidate A added a small extra index re-export outside the core parse implementation."
+        }
+      }
+    ]
+  },
+  {
+    "pairId": "csv-parser::AvsB::csv-parser-20260511-151126_vs_csv-parser-20260511-151126",
+    "condX": "A",
+    "condY": "B",
+    "results": {
+      "test_quality": {
+        "verdict": "X",
+        "reasons": [
+          "Condition [A] provides a much larger, more diagnostic test suite that covers empty input, leading/trailing empty fields, trailing-newline behavior, many quoted-field edge cases, and specific assertions that would catch regressions.",
+          "[A]'s test suite is substantially broader and more diagnostic — it covers empty input, leading/trailing/empty fields, trailing-newline behavior, quoted-empty and various escaped-quote patterns and mixed line endings that would catch regressions [[A]]'s smaller suite would miss.",
+          "Condition [A] has a much more comprehensive, specific test suite that covers many edge cases (empty input, trailing/leading empty fields, quoted empties, consecutive escaped quotes, mixed line endings) that would catch regressions Condition [B]’s tests would miss."
+        ]
+      },
+      "design_quality": {
+        "verdict": "X",
+        "reasons": [
+          "Condition [A]'s implementation has clearer control flow (explicit index handling, well-structured inQuotes logic and clean termination handling) and avoids the subtle index-modification-in-a-for-loop pattern in [B] that makes reasoning harder.",
+          "[A]'s implementation has clearer control flow (while + continues), a defensive final-state guard to avoid spurious empty rows, and a clean index export, making it easier to read and maintain than [[A]]'s for-loop that always pushes a final row.",
+          "Condition [A]’s parser has clearer EOF handling and avoids adding spurious empty rows (conditional final push) and its control flow is explicit and robust compared with Condition [B]’s simpler but error-prone unconditional final push."
+        ]
+      },
+      "spec_adherence": {
+        "verdict": "X",
+        "reasons": [
+          "Condition [A] more completely matches the spec and implied CSV behaviors (preserves bare CR, preserves CRLF inside quotes, treats a trailing newline as not producing an extra empty row, and handles the empty-input case sensibly), whereas [B] returns an extra empty row for empty or trailing-newline inputs.",
+          "[A] more faithfully implements the spec and extension (correct CRLF handling, preserves bare CR, and avoids producing an extra empty row or [['']] for empty input) while [[A]] can return an unwanted extra/empty row in those edge cases.",
+          "Condition [A] implements the required behaviours (commas, quoted fields, escaped quotes, multiline quoted fields, CRLF handling) and correctly avoids producing extra rows for empty/trailing-newline inputs where Condition [B] would produce incorrect extra rows."
+        ]
+      },
+      "restraint": {
+        "verdict": "Y",
+        "reasons": [
+          "Condition [B] is more minimal and stays narrowly scoped to parsing logic (no extra export shim/index file) while Condition [A] adds an extra index export and a broader set of behaviors/tests beyond the bare minimum. ",
+          "[[A]] stays closer to the minimal parser surface (no extra index export and fewer added behaviors/tests), whereas [A] adds extra conveniences and many additional test cases beyond the strict minimal spec.",
+          "Condition [B] is more minimal and doesn’t add extra test surface or auxiliary exports; Condition [A] added a broader test surface and an extra index export (small scope creep) even though those are useful."
+        ]
+      }
+    },
+    "raw": [
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "Candidate A provides a much larger, more diagnostic test suite that covers empty input, leading/trailing empty fields, trailing-newline behavior, many quoted-field edge cases, and specific assertions that would catch regressions.",
+          "design_quality": "A",
+          "design_quality_reason": "Candidate A's implementation has clearer control flow (explicit index handling, well-structured inQuotes logic and clean termination handling) and avoids the subtle index-modification-in-a-for-loop pattern in B that makes reasoning harder.",
+          "spec_adherence": "A",
+          "spec_adherence_reason": "Candidate A more completely matches the spec and implied CSV behaviors (preserves bare CR, preserves CRLF inside quotes, treats a trailing newline as not producing an extra empty row, and handles the empty-input case sensibly), whereas B returns an extra empty row for empty or trailing-newline inputs.",
+          "restraint": "B",
+          "restraint_reason": "Candidate B is more minimal and stays narrowly scoped to parsing logic (no extra export shim/index file) while Candidate A adds an extra index export and a broader set of behaviors/tests beyond the bare minimum. "
+        }
+      },
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "B's test suite is substantially broader and more diagnostic — it covers empty input, leading/trailing/empty fields, trailing-newline behavior, quoted-empty and various escaped-quote patterns and mixed line endings that would catch regressions A's smaller suite would miss.",
+          "design_quality": "B",
+          "design_quality_reason": "B's implementation has clearer control flow (while + continues), a defensive final-state guard to avoid spurious empty rows, and a clean index export, making it easier to read and maintain than A's for-loop that always pushes a final row.",
+          "spec_adherence": "B",
+          "spec_adherence_reason": "B more faithfully implements the spec and extension (correct CRLF handling, preserves bare CR, and avoids producing an extra empty row or [['']] for empty input) while A can return an unwanted extra/empty row in those edge cases.",
+          "restraint": "A",
+          "restraint_reason": "A stays closer to the minimal parser surface (no extra index export and fewer added behaviors/tests), whereas B adds extra conveniences and many additional test cases beyond the strict minimal spec."
+        }
+      },
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "Candidate A has a much more comprehensive, specific test suite that covers many edge cases (empty input, trailing/leading empty fields, quoted empties, consecutive escaped quotes, mixed line endings) that would catch regressions Candidate B’s tests would miss.",
+          "design_quality": "A",
+          "design_quality_reason": "Candidate A’s parser has clearer EOF handling and avoids adding spurious empty rows (conditional final push) and its control flow is explicit and robust compared with Candidate B’s simpler but error-prone unconditional final push.",
+          "spec_adherence": "A",
+          "spec_adherence_reason": "Candidate A implements the required behaviours (commas, quoted fields, escaped quotes, multiline quoted fields, CRLF handling) and correctly avoids producing extra rows for empty/trailing-newline inputs where Candidate B would produce incorrect extra rows.",
+          "restraint": "B",
+          "restraint_reason": "Candidate B is more minimal and doesn’t add extra test surface or auxiliary exports; Candidate A added a broader test surface and an extra index export (small scope creep) even though those are useful."
+        }
+      }
+    ]
+  },
+  {
+    "pairId": "csv-parser::AvsB::csv-parser-20260511-151126_vs_csv-parser-20260511-153335",
+    "condX": "A",
+    "condY": "B",
+    "results": {
+      "test_quality": {
+        "verdict": "X",
+        "reasons": [
+          "Condition [[A]]'s test suite is broader and more diagnostic — it covers many boundary cases (empty input, empty/leading/trailing fields, trailing newline, fully quoted/only-escaped-quote cases) that would catch regressions Condition [A]'s slimmer suite would miss.",
+          "Condition [A]'s test suite is larger and exercises many edge cases (empty input, leading/trailing empty fields, quoted empty fields, escaped-quote sequences, CRLF, mixed line endings) that would catch regressions [B]'s smaller suite would miss.",
+          "[A]'s test suite is broader and more diagnostic—covers empty input, leading/trailing/empty quoted fields, multiple newlines and tricky escaped-quote cases that would catch regressions [[A]]'s tests miss."
+        ]
+      },
+      "design_quality": {
+        "verdict": "X",
+        "reasons": [
+          "Condition [[A]]'s implementation has clearer control flow (explicit continues, careful index management), a correct end-of-input check to avoid spurious empty rows, and a tidy export, making it more maintainable and less bug-prone.",
+          "Condition [A]'s implementation has clearer control flow and correct end-of-input handling (avoids spurious final empty row), while [B]'s simpler loop leaves a faulty unconditional final push and is therefore less maintainable/correct.",
+          "[A]'s implementation is clearer and more robust (careful index management, avoids spurious empty final rows) while remaining simple and well-structured; [[A]]'s unconditional final push leads to incorrect trailing-newline/empty-input behavior."
+        ]
+      },
+      "spec_adherence": {
+        "verdict": "X",
+        "reasons": [
+          "Both implementations implement the core CSV rules and CRLF behaviour, but Condition [A] unconditionally appends a final row (producing an extra empty row for empty input or a trailing newline) whereas Condition [[A]] handles these boundary cases correctly.",
+          "Condition [A] correctly implements the spec including empty input, trailing-newline behavior, quoted newlines and CRLF handling; Condition [B] produces incorrect outputs for empty input and trailing-newline cases.",
+          "[A] more faithfully implements the expected CSV semantics (correct handling of trailing newline as not creating an extra row and returning [] for empty input) while also meeting the quoted-field and CRLF requirements."
+        ]
+      },
+      "restraint": {
+        "verdict": "Y",
+        "reasons": [
+          "Condition [A] stays narrowly focused on the spec, while Condition [[A]] adds many extra features and tests (empty-input semantics, many additional edge cases) beyond the explicit requirements. ",
+          "Condition [A] sticks to the required behaviors and edge cases implied by the spec without adding unrelated bells/whistles, whereas [B]'s unconditional final push introduces unintended behavior outside the spec's intent.",
+          "[[A]] sticks closer to a minimal implementation with no extra files or broad test expansions, whereas [A] adds a re-export file and many extra tests/features beyond the strict spec."
+        ]
+      }
+    },
+    "raw": [
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "Candidate B's test suite is broader and more diagnostic — it covers many boundary cases (empty input, empty/leading/trailing fields, trailing newline, fully quoted/only-escaped-quote cases) that would catch regressions Candidate A's slimmer suite would miss.",
+          "design_quality": "B",
+          "design_quality_reason": "Candidate B's implementation has clearer control flow (explicit continues, careful index management), a correct end-of-input check to avoid spurious empty rows, and a tidy export, making it more maintainable and less bug-prone.",
+          "spec_adherence": "B",
+          "spec_adherence_reason": "Both implementations implement the core CSV rules and CRLF behaviour, but Candidate A unconditionally appends a final row (producing an extra empty row for empty input or a trailing newline) whereas Candidate B handles these boundary cases correctly.",
+          "restraint": "A",
+          "restraint_reason": "Candidate A stays narrowly focused on the spec, while Candidate B adds many extra features and tests (empty-input semantics, many additional edge cases) beyond the explicit requirements. "
+        }
+      },
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "Candidate A's test suite is larger and exercises many edge cases (empty input, leading/trailing empty fields, quoted empty fields, escaped-quote sequences, CRLF, mixed line endings) that would catch regressions B's smaller suite would miss.",
+          "design_quality": "A",
+          "design_quality_reason": "Candidate A's implementation has clearer control flow and correct end-of-input handling (avoids spurious final empty row), while B's simpler loop leaves a faulty unconditional final push and is therefore less maintainable/correct.",
+          "spec_adherence": "A",
+          "spec_adherence_reason": "Candidate A correctly implements the spec including empty input, trailing-newline behavior, quoted newlines and CRLF handling; Candidate B produces incorrect outputs for empty input and trailing-newline cases.",
+          "restraint": "A",
+          "restraint_reason": "Candidate A sticks to the required behaviors and edge cases implied by the spec without adding unrelated bells/whistles, whereas B's unconditional final push introduces unintended behavior outside the spec's intent."
+        }
+      },
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "B's test suite is broader and more diagnostic—covers empty input, leading/trailing/empty quoted fields, multiple newlines and tricky escaped-quote cases that would catch regressions A's tests miss.",
+          "design_quality": "B",
+          "design_quality_reason": "B's implementation is clearer and more robust (careful index management, avoids spurious empty final rows) while remaining simple and well-structured; A's unconditional final push leads to incorrect trailing-newline/empty-input behavior.",
+          "spec_adherence": "B",
+          "spec_adherence_reason": "B more faithfully implements the expected CSV semantics (correct handling of trailing newline as not creating an extra row and returning [] for empty input) while also meeting the quoted-field and CRLF requirements.",
+          "restraint": "A",
+          "restraint_reason": "A sticks closer to a minimal implementation with no extra files or broad test expansions, whereas B adds a re-export file and many extra tests/features beyond the strict spec."
+        }
+      }
+    ]
+  },
+  {
+    "pairId": "csv-parser::AvsB::csv-parser-20260511-153335_vs_csv-parser-20260511-142614",
+    "condX": "A",
+    "condY": "B",
+    "results": {
+      "test_quality": {
+        "verdict": "X",
+        "reasons": [
+          "Condition [A] has a much broader, more diagnostic test suite (empty input, trailing newline avoidance, many quoted/empty-field edge cases) while [B]'s tests are smaller and miss several plausible failure modes.",
+          "[A]'s test suite is broader and exercises many edge cases (empty input, empty fields, trailing-newline phantom row, multiple newlines in quoted fields, various quoted/unquoted mixes) while [B]'s suite is smaller even though it adds CRLF tests.",
+          "Condition [A] provides a much larger, more diagnostic test suite covering many edge cases (empty input, trailing newline, various quoted-field permutations) while [B]'s tests are narrower even though it includes CRLF checks."
+        ]
+      },
+      "design_quality": {
+        "verdict": "X",
+        "reasons": [
+          "[A]'s implementation, though slightly more complex, defensively handles edge cases (no phantom trailing row, empty input) and avoids subtle bugs that [B]'s simpler code contains.",
+          "[A]'s parser shows deliberate boundary handling (fieldStarted to avoid phantom rows) and clear state transitions for quoted vs unquoted content, whereas [B]'s simpler final unconditional push produces a correctness-affecting bug.",
+          "Condition [A]'s implementation more carefully handles edge cases (avoids phantom trailing rows, preserves bare CR) and is explicit about state, whereas [B]'s simpler loop produces an extra empty row on trailing newlines."
+        ]
+      },
+      "spec_adherence": {
+        "verdict": "X",
+        "reasons": [
+          "[A] implements the CSV rules including CRLF handling, quoted multi-line fields and preserves bare CR, and avoids producing a phantom extra row on trailing newlines whereas [B] produces an extra empty row/incorrect result for those cases.",
+          "[A] implements the CSV rules including correct handling of quotes, escaped quotes, multiline quoted fields and CRLF row separators without producing an extra empty row at EOF, whereas [B] can emit a phantom row at the end.",
+          "Condition [A] more completely implements the CSV behaviours implied by the spec (correctly handles quoted fields, escaped quotes, multiline quoted fields, CRLF, bare CR and avoids phantom rows), while [B] misses the trailing-newline/empty-input behavior."
+        ]
+      },
+      "restraint": {
+        "verdict": "Y",
+        "reasons": [
+          "[B] stays closer to a minimal implementation and adds fewer extra behaviors/tests beyond the spec, whereas [A] expands the surface (many additional tests and handling) beyond what was strictly requested.",
+          "Neither implementation adds large unrelated features beyond the spec extension; [A] adds a small extra flag for correct behavior and [B] keeps a minimal structure, so both show comparable restraint.",
+          "Condition [B] is a leaner, more minimal implementation that doesn't add extra orchestration or special-case flags beyond the parser's core, whereas [A] adds extra handling (e.g. fieldStarted) and tests beyond the literal spec. "
+        ]
+      }
+    },
+    "raw": [
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "Candidate A has a much broader, more diagnostic test suite (empty input, trailing newline avoidance, many quoted/empty-field edge cases) while B's tests are smaller and miss several plausible failure modes.",
+          "design_quality": "A",
+          "design_quality_reason": "A's implementation, though slightly more complex, defensively handles edge cases (no phantom trailing row, empty input) and avoids subtle bugs that B's simpler code contains.",
+          "spec_adherence": "A",
+          "spec_adherence_reason": "A implements the CSV rules including CRLF handling, quoted multi-line fields and preserves bare CR, and avoids producing a phantom extra row on trailing newlines whereas B produces an extra empty row/incorrect result for those cases.",
+          "restraint": "B",
+          "restraint_reason": "B stays closer to a minimal implementation and adds fewer extra behaviors/tests beyond the spec, whereas A expands the surface (many additional tests and handling) beyond what was strictly requested."
+        }
+      },
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "A's test suite is broader and exercises many edge cases (empty input, empty fields, trailing-newline phantom row, multiple newlines in quoted fields, various quoted/unquoted mixes) while B's suite is smaller even though it adds CRLF tests.",
+          "design_quality": "A",
+          "design_quality_reason": "A's parser shows deliberate boundary handling (fieldStarted to avoid phantom rows) and clear state transitions for quoted vs unquoted content, whereas B's simpler final unconditional push produces a correctness-affecting bug.",
+          "spec_adherence": "A",
+          "spec_adherence_reason": "A implements the CSV rules including correct handling of quotes, escaped quotes, multiline quoted fields and CRLF row separators without producing an extra empty row at EOF, whereas B can emit a phantom row at the end.",
+          "restraint": "tie",
+          "restraint_reason": "Neither implementation adds large unrelated features beyond the spec extension; A adds a small extra flag for correct behavior and B keeps a minimal structure, so both show comparable restraint."
+        }
+      },
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "Candidate A provides a much larger, more diagnostic test suite covering many edge cases (empty input, trailing newline, various quoted-field permutations) while B's tests are narrower even though it includes CRLF checks.",
+          "design_quality": "A",
+          "design_quality_reason": "Candidate A's implementation more carefully handles edge cases (avoids phantom trailing rows, preserves bare CR) and is explicit about state, whereas B's simpler loop produces an extra empty row on trailing newlines.",
+          "spec_adherence": "A",
+          "spec_adherence_reason": "Candidate A more completely implements the CSV behaviours implied by the spec (correctly handles quoted fields, escaped quotes, multiline quoted fields, CRLF, bare CR and avoids phantom rows), while B misses the trailing-newline/empty-input behavior.",
+          "restraint": "B",
+          "restraint_reason": "Candidate B is a leaner, more minimal implementation that doesn't add extra orchestration or special-case flags beyond the parser's core, whereas A adds extra handling (e.g. fieldStarted) and tests beyond the literal spec. "
+        }
+      }
+    ]
+  },
+  {
+    "pairId": "csv-parser::AvsB::csv-parser-20260511-153335_vs_csv-parser-20260511-151126",
+    "condX": "A",
+    "condY": "B",
+    "results": {
+      "test_quality": {
+        "verdict": "X",
+        "reasons": [
+          "[A]'s test suite is much broader and more diagnostic—covering empty input, empty/leading/trailing fields, trailing-newline phantom rows, tricky quote sequences and multiple newlines—so it would catch many more regressions than [[A]]'s smaller set (even though [[A]] includes some CRLF tests).",
+          "[A]'s test suite is much larger and covers many important edge cases (empty input, empty fields, trailing newlines, mixed quoted/unquoted fields, complex quoted-quote patterns) that would catch regressions that [[A]]'s narrower tests would miss.",
+          "Condition [[A]]'s test suite is far more comprehensive and exercises many edge cases (empty input, empty fields, trailing newline, mixed quoted/unquoted, tricky-quote sequences) that would catch regressions beyond the basic examples in [[A]]'s tests."
+        ]
+      },
+      "design_quality": {
+        "verdict": "X",
+        "reasons": [
+          "[A] uses an explicit stateful loop with a clear separation of cases and a deliberate fieldStarted guard to avoid phantom rows, making the control flow more robust and easier to reason about for edge cases than [[A]]'s minimal loop.",
+          "[A] has a more robust, explicit state machine (fieldStarted/inQuotes) that prevents subtle bugs like phantom rows and handles edge cases, making it easier to maintain despite slightly more complexity.",
+          "Condition [[A]]'s parser has clearer control flow and explicit state (fieldStarted) to avoid phantom rows and handles edge cases more defensively, making it easier to maintain than [[A]]'s simpler but brittle final-push logic."
+        ]
+      },
+      "spec_adherence": {
+        "verdict": "X",
+        "reasons": [
+          "[A] implements the required quoted-field, escaped-quote, newline- and CRLF-handling and also correctly avoids producing phantom rows and handles empty input, so it more fully matches the spec and likely implied expectations. ",
+          "[A] implements the required behaviours (commas, quotes, escaped quotes, multiline quoted fields, CRLF handling) and additionally avoids producing phantom rows and handles empty input sensibly, so it more faithfully satisfies the spec's intent.",
+          "Both implementations implement the core CSV and CRLF behaviours, but [A] more robustly handles boundary cases (empty input, trailing newline) that the spec implies should be handled, whereas [[A]] unconditionally emits a final empty row for empty input."
+        ]
+      },
+      "restraint": {
+        "verdict": "Y",
+        "reasons": [
+          "[[A]] is more minimal and sticks closely to the core parsing logic without adding extra guards/behaviour beyond the spec, whereas [A] adds additional handling and tests (empty-input semantics, fieldStarted flag) that go beyond the written requirements.",
+          "[[A]] sticks closer to the minimal spec and tests, while [A] adds extra behavior/tests and defensive logic beyond what was explicitly required.",
+          "Condition [A] stays closer to a minimal implementation of the spec without adding a large number of extra behaviours and tests, while [A] expands scope with many additional edge-case behaviours and test cases beyond the explicit requirements."
+        ]
+      }
+    },
+    "raw": [
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "B's test suite is much broader and more diagnostic—covering empty input, empty/leading/trailing fields, trailing-newline phantom rows, tricky quote sequences and multiple newlines—so it would catch many more regressions than A's smaller set (even though A includes some CRLF tests).",
+          "design_quality": "B",
+          "design_quality_reason": "B uses an explicit stateful loop with a clear separation of cases and a deliberate fieldStarted guard to avoid phantom rows, making the control flow more robust and easier to reason about for edge cases than A's minimal loop.",
+          "spec_adherence": "B",
+          "spec_adherence_reason": "B implements the required quoted-field, escaped-quote, newline- and CRLF-handling and also correctly avoids producing phantom rows and handles empty input, so it more fully matches the spec and likely implied expectations. ",
+          "restraint": "A",
+          "restraint_reason": "A is more minimal and sticks closely to the core parsing logic without adding extra guards/behaviour beyond the spec, whereas B adds additional handling and tests (empty-input semantics, fieldStarted flag) that go beyond the written requirements."
+        }
+      },
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "B's test suite is much larger and covers many important edge cases (empty input, empty fields, trailing newlines, mixed quoted/unquoted fields, complex quoted-quote patterns) that would catch regressions that A's narrower tests would miss.",
+          "design_quality": "B",
+          "design_quality_reason": "B has a more robust, explicit state machine (fieldStarted/inQuotes) that prevents subtle bugs like phantom rows and handles edge cases, making it easier to maintain despite slightly more complexity.",
+          "spec_adherence": "B",
+          "spec_adherence_reason": "B implements the required behaviours (commas, quotes, escaped quotes, multiline quoted fields, CRLF handling) and additionally avoids producing phantom rows and handles empty input sensibly, so it more faithfully satisfies the spec's intent.",
+          "restraint": "A",
+          "restraint_reason": "A sticks closer to the minimal spec and tests, while B adds extra behavior/tests and defensive logic beyond what was explicitly required."
+        }
+      },
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "Candidate B's test suite is far more comprehensive and exercises many edge cases (empty input, empty fields, trailing newline, mixed quoted/unquoted, tricky-quote sequences) that would catch regressions beyond the basic examples in A's tests.",
+          "design_quality": "B",
+          "design_quality_reason": "Candidate B's parser has clearer control flow and explicit state (fieldStarted) to avoid phantom rows and handles edge cases more defensively, making it easier to maintain than A's simpler but brittle final-push logic.",
+          "spec_adherence": "B",
+          "spec_adherence_reason": "Both implementations implement the core CSV and CRLF behaviours, but B more robustly handles boundary cases (empty input, trailing newline) that the spec implies should be handled, whereas A unconditionally emits a final empty row for empty input.",
+          "restraint": "A",
+          "restraint_reason": "Candidate A stays closer to a minimal implementation of the spec without adding a large number of extra behaviours and tests, while B expands scope with many additional edge-case behaviours and test cases beyond the explicit requirements."
+        }
+      }
+    ]
+  },
+  {
+    "pairId": "csv-parser::AvsB::csv-parser-20260511-153335_vs_csv-parser-20260511-153335",
+    "condX": "A",
+    "condY": "B",
+    "results": {
+      "test_quality": {
+        "verdict": "X",
+        "reasons": [
+          "Condition [A]'s test suite is broader and exercises many edge cases (empty input, trailing-newline phantom row, empty/odd quoted fields, empty fields) that would catch regressions Condition [B]'s suite misses.",
+          "Condition [[A]] has a much broader, more diagnostic test suite covering empty input, empty fields, trailing-newline behavior, mixed quoted/unquoted cases and other edge cases that would catch regressions [[A]]'s tests miss.",
+          "Condition [[A]]'s tests cover many more edge cases (empty input, empty fields, trailing-newline phantom rows, quoted-only rows, multiple newlines inside quotes) and have precise assertions, making them a stronger regression net."
+        ]
+      },
+      "design_quality": {
+        "verdict": "X",
+        "reasons": [
+          "Condition [A]'s parser is more carefully structured (handles trailing-newline/empty-input with a fieldStarted guard and clear state transitions) while Condition [B]'s simpler final unconditional push leads to incorrect outputs (phantom rows).",
+          "[A]'s implementation is more robustly structured (explicit index control, careful in-quote handling and fieldStarted state) and avoids subtle bugs like phantom trailing rows, making it easier to maintain despite slightly more complexity.",
+          "Condition [[A]] has clearer, well-structured control flow (while loop with early continues) and a small, purposeful abstraction (fieldStarted) that avoids phantom rows and improves correctness without over-engineering."
+        ]
+      },
+      "spec_adherence": {
+        "verdict": "X",
+        "reasons": [
+          "Condition [A] correctly implements the CSV rules including quoted fields, escaped quotes, multiline quotes and CRLF handling and avoids phantom rows on empty/trailing-newline input, whereas Condition [B] produces incorrect outputs for empty input and trailing-newline cases.",
+          "Both satisfy the core CSV and CRLF requirements, but [A] handles additional realistic edge cases (e.g. trailing newline not producing a phantom row) that make its behavior more correct in practice.",
+          "Condition [[A]] more faithfully handles implied CSV behaviours (empty input -> [], no phantom row for trailing newline) while also correctly implementing quotes, escaped quotes, multi-line quoted fields, CRLF and bare CR preservation."
+        ]
+      },
+      "restraint": {
+        "verdict": "Y",
+        "reasons": [
+          "Neither implementation introduces large unrelated features or abstractions beyond the spec; [A] adds defensive handling and more tests while [B] sticks to a minimal implementation (but with correctness gaps), so overall neither clearly overreaches.",
+          "Condition [A] sticks more closely to the requested functionality without adding extra behaviors or knobs, whereas [A] introduces additional features (empty-input semantics, trailing-newline suppression) beyond the explicit spec.",
+          "Condition [A] is more minimal and stays closer to the simplest interpretation of the spec, whereas Condition [[A]] adds extra handling (e.g. special empty-input/trailing-newline logic) beyond the explicit requirements."
+        ]
+      }
+    },
+    "raw": [
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "Candidate A's test suite is broader and exercises many edge cases (empty input, trailing-newline phantom row, empty/odd quoted fields, empty fields) that would catch regressions Candidate B's suite misses.",
+          "design_quality": "A",
+          "design_quality_reason": "Candidate A's parser is more carefully structured (handles trailing-newline/empty-input with a fieldStarted guard and clear state transitions) while Candidate B's simpler final unconditional push leads to incorrect outputs (phantom rows).",
+          "spec_adherence": "A",
+          "spec_adherence_reason": "Candidate A correctly implements the CSV rules including quoted fields, escaped quotes, multiline quotes and CRLF handling and avoids phantom rows on empty/trailing-newline input, whereas Candidate B produces incorrect outputs for empty input and trailing-newline cases.",
+          "restraint": "tie",
+          "restraint_reason": "Neither implementation introduces large unrelated features or abstractions beyond the spec; A adds defensive handling and more tests while B sticks to a minimal implementation (but with correctness gaps), so overall neither clearly overreaches."
+        }
+      },
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "Candidate B has a much broader, more diagnostic test suite covering empty input, empty fields, trailing-newline behavior, mixed quoted/unquoted cases and other edge cases that would catch regressions A's tests miss.",
+          "design_quality": "B",
+          "design_quality_reason": "B's implementation is more robustly structured (explicit index control, careful in-quote handling and fieldStarted state) and avoids subtle bugs like phantom trailing rows, making it easier to maintain despite slightly more complexity.",
+          "spec_adherence": "B",
+          "spec_adherence_reason": "Both satisfy the core CSV and CRLF requirements, but B handles additional realistic edge cases (e.g. trailing newline not producing a phantom row) that make its behavior more correct in practice.",
+          "restraint": "A",
+          "restraint_reason": "Candidate A sticks more closely to the requested functionality without adding extra behaviors or knobs, whereas B introduces additional features (empty-input semantics, trailing-newline suppression) beyond the explicit spec."
+        }
+      },
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "Candidate B's tests cover many more edge cases (empty input, empty fields, trailing-newline phantom rows, quoted-only rows, multiple newlines inside quotes) and have precise assertions, making them a stronger regression net.",
+          "design_quality": "B",
+          "design_quality_reason": "Candidate B has clearer, well-structured control flow (while loop with early continues) and a small, purposeful abstraction (fieldStarted) that avoids phantom rows and improves correctness without over-engineering.",
+          "spec_adherence": "B",
+          "spec_adherence_reason": "Candidate B more faithfully handles implied CSV behaviours (empty input -> [], no phantom row for trailing newline) while also correctly implementing quotes, escaped quotes, multi-line quoted fields, CRLF and bare CR preservation.",
+          "restraint": "A",
+          "restraint_reason": "Candidate A is more minimal and stays closer to the simplest interpretation of the spec, whereas Candidate B adds extra handling (e.g. special empty-input/trailing-newline logic) beyond the explicit requirements."
+        }
+      }
+    ]
+  },
+  {
+    "pairId": "csv-parser::AvsC::csv-parser-20260511-142614_vs_csv-parser-20260511-142614",
+    "condX": "A",
+    "condY": "C",
+    "results": {
+      "test_quality": {
+        "verdict": "X",
+        "reasons": [
+          "Condition [A]'s tests cover more spec-critical edge cases (empty input, trailing newline, empty quoted field, tricky escaped-quote sequences) that would catch regressions [C]'s suite would miss.",
+          "Condition [A]'s test suite covers more edge cases (empty input, leading/trailing empty fields, empty quoted field, escaped-quote-only field, trailing newline) and contains more focused assertions that would catch regressions, whereas [C]'s tests omit several of these cases.",
+          "Condition [A]'s test suite is broader and more diagnostic — it covers many edge cases (empty input, leading/trailing/empty fields, escaped-quote edge case, multiple quoted fields) while [C] focuses mainly on CRLF permutations and misses several of those failure modes."
+        ]
+      },
+      "design_quality": {
+        "verdict": "X",
+        "reasons": [
+          "Condition [A]'s parser is slightly more careful and robust (correct final-state handling, conditional final push, explicit CRLF handling) while [C]'s simpler flow contains a subtle end-of-input bug (unconditional final push).",
+          "Condition [A]'s implementation includes a correct end-of-input guard and explicit CRLF handling and organizes the parsing loop to avoid incorrect final rows, making it clearer and safer for maintainers than [C]'s simpler but flawed unconditional final push.",
+          "Condition [A]'s parser is slightly cleaner and more defensive (it avoids producing a spurious row on empty input and has explicit index control), whereas [C]'s final unconditional push produces an undesirable [['']] for empty input."
+        ]
+      },
+      "spec_adherence": {
+        "verdict": "X",
+        "reasons": [
+          "Condition [A] correctly implements the spec including empty input and trailing-newline semantics and CRLF handling; Condition C produces an extra row for empty input/trailing newlines, violating the spec.",
+          "Condition [A] matches the spec examples including returning [] for empty input and preserves CRLF inside quoted fields, while Condition C incorrectly returns [['']] for empty input and therefore fails the spec.",
+          "Condition [A] implements the required behaviors (commas, quotes, escaped quotes, multiline quoted fields, CRLF handling) and handles empty input sensibly, while [C] exhibits a concrete deviation (producing [['']] for empty input)."
+        ]
+      },
+      "restraint": {
+        "verdict": "X",
+        "reasons": [
+          "Condition [A] stays focused on the required behaviour without adding extraneous surface area, whereas Condition C's unconditional final push introduces behavior outside the spec (extra empty row).",
+          "Condition C's unconditional final row push introduces behavior outside the spec (producing a row for empty input); Condition [A] avoids that and stays closer to the required behaviour.",
+          "Neither implementation introduces large out-of-spec features or heavy abstractions — both stick to straightforward parsing logic without notable scope creep."
+        ]
+      }
+    },
+    "raw": [
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "Candidate A's tests cover more spec-critical edge cases (empty input, trailing newline, empty quoted field, tricky escaped-quote sequences) that would catch regressions B's suite would miss.",
+          "design_quality": "A",
+          "design_quality_reason": "Candidate A's parser is slightly more careful and robust (correct final-state handling, conditional final push, explicit CRLF handling) while B's simpler flow contains a subtle end-of-input bug (unconditional final push).",
+          "spec_adherence": "A",
+          "spec_adherence_reason": "Candidate A correctly implements the spec including empty input and trailing-newline semantics and CRLF handling; Candidate B produces an extra row for empty input/trailing newlines, violating the spec.",
+          "restraint": "A",
+          "restraint_reason": "Candidate A stays focused on the required behaviour without adding extraneous surface area, whereas Candidate B's unconditional final push introduces behavior outside the spec (extra empty row)."
+        }
+      },
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "Candidate A's test suite covers more edge cases (empty input, leading/trailing empty fields, empty quoted field, escaped-quote-only field, trailing newline) and contains more focused assertions that would catch regressions, whereas B's tests omit several of these cases.",
+          "design_quality": "A",
+          "design_quality_reason": "Candidate A's implementation includes a correct end-of-input guard and explicit CRLF handling and organizes the parsing loop to avoid incorrect final rows, making it clearer and safer for maintainers than B's simpler but flawed unconditional final push.",
+          "spec_adherence": "A",
+          "spec_adherence_reason": "Candidate A matches the spec examples including returning [] for empty input and preserves CRLF inside quoted fields, while Candidate B incorrectly returns [['']] for empty input and therefore fails the spec.",
+          "restraint": "A",
+          "restraint_reason": "Candidate B's unconditional final row push introduces behavior outside the spec (producing a row for empty input); Candidate A avoids that and stays closer to the required behaviour."
+        }
+      },
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "Candidate A's test suite is broader and more diagnostic — it covers many edge cases (empty input, leading/trailing/empty fields, escaped-quote edge case, multiple quoted fields) while B focuses mainly on CRLF permutations and misses several of those failure modes.",
+          "design_quality": "A",
+          "design_quality_reason": "Candidate A's parser is slightly cleaner and more defensive (it avoids producing a spurious row on empty input and has explicit index control), whereas B's final unconditional push produces an undesirable [['']] for empty input.",
+          "spec_adherence": "A",
+          "spec_adherence_reason": "Candidate A implements the required behaviors (commas, quotes, escaped quotes, multiline quoted fields, CRLF handling) and handles empty input sensibly, while B exhibits a concrete deviation (producing [['']] for empty input).",
+          "restraint": "tie",
+          "restraint_reason": "Neither implementation introduces large out-of-spec features or heavy abstractions — both stick to straightforward parsing logic without notable scope creep."
+        }
+      }
+    ]
+  },
+  {
+    "pairId": "csv-parser::AvsC::csv-parser-20260511-142614_vs_csv-parser-20260511-151126",
+    "condX": "A",
+    "condY": "C",
+    "results": {
+      "test_quality": {
+        "verdict": "X",
+        "reasons": [
+          "[A] has a much larger, more diagnostic test suite (empty input, empty/leading/trailing fields, trailing newline, multiple quoted-field cases) that covers many edge and boundary cases [C]'s tests miss.",
+          "[A]'s test suite is broader and more diagnostic—covering empty input, empty/leading/trailing fields, trailing newline, complex-quote edge cases and multiple quoted fields—whereas [C]'s tests are narrower and miss several useful failure modes.",
+          "[A]'s test suite is broader and more diagnostic — it checks empty input, empty/trailing/leading fields, trailing newlines, multiple quoted-field patterns and edge cases that would catch regressions [C]'s narrower suite misses."
+        ]
+      },
+      "design_quality": {
+        "verdict": "X",
+        "reasons": [
+          "[A]'s implementation has clearer control flow (explicit inQuotes block and manual index), better end-of-input handling, and a tidy export, making it easier to read and maintain.",
+          "[A]'s implementation is clearer and better structured (separate inQuotes branch, explicit index management, avoids always appending a row for empty input), making it easier to read and maintain than [C]'s more error-prone for-loop/toggle logic.",
+          "[A] has clearer, more maintainable control flow (explicit inQuotes branch, while-loop index handling), avoids the for-loop/post-increment pitfalls in [C], and cleanly avoids pushing spurious rows at the end."
+        ]
+      },
+      "spec_adherence": {
+        "verdict": "X",
+        "reasons": [
+          "[A] handles the full set of required behaviors plus implied edge cases (empty fields, trailing newline, empty input) more correctly; [C] returns a spurious [['']] for empty input and has a smaller test surface.",
+          "[A] more faithfully satisfies the spec and extension overall (correct CRLF handling, preserves CRLF inside quotes, and sensible empty-input behavior) and its tests exercise more edge cases that the spec implies.",
+          "[A] more correctly handles edge cases implied by the spec (empty input, trailing newline not producing an extra row) while [C] unconditionally appends a final row/field and can produce an extra empty row for empty or trailing-newline inputs."
+        ]
+      },
+      "restraint": {
+        "verdict": "Y",
+        "reasons": [
+          "[C] stays closer to the minimal spec and tests without adding extra conveniences or exports that [A] introduced ([A] adds extra behaviors and an export file beyond the core requirement).",
+          "[C] sticks closely to the core spec without adding extra files or numerous additional behaviors/tests, while [A] introduces extra test coverage and an export file that go beyond the minimal requirements.",
+          "[C] stays closer to a minimal implementation of the spec without adding an extra export file or numerous extra test cases and heuristics beyond what was requested."
+        ]
+      }
+    },
+    "raw": [
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "B has a much larger, more diagnostic test suite (empty input, empty/leading/trailing fields, trailing newline, multiple quoted-field cases) that covers many edge and boundary cases A's tests miss.",
+          "design_quality": "B",
+          "design_quality_reason": "B's implementation has clearer control flow (explicit inQuotes block and manual index), better end-of-input handling, and a tidy export, making it easier to read and maintain.",
+          "spec_adherence": "B",
+          "spec_adherence_reason": "B handles the full set of required behaviors plus implied edge cases (empty fields, trailing newline, empty input) more correctly; A returns a spurious [['']] for empty input and has a smaller test surface.",
+          "restraint": "A",
+          "restraint_reason": "A stays closer to the minimal spec and tests without adding extra conveniences or exports that B introduced (B adds extra behaviors and an export file beyond the core requirement)."
+        }
+      },
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "B's test suite is broader and more diagnostic—covering empty input, empty/leading/trailing fields, trailing newline, complex-quote edge cases and multiple quoted fields—whereas A's tests are narrower and miss several useful failure modes.",
+          "design_quality": "B",
+          "design_quality_reason": "B's implementation is clearer and better structured (separate inQuotes branch, explicit index management, avoids always appending a row for empty input), making it easier to read and maintain than A's more error-prone for-loop/toggle logic.",
+          "spec_adherence": "B",
+          "spec_adherence_reason": "B more faithfully satisfies the spec and extension overall (correct CRLF handling, preserves CRLF inside quotes, and sensible empty-input behavior) and its tests exercise more edge cases that the spec implies.",
+          "restraint": "A",
+          "restraint_reason": "A sticks closely to the core spec without adding extra files or numerous additional behaviors/tests, while B introduces extra test coverage and an export file that go beyond the minimal requirements."
+        }
+      },
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "B's test suite is broader and more diagnostic — it checks empty input, empty/trailing/leading fields, trailing newlines, multiple quoted-field patterns and edge cases that would catch regressions A's narrower suite misses.",
+          "design_quality": "B",
+          "design_quality_reason": "B has clearer, more maintainable control flow (explicit inQuotes branch, while-loop index handling), avoids the for-loop/post-increment pitfalls in A, and cleanly avoids pushing spurious rows at the end.",
+          "spec_adherence": "B",
+          "spec_adherence_reason": "B more correctly handles edge cases implied by the spec (empty input, trailing newline not producing an extra row) while A unconditionally appends a final row/field and can produce an extra empty row for empty or trailing-newline inputs.",
+          "restraint": "A",
+          "restraint_reason": "A stays closer to a minimal implementation of the spec without adding an extra export file or numerous extra test cases and heuristics beyond what was requested."
+        }
+      }
+    ]
+  },
+  {
+    "pairId": "csv-parser::AvsC::csv-parser-20260511-142614_vs_csv-parser-20260511-153335",
+    "condX": "A",
+    "condY": "C",
+    "results": {
+      "test_quality": {
+        "verdict": "X",
+        "reasons": [
+          "[A]'s test suite is broader and more diagnostic—covers empty input, trailing newlines, empty/leading/trailing fields and several quoted-field edge cases that would catch regressions [C]'s suite misses.",
+          "[A]'s test suite covers many additional edge cases (empty input, empty/leading/trailing fields, trailing newline, multiple quoted fields) making it a stronger regression net despite missing an explicit quoted-CRLF preservation test.",
+          "[A]'s test suite is broader and more diagnostic — it covers many edge cases (empty input, empty/leading/trailing fields, trailing newline, empty quoted fields, multiple quoted fields and tricky escaped-quote cases) that would catch regressions the slimmer suite from [C] would miss."
+        ]
+      },
+      "design_quality": {
+        "verdict": "X",
+        "reasons": [
+          "[A]'s implementation is slightly better structured and defensive (guards against spurious final empty row, small project export), whereas [C] always pushes a final row unconditionally which is error-prone.",
+          "[A]'s implementation includes cleaner end-of-input handling (avoids spurious empty rows for empty input or a trailing newline) and a small module export, making it slightly more maintainable.",
+          "[A]'s implementation has slightly cleaner end-of-input handling (avoids spurious empty rows) and a small, sensible module export, resulting in fewer edge-case surprises and marginally better maintainability."
+        ]
+      },
+      "spec_adherence": {
+        "verdict": "X",
+        "reasons": [
+          "[A] correctly implements quoted fields, escaped quotes, multiline quoted fields, CRLF handling and returns [] for empty input; [C] produces an extra row for empty input/trailing-newline cases and therefore fails parts of the spec.",
+          "[A] more faithfully handles practical expectations (returns [] for empty input and doesn't emit an extra row for a trailing newline) while both implement quoted fields, doubled quotes, and CRLF handling correctly.",
+          "[A] more carefully handles practical edge cases implied by the spec (empty input and trailing newlines) and its tests validate the expected behaviors, while [C] unconditionally appends a final row which can produce an extra empty row."
+        ]
+      },
+      "restraint": {
+        "verdict": "Y",
+        "reasons": [
+          "[A] sticks closely to the spec (including avoiding emitting a spurious final row); [C]'s unconditional final push expands output beyond the spec (extra empty rows) and thus shows less restraint.",
+          "[C] sticks closer to the spec without adding extra exports or heuristics (like special empty-input behavior) and keeps scope minimal.",
+          "[C] stays closer to the narrow spec and tests the required CRLF/bare-CR behaviors without adding extra export files or numerous extra test-driven features beyond the spec."
+        ]
+      }
+    },
+    "raw": [
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "A's test suite is broader and more diagnostic—covers empty input, trailing newlines, empty/leading/trailing fields and several quoted-field edge cases that would catch regressions B's suite misses.",
+          "design_quality": "A",
+          "design_quality_reason": "A's implementation is slightly better structured and defensive (guards against spurious final empty row, small project export), whereas B always pushes a final row unconditionally which is error-prone.",
+          "spec_adherence": "A",
+          "spec_adherence_reason": "A correctly implements quoted fields, escaped quotes, multiline quoted fields, CRLF handling and returns [] for empty input; B produces an extra row for empty input/trailing-newline cases and therefore fails parts of the spec.",
+          "restraint": "A",
+          "restraint_reason": "A sticks closely to the spec (including avoiding emitting a spurious final row); B's unconditional final push expands output beyond the spec (extra empty rows) and thus shows less restraint."
+        }
+      },
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "B's test suite covers many additional edge cases (empty input, empty/leading/trailing fields, trailing newline, multiple quoted fields) making it a stronger regression net despite missing an explicit quoted-CRLF preservation test.",
+          "design_quality": "B",
+          "design_quality_reason": "B's implementation includes cleaner end-of-input handling (avoids spurious empty rows for empty input or a trailing newline) and a small module export, making it slightly more maintainable.",
+          "spec_adherence": "B",
+          "spec_adherence_reason": "B more faithfully handles practical expectations (returns [] for empty input and doesn't emit an extra row for a trailing newline) while both implement quoted fields, doubled quotes, and CRLF handling correctly.",
+          "restraint": "A",
+          "restraint_reason": "A sticks closer to the spec without adding extra exports or heuristics (like special empty-input behavior) and keeps scope minimal."
+        }
+      },
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "B's test suite is broader and more diagnostic — it covers many edge cases (empty input, empty/leading/trailing fields, trailing newline, empty quoted fields, multiple quoted fields and tricky escaped-quote cases) that would catch regressions the slimmer suite from A would miss.",
+          "design_quality": "B",
+          "design_quality_reason": "B's implementation has slightly cleaner end-of-input handling (avoids spurious empty rows) and a small, sensible module export, resulting in fewer edge-case surprises and marginally better maintainability.",
+          "spec_adherence": "B",
+          "spec_adherence_reason": "B more carefully handles practical edge cases implied by the spec (empty input and trailing newlines) and its tests validate the expected behaviors, while A unconditionally appends a final row which can produce an extra empty row.",
+          "restraint": "A",
+          "restraint_reason": "A stays closer to the narrow spec and tests the required CRLF/bare-CR behaviors without adding extra export files or numerous extra test-driven features beyond the spec."
+        }
+      }
+    ]
+  },
+  {
+    "pairId": "csv-parser::AvsC::csv-parser-20260511-151126_vs_csv-parser-20260511-142614",
+    "condX": "A",
+    "condY": "C",
+    "results": {
+      "test_quality": {
+        "verdict": "X",
+        "reasons": [
+          "[A]'s test suite is broader and more diagnostic (covers empty input, leading/trailing empty fields, quoted-empty, fully-quoted cases, multiple newlines and escaped-quote edge cases) while [C]'s tests are thinner and miss many likely regressions.",
+          "Condition [C]'s test suite is broader and more diagnostic—covering empty input, empty/leading/trailing fields, trailing-newline behavior, multiple newline/quote edge cases—so it would catch more regressions.",
+          "[A]'s test suite is notably more comprehensive and diagnostic — it covers many edge cases (empty input, empty/trailing/leading fields, quoted-empty, fully quoted fields, consecutive escaped quotes, trailing-newline behavior) that would catch regressions [C]'s slimmer suite misses."
+        ]
+      },
+      "design_quality": {
+        "verdict": "X",
+        "reasons": [
+          "[A]'s implementation has clearer control flow with well-placed early continues and a final check to avoid spurious rows (e.g. from trailing newlines), making it easier to reason about and maintain than [C]'s simpler but error-prone for-loop that unconditionally appends a final row.",
+          "Condition [C]'s implementation has clearer, more explicit control flow (well-placed continues, precise index management) and a correct end-of-input guard that prevents extra empty rows, making it easier to maintain.",
+          "[A]'s implementation has clearer control flow, explicit index management and a final guard to avoid spurious empty rows (e.g. trailing-newline/empty-input cases) making it more robust and maintainable than [C]'s simpler but error-prone loop."
+        ]
+      },
+      "spec_adherence": {
+        "verdict": "X",
+        "reasons": [
+          "[A] correctly implements the required CSV behaviours and also avoids producing an extra empty row for inputs like trailing newlines or empty input, whereas [C] unconditionally appends a final row (yielding [['']] for empty input or an extra empty row for a trailing newline).",
+          "Condition [C] more faithfully implements the intended CSV semantics (including not producing a spurious final empty row and correctly handling various quoted-field edge cases) while Condition C can produce an extra empty row for trailing newlines.",
+          "[A] more fully and correctly implements the spec and extensions (CRLF handling, CRLF preserved inside quotes, bare CR preserved) and also avoids producing an extra empty row on trailing newlines which [C] would produce."
+        ]
+      },
+      "restraint": {
+        "verdict": "Y",
+        "reasons": [
+          "[C] sticks closer to the minimal parser and tests required by the spec, while [A] adds extra surface area (an index export file and many additional test cases and behaviors beyond the explicit spec).",
+          "Condition C sticks more narrowly to the core parser without adding extra entry-point files or broader behaviour tests; Condition [C] includes an extra index export and wider handling beyond the minimal spec.",
+          "[C] stays closer to the requested scope (single file export, implements the core CSV rules) while [A] adds extra surface area (re-export file and many additional edge-case behaviors/tests) beyond the minimal spec."
+        ]
+      }
+    },
+    "raw": [
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "B's test suite is broader and more diagnostic (covers empty input, leading/trailing empty fields, quoted-empty, fully-quoted cases, multiple newlines and escaped-quote edge cases) while A's tests are thinner and miss many likely regressions.",
+          "design_quality": "B",
+          "design_quality_reason": "B's implementation has clearer control flow with well-placed early continues and a final check to avoid spurious rows (e.g. from trailing newlines), making it easier to reason about and maintain than A's simpler but error-prone for-loop that unconditionally appends a final row.",
+          "spec_adherence": "B",
+          "spec_adherence_reason": "B correctly implements the required CSV behaviours and also avoids producing an extra empty row for inputs like trailing newlines or empty input, whereas A unconditionally appends a final row (yielding [['']] for empty input or an extra empty row for a trailing newline).",
+          "restraint": "A",
+          "restraint_reason": "A sticks closer to the minimal parser and tests required by the spec, while B adds extra surface area (an index export file and many additional test cases and behaviors beyond the explicit spec)."
+        }
+      },
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "Candidate B's test suite is broader and more diagnostic—covering empty input, empty/leading/trailing fields, trailing-newline behavior, multiple newline/quote edge cases—so it would catch more regressions.",
+          "design_quality": "B",
+          "design_quality_reason": "Candidate B's implementation has clearer, more explicit control flow (well-placed continues, precise index management) and a correct end-of-input guard that prevents extra empty rows, making it easier to maintain.",
+          "spec_adherence": "B",
+          "spec_adherence_reason": "Candidate B more faithfully implements the intended CSV semantics (including not producing a spurious final empty row and correctly handling various quoted-field edge cases) while Candidate A can produce an extra empty row for trailing newlines.",
+          "restraint": "A",
+          "restraint_reason": "Candidate A sticks more narrowly to the core parser without adding extra entry-point files or broader behaviour tests; Candidate B includes an extra index export and wider handling beyond the minimal spec."
+        }
+      },
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "B's test suite is notably more comprehensive and diagnostic — it covers many edge cases (empty input, empty/trailing/leading fields, quoted-empty, fully quoted fields, consecutive escaped quotes, trailing-newline behavior) that would catch regressions A's slimmer suite misses.",
+          "design_quality": "B",
+          "design_quality_reason": "B's implementation has clearer control flow, explicit index management and a final guard to avoid spurious empty rows (e.g. trailing-newline/empty-input cases) making it more robust and maintainable than A's simpler but error-prone loop.",
+          "spec_adherence": "B",
+          "spec_adherence_reason": "B more fully and correctly implements the spec and extensions (CRLF handling, CRLF preserved inside quotes, bare CR preserved) and also avoids producing an extra empty row on trailing newlines which A would produce.",
+          "restraint": "A",
+          "restraint_reason": "A stays closer to the requested scope (single file export, implements the core CSV rules) while B adds extra surface area (re-export file and many additional edge-case behaviors/tests) beyond the minimal spec."
+        }
+      }
+    ]
+  },
+  {
+    "pairId": "csv-parser::AvsC::csv-parser-20260511-151126_vs_csv-parser-20260511-151126",
+    "condX": "A",
+    "condY": "C",
+    "results": {
+      "test_quality": {
+        "verdict": "X",
+        "reasons": [
+          "Condition [A] has a much more thorough and diagnostic test suite (empty input, trailing newline, many quoted-edge cases and CR/LF variants) while [C]'s tests are narrower and miss important failure modes (e.g. empty input/trailing-newline behavior).",
+          "[A] has a much richer, more diagnostic test suite that covers many edge cases (empty input, empty/trailing/leading fields, quoted-empty, fully quoted fields, consecutive escaped quotes, trailing-newline behavior) that would catch regressions [C]'s smaller suite would miss.",
+          "[A]'s test suite is significantly more comprehensive (empty input, empty fields, leading/trailing fields, many edge cases) and would catch many more regressions than [C]'s smaller example-focused suite."
+        ]
+      },
+      "design_quality": {
+        "verdict": "X",
+        "reasons": [
+          "Condition [A]'s parser code is slightly more robust and explicit (correctly avoids producing spurious rows for empty/trailing-newline inputs) and its control flow and final-commit logic are clearer than [C]'s simpler-but-buggy unconditional final push.",
+          "[A]'s parser has clearer control flow (explicit inQuotes branch), careful index management, and a safer end-of-input condition that avoids spurious rows, making it easier to read and maintain than [C]'s for-loop with unconditional final push.",
+          "[A]'s implementation has clearer control flow (explicit inQuotes branch, explicit index management), better end-of-input handling, and slightly cleaner structure (separate export), making it easier to maintain."
+        ]
+      },
+      "spec_adherence": {
+        "verdict": "X",
+        "reasons": [
+          "Condition [A] more faithfully implements the spec (including preserving bare CR, CRLF handling, and not creating an extra empty row on empty or trailing-newline input) whereas [C] produces incorrect extra rows in those cases.",
+          "[A] more faithfully implements the CSV behaviour implied by the spec (correct CRLF handling, preserves CRLF inside quotes, preserves bare CR, and avoids emitting an extra empty row for trailing newlines/empty input) while [C] can produce an extra empty row or [''] for empty input.",
+          "Both implementations correctly implement the required CSV behaviors from the spec (commas, quotes, escaped quotes, newlines, and CRLF handling) and satisfy the provided examples."
+        ]
+      },
+      "restraint": {
+        "verdict": "Y",
+        "reasons": [
+          "Neither implementation introduces significant out-of-spec features — [A]'s small extra re-export and [C]'s minimal implementation are both within reasonable scope, so neither shows clear overreach.",
+          "[C] stays closer to the original minimal spec and tests, whereas [A] expands scope (extra tests, an additional export file and behaviors like empty-input handling) beyond what was explicitly requested.",
+          "[C] stays closer to the minimal spec and tests without adding extra behaviours or scaffolding, whereas [A] introduces extra features/tests (empty-input semantics, many additional edge-case tests and an export file) beyond what the spec demanded."
+        ]
+      }
+    },
+    "raw": [
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "Candidate A has a much more thorough and diagnostic test suite (empty input, trailing newline, many quoted-edge cases and CR/LF variants) while B's tests are narrower and miss important failure modes (e.g. empty input/trailing-newline behavior).",
+          "design_quality": "A",
+          "design_quality_reason": "Candidate A's parser code is slightly more robust and explicit (correctly avoids producing spurious rows for empty/trailing-newline inputs) and its control flow and final-commit logic are clearer than B's simpler-but-buggy unconditional final push.",
+          "spec_adherence": "A",
+          "spec_adherence_reason": "Candidate A more faithfully implements the spec (including preserving bare CR, CRLF handling, and not creating an extra empty row on empty or trailing-newline input) whereas B produces incorrect extra rows in those cases.",
+          "restraint": "tie",
+          "restraint_reason": "Neither implementation introduces significant out-of-spec features — A's small extra re-export and B's minimal implementation are both within reasonable scope, so neither shows clear overreach."
+        }
+      },
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "B has a much richer, more diagnostic test suite that covers many edge cases (empty input, empty/trailing/leading fields, quoted-empty, fully quoted fields, consecutive escaped quotes, trailing-newline behavior) that would catch regressions A's smaller suite would miss.",
+          "design_quality": "B",
+          "design_quality_reason": "B's parser has clearer control flow (explicit inQuotes branch), careful index management, and a safer end-of-input condition that avoids spurious rows, making it easier to read and maintain than A's for-loop with unconditional final push.",
+          "spec_adherence": "B",
+          "spec_adherence_reason": "B more faithfully implements the CSV behaviour implied by the spec (correct CRLF handling, preserves CRLF inside quotes, preserves bare CR, and avoids emitting an extra empty row for trailing newlines/empty input) while A can produce an extra empty row or [''] for empty input.",
+          "restraint": "A",
+          "restraint_reason": "A stays closer to the original minimal spec and tests, whereas B expands scope (extra tests, an additional export file and behaviors like empty-input handling) beyond what was explicitly requested."
+        }
+      },
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "B's test suite is significantly more comprehensive (empty input, empty fields, leading/trailing fields, many edge cases) and would catch many more regressions than A's smaller example-focused suite.",
+          "design_quality": "B",
+          "design_quality_reason": "B's implementation has clearer control flow (explicit inQuotes branch, explicit index management), better end-of-input handling, and slightly cleaner structure (separate export), making it easier to maintain.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement the required CSV behaviors from the spec (commas, quotes, escaped quotes, newlines, and CRLF handling) and satisfy the provided examples.",
+          "restraint": "A",
+          "restraint_reason": "A stays closer to the minimal spec and tests without adding extra behaviours or scaffolding, whereas B introduces extra features/tests (empty-input semantics, many additional edge-case tests and an export file) beyond what the spec demanded."
+        }
+      }
+    ]
+  },
+  {
+    "pairId": "csv-parser::AvsC::csv-parser-20260511-151126_vs_csv-parser-20260511-153335",
+    "condX": "A",
+    "condY": "C",
+    "results": {
+      "test_quality": {
+        "verdict": "X",
+        "reasons": [
+          "Condition [C] has a much more comprehensive, targeted test suite (empty input, leading/trailing empty fields, trailing-newline behavior, fully quoted/escaped-quote cases and multiple newlines) that would catch many regressions the spec implies.",
+          "[A] has a much broader, more diagnostic test suite (empty input, empty fields, leading/trailing empties, quoted-only cases, multiple newlines and escaped-quote edge cases) that would catch regressions [C]'s tests would miss.",
+          "Condition [A] has a larger, more diagnostic test suite that covers empty input, leading/trailing empty fields, quoted-empty, escaped-quote edge cases and trailing-newline behaviour that would catch regressions [C]'s smaller suite would miss."
+        ]
+      },
+      "design_quality": {
+        "verdict": "X",
+        "reasons": [
+          "Condition [C]'s parser includes a deliberate end-of-input check to avoid spurious empty rows and otherwise has clear, concise control flow, making it easier to maintain and correct in edge cases.",
+          "[A]'s implementation includes a sensible end-of-input guard to avoid spurious empty rows and otherwise has the same clear control flow, making it slightly more robust and maintainable than [C].",
+          "Condition [A] has slightly cleaner packaging (index re-export) and a safer finalization check to avoid spurious empty rows, making the implementation and module layout easier to maintain."
+        ]
+      },
+      "spec_adherence": {
+        "verdict": "X",
+        "reasons": [
+          "Condition [C] handles the required CSV behaviors plus sensible edge cases (empty input and trailing-newline handling) that Condition C mishandles by unconditionally emitting an extra empty row at end-of-input.",
+          "[A] handles all required behaviors (including CRLF, preserved bare CR, newlines in quotes) while also avoiding incorrect extra rows on empty or trailing-newline inputs that [C] would produce.",
+          "Condition [A] more faithfully handles boundary cases (empty input and trailing newlines without producing an extra empty row) and otherwise implements the quoted-field/CRLF requirements correctly."
+        ]
+      },
+      "restraint": {
+        "verdict": "Y",
+        "reasons": [
+          "Condition C sticks closer to just the requested functionality and tests the spec examples, while [A] adds extra test cases and an additional index export beyond the minimal spec.",
+          "[C] sticks more closely to the spec and tests the given examples without adding extra files or many additional behaviors/tests that [A] introduced. ",
+          "Condition C is simpler and avoids adding extra surface area (no re-export/file), whereas [A] added more behaviors/tests beyond the minimal spec (e.g. explicit empty-input handling and extra module indirection)."
+        ]
+      }
+    },
+    "raw": [
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "Candidate B has a much more comprehensive, targeted test suite (empty input, leading/trailing empty fields, trailing-newline behavior, fully quoted/escaped-quote cases and multiple newlines) that would catch many regressions the spec implies.",
+          "design_quality": "B",
+          "design_quality_reason": "Candidate B's parser includes a deliberate end-of-input check to avoid spurious empty rows and otherwise has clear, concise control flow, making it easier to maintain and correct in edge cases.",
+          "spec_adherence": "B",
+          "spec_adherence_reason": "Candidate B handles the required CSV behaviors plus sensible edge cases (empty input and trailing-newline handling) that Candidate A mishandles by unconditionally emitting an extra empty row at end-of-input.",
+          "restraint": "A",
+          "restraint_reason": "Candidate A sticks closer to just the requested functionality and tests the spec examples, while B adds extra test cases and an additional index export beyond the minimal spec."
+        }
+      },
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "B has a much broader, more diagnostic test suite (empty input, empty fields, leading/trailing empties, quoted-only cases, multiple newlines and escaped-quote edge cases) that would catch regressions A's tests would miss.",
+          "design_quality": "B",
+          "design_quality_reason": "B's implementation includes a sensible end-of-input guard to avoid spurious empty rows and otherwise has the same clear control flow, making it slightly more robust and maintainable than A.",
+          "spec_adherence": "B",
+          "spec_adherence_reason": "B handles all required behaviors (including CRLF, preserved bare CR, newlines in quotes) while also avoiding incorrect extra rows on empty or trailing-newline inputs that A would produce.",
+          "restraint": "A",
+          "restraint_reason": "A sticks more closely to the spec and tests the given examples without adding extra files or many additional behaviors/tests that B introduced. "
+        }
+      },
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "Candidate A has a larger, more diagnostic test suite that covers empty input, leading/trailing empty fields, quoted-empty, escaped-quote edge cases and trailing-newline behaviour that would catch regressions B's smaller suite would miss.",
+          "design_quality": "A",
+          "design_quality_reason": "Candidate A has slightly cleaner packaging (index re-export) and a safer finalization check to avoid spurious empty rows, making the implementation and module layout easier to maintain.",
+          "spec_adherence": "A",
+          "spec_adherence_reason": "Candidate A more faithfully handles boundary cases (empty input and trailing newlines without producing an extra empty row) and otherwise implements the quoted-field/CRLF requirements correctly.",
+          "restraint": "B",
+          "restraint_reason": "Candidate B is simpler and avoids adding extra surface area (no re-export/file), whereas A added more behaviors/tests beyond the minimal spec (e.g. explicit empty-input handling and extra module indirection)."
+        }
+      }
+    ]
+  },
+  {
+    "pairId": "csv-parser::AvsC::csv-parser-20260511-153335_vs_csv-parser-20260511-142614",
+    "condX": "A",
+    "condY": "C",
+    "results": {
+      "test_quality": {
+        "verdict": "X",
+        "reasons": [
+          "Condition [C]'s test suite is broader and more diagnostic — it covers empty input, empty fields, leading/trailing empties, trailing-newline phantom rows and many quoted-field edge cases that would catch common regressions that [C]'s tests miss.",
+          "Condition [A]'s test suite is broader and checks many edge cases (empty input, trailing newline, empty quoted fields, tricky quote-only inputs) that are likely to catch regressions, whereas [C]'s suite is narrower despite covering CRLF cases.",
+          "[A]'s test suite is broader and more diagnostic — it covers many edge cases (empty input, empty fields, leading/trailing empties, trailing-newline phantom row, tricky quote-only cases) that would catch regressions beyond the spec examples [C] focuses on (mostly examples + CRLF)."
+        ]
+      },
+      "design_quality": {
+        "verdict": "X",
+        "reasons": [
+          "Condition [C]'s implementation is more robust and deliberately stateful (avoids phantom trailing rows, preserves empty/quoted-field semantics) making it easier to maintain despite slightly more complex control flow.",
+          "Condition [A] uses explicit state (fieldStarted) to avoid phantom rows and handles edge cases correctly, resulting in clearer, more robust control flow than [C]'s simpler but error-prone final unconditional push.",
+          "[A] has clearer control flow and safer state handling (explicit fieldStarted flag, explicit CRLF/LF branches and guarded final push) whereas [C]'s simpler loop unconditionally appends a final row and can produce a phantom empty row."
+        ]
+      },
+      "spec_adherence": {
+        "verdict": "tie",
+        "reasons": [
+          "Both implementations correctly implement the required CSV behaviours (commas, newlines, quoted fields, doubled quotes, multi-line quoted fields and CRLF handling) so neither clearly out- or under-implements the spec.",
+          "Condition [A] more faithfully implements the spec and extension (correct CRLF handling while preserving bare CRs and avoiding spurious empty rows), whereas [C] produces incorrect results for empty input / trailing-newline cases.",
+          "Both implementations correctly implement the required CSV features (commas, quotes, doubled quotes, multiline quoted fields, CRLF row separators and preservation of bare CR inside fields) so neither is clearly more faithful to the spec."
+        ]
+      },
+      "restraint": {
+        "verdict": "Y",
+        "reasons": [
+          "Condition C stays closer to the requested scope and tests only the spec and its CRLF extension, while [A] adds numerous extra behaviours and tests beyond what was asked for.",
+          "Neither implementation introduces significant out-of-spec features or unnecessary abstractions; [A] adds defensive behavior and more tests while [C] stays minimal, so overall neither clearly overreaches.",
+          "[C] is more minimal and sticks to the core spec behaviors, while [A] introduces extra behavior/tests (empty-input semantics, trailing-newline suppression and other conveniences) beyond what the spec explicitly required."
+        ]
+      }
+    },
+    "raw": [
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "Candidate B's test suite is broader and more diagnostic — it covers empty input, empty fields, leading/trailing empties, trailing-newline phantom rows and many quoted-field edge cases that would catch common regressions that A's tests miss.",
+          "design_quality": "B",
+          "design_quality_reason": "Candidate B's implementation is more robust and deliberately stateful (avoids phantom trailing rows, preserves empty/quoted-field semantics) making it easier to maintain despite slightly more complex control flow.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement the required CSV behaviours (commas, newlines, quoted fields, doubled quotes, multi-line quoted fields and CRLF handling) so neither clearly out- or under-implements the spec.",
+          "restraint": "A",
+          "restraint_reason": "Candidate A stays closer to the requested scope and tests only the spec and its CRLF extension, while B adds numerous extra behaviours and tests beyond what was asked for."
+        }
+      },
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "Candidate A's test suite is broader and checks many edge cases (empty input, trailing newline, empty quoted fields, tricky quote-only inputs) that are likely to catch regressions, whereas B's suite is narrower despite covering CRLF cases.",
+          "design_quality": "A",
+          "design_quality_reason": "Candidate A uses explicit state (fieldStarted) to avoid phantom rows and handles edge cases correctly, resulting in clearer, more robust control flow than B's simpler but error-prone final unconditional push.",
+          "spec_adherence": "A",
+          "spec_adherence_reason": "Candidate A more faithfully implements the spec and extension (correct CRLF handling while preserving bare CRs and avoiding spurious empty rows), whereas B produces incorrect results for empty input / trailing-newline cases.",
+          "restraint": "tie",
+          "restraint_reason": "Neither implementation introduces significant out-of-spec features or unnecessary abstractions; A adds defensive behavior and more tests while B stays minimal, so overall neither clearly overreaches."
+        }
+      },
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "B's test suite is broader and more diagnostic — it covers many edge cases (empty input, empty fields, leading/trailing empties, trailing-newline phantom row, tricky quote-only cases) that would catch regressions beyond the spec examples A focuses on (mostly examples + CRLF).",
+          "design_quality": "B",
+          "design_quality_reason": "B has clearer control flow and safer state handling (explicit fieldStarted flag, explicit CRLF/LF branches and guarded final push) whereas A's simpler loop unconditionally appends a final row and can produce a phantom empty row.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement the required CSV features (commas, quotes, doubled quotes, multiline quoted fields, CRLF row separators and preservation of bare CR inside fields) so neither is clearly more faithful to the spec.",
+          "restraint": "A",
+          "restraint_reason": "A is more minimal and sticks to the core spec behaviors, while B introduces extra behavior/tests (empty-input semantics, trailing-newline suppression and other conveniences) beyond what the spec explicitly required."
+        }
+      }
+    ]
+  },
+  {
+    "pairId": "csv-parser::AvsC::csv-parser-20260511-153335_vs_csv-parser-20260511-151126",
+    "condX": "A",
+    "condY": "C",
+    "results": {
+      "test_quality": {
+        "verdict": "X",
+        "reasons": [
+          "[A]'s test suite is much more comprehensive—covers empty input, empty/leading/trailing fields, trailing-newline behavior, multiple quoted/newline edge cases and tricky escaped-quote forms—so it would catch more regressions.",
+          "[A]'s test suite is broader and exercises many edge cases (empty input, empty fields, trailing newline, many quoted-field variants) giving better regression coverage, whereas [C]'s tests are narrower even though they do include CRLF cases.",
+          "Condition [A]'s test suite is much more comprehensive and exercises many edge cases (empty input, trailing-newline suppression, empty quoted fields, tricky escaped-quote sequences) while [C]'s tests are narrower (focused on CRLF and bare CR) and miss several useful regression cases."
+        ]
+      },
+      "design_quality": {
+        "verdict": "X",
+        "reasons": [
+          "[A]'s implementation has clearer, more maintainable control flow (explicit while loop, inQuotes branch, fieldStarted to avoid phantom rows) and avoids subtle end-of-input bugs present in [C].",
+          "[A]'s implementation correctly handles quoted fields, escapes, CRLF, bare CR and avoids phantom rows (via fieldStarted logic), while [C]'s simpler loop produces incorrect extra rows for empty input or trailing newlines.",
+          "Condition [A]'s parser has clearer, more defensive control flow (correct end-of-input handling, no phantom row on trailing newline) and explicit state management, whereas [C]'s shorter implementation has fragile end-of-input logic and indexing that leads to bugs."
+        ]
+      },
+      "spec_adherence": {
+        "verdict": "X",
+        "reasons": [
+          "[A] implements all required behaviours (commas, quoted fields, escaped quotes, multiline quoted fields, CRLF handling) and also avoids producing a phantom empty row for trailing newlines, whereas [C] would produce an unexpected row for empty input.",
+          "[A] more faithfully implements the spec and extension (CRLF as row separator, CRLF preserved inside quotes, bare CR preserved) and avoids phantom/extra rows; [C] fails on empty input and trailing-newline cases.",
+          "Condition [A] correctly implements the required behaviours (including CRLF handling, preserving bare CR and CRLF inside quotes, and returning [] for empty input / not emitting a phantom row), while [C] fails on empty input and can produce extra phantom rows."
+        ]
+      },
+      "restraint": {
+        "verdict": "tie",
+        "reasons": [
+          "[C] sticks closely to the spec and tests the specified examples (plus CRLF) without adding the broad set of extra edge-case behaviours and test cases present in [A].",
+          "Both implementations are fairly minimal and focused on the CSV requirements — [A]'s extra fieldStarted flag is a small, justifiable detail to meet the spec and [C] avoids unnecessary abstractions, so neither shows concerning scope creep.",
+          "Neither implementation adds unnecessary features beyond the spec — [A] adds more thorough tests (relevant edge cases) and [C] focuses on the CRLF extension, so both stay within the intended scope."
+        ]
+      }
+    },
+    "raw": [
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "B's test suite is much more comprehensive—covers empty input, empty/leading/trailing fields, trailing-newline behavior, multiple quoted/newline edge cases and tricky escaped-quote forms—so it would catch more regressions.",
+          "design_quality": "B",
+          "design_quality_reason": "B's implementation has clearer, more maintainable control flow (explicit while loop, inQuotes branch, fieldStarted to avoid phantom rows) and avoids subtle end-of-input bugs present in A.",
+          "spec_adherence": "B",
+          "spec_adherence_reason": "B implements all required behaviours (commas, quoted fields, escaped quotes, multiline quoted fields, CRLF handling) and also avoids producing a phantom empty row for trailing newlines, whereas A would produce an unexpected row for empty input.",
+          "restraint": "A",
+          "restraint_reason": "A sticks closely to the spec and tests the specified examples (plus CRLF) without adding the broad set of extra edge-case behaviours and test cases present in B."
+        }
+      },
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "A's test suite is broader and exercises many edge cases (empty input, empty fields, trailing newline, many quoted-field variants) giving better regression coverage, whereas B's tests are narrower even though they do include CRLF cases.",
+          "design_quality": "A",
+          "design_quality_reason": "A's implementation correctly handles quoted fields, escapes, CRLF, bare CR and avoids phantom rows (via fieldStarted logic), while B's simpler loop produces incorrect extra rows for empty input or trailing newlines.",
+          "spec_adherence": "A",
+          "spec_adherence_reason": "A more faithfully implements the spec and extension (CRLF as row separator, CRLF preserved inside quotes, bare CR preserved) and avoids phantom/extra rows; B fails on empty input and trailing-newline cases.",
+          "restraint": "tie",
+          "restraint_reason": "Both implementations are fairly minimal and focused on the CSV requirements — A's extra fieldStarted flag is a small, justifiable detail to meet the spec and B avoids unnecessary abstractions, so neither shows concerning scope creep."
+        }
+      },
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "Candidate A's test suite is much more comprehensive and exercises many edge cases (empty input, trailing-newline suppression, empty quoted fields, tricky escaped-quote sequences) while B's tests are narrower (focused on CRLF and bare CR) and miss several useful regression cases.",
+          "design_quality": "A",
+          "design_quality_reason": "Candidate A's parser has clearer, more defensive control flow (correct end-of-input handling, no phantom row on trailing newline) and explicit state management, whereas B's shorter implementation has fragile end-of-input logic and indexing that leads to bugs.",
+          "spec_adherence": "A",
+          "spec_adherence_reason": "Candidate A correctly implements the required behaviours (including CRLF handling, preserving bare CR and CRLF inside quotes, and returning [] for empty input / not emitting a phantom row), while B fails on empty input and can produce extra phantom rows.",
+          "restraint": "tie",
+          "restraint_reason": "Neither implementation adds unnecessary features beyond the spec — A adds more thorough tests (relevant edge cases) and B focuses on the CRLF extension, so both stay within the intended scope."
+        }
+      }
+    ]
+  },
+  {
+    "pairId": "csv-parser::AvsC::csv-parser-20260511-153335_vs_csv-parser-20260511-153335",
+    "condX": "A",
+    "condY": "C",
+    "results": {
+      "test_quality": {
+        "verdict": "X",
+        "reasons": [
+          "Condition [C]'s test suite covers many more edge cases and failure modes (empty input, empty fields, trailing newline, various quoted-field permutations) providing stronger regression protection than [C]'s narrower, mostly spec-example-focused tests.",
+          "Condition [A] has a much broader, targeted test suite (empty input, trailing-newline, many quoted/unquoted edge cases and boundary conditions) while [C]'s tests focus narrowly on CRLF and basic cases and miss important regressions, so [A]'s tests are more likely to catch real breaks.",
+          "[A]'s test suite covers many more edge cases (empty input, empty fields, trailing newline, complex quoting patterns) and has more specific assertions, making it more likely to catch regressions."
+        ]
+      },
+      "design_quality": {
+        "verdict": "X",
+        "reasons": [
+          "Condition [C] uses small, purposeful state (fieldStarted) and explicit final-row logic to avoid phantom rows and handles many corner cases cleanly, making the control flow slightly more complex but clearer and more robust than [C]'s simpler but less defensive code.",
+          "Condition [A]'s implementation is clearer and more defensive (tracks fieldStarted to avoid phantom rows, explicit state transitions) while [C] is simpler but leaves a surprising unconditional final push and thus is less robust/maintainable.",
+          "[A]'s implementation is slightly more robust and explicitly tracks field/start state to avoid phantom rows and empty-input issues, resulting in clearer, correct control flow compared with [C]'s simpler but brittle final-row logic."
+        ]
+      },
+      "spec_adherence": {
+        "verdict": "X",
+        "reasons": [
+          "Both implementations implement the core CSV and CRLF behaviors, but [A] handles additional important cases (empty input, trailing-newline suppression) that make its behavior more correct and robust against realistic inputs.",
+          "[A] correctly implements quoting, escaped quotes, multi-line quoted fields and avoids producing a phantom row for trailing newlines (and returns [] for empty input), whereas [C] produces an incorrect extra row on empty or trailing-newline inputs.",
+          "[A] more faithfully implements the CSV rules including quoted multi-line fields, escaped quotes, CRLF row breaks, and avoids producing phantom rows or incorrect output on empty input, whereas [C] unconditionally emits a final row and can produce incorrect results for empty or trailing-newline inputs."
+        ]
+      },
+      "restraint": {
+        "verdict": "Y",
+        "reasons": [
+          "Condition C sticks closely to the spec and implements only the required behaviors, while [A] adds extra features and tests (empty-input semantics and extra edge-case handling) beyond the explicit requirements.",
+          "Condition [A] stays focused on the parser behaviour and only adds minimal, justified state (fieldStarted) to meet the spec, while [C]'s logic ends up adding unintended output (extra row) and thus shows less discipline.",
+          "[C]'s implementation is simpler and does not introduce extra state/behaviour beyond the core parser (whereas [A] adds additional handling like fieldStarted and many extra test cases beyond the minimal spec)."
+        ]
+      }
+    },
+    "raw": [
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "Candidate B's test suite covers many more edge cases and failure modes (empty input, empty fields, trailing newline, various quoted-field permutations) providing stronger regression protection than A's narrower, mostly spec-example-focused tests.",
+          "design_quality": "B",
+          "design_quality_reason": "Candidate B uses small, purposeful state (fieldStarted) and explicit final-row logic to avoid phantom rows and handles many corner cases cleanly, making the control flow slightly more complex but clearer and more robust than A's simpler but less defensive code.",
+          "spec_adherence": "B",
+          "spec_adherence_reason": "Both implementations implement the core CSV and CRLF behaviors, but B handles additional important cases (empty input, trailing-newline suppression) that make its behavior more correct and robust against realistic inputs.",
+          "restraint": "A",
+          "restraint_reason": "Candidate A sticks closely to the spec and implements only the required behaviors, while B adds extra features and tests (empty-input semantics and extra edge-case handling) beyond the explicit requirements."
+        }
+      },
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "Candidate A has a much broader, targeted test suite (empty input, trailing-newline, many quoted/unquoted edge cases and boundary conditions) while B's tests focus narrowly on CRLF and basic cases and miss important regressions, so A's tests are more likely to catch real breaks.",
+          "design_quality": "A",
+          "design_quality_reason": "Candidate A's implementation is clearer and more defensive (tracks fieldStarted to avoid phantom rows, explicit state transitions) while B is simpler but leaves a surprising unconditional final push and thus is less robust/maintainable.",
+          "spec_adherence": "A",
+          "spec_adherence_reason": "A correctly implements quoting, escaped quotes, multi-line quoted fields and avoids producing a phantom row for trailing newlines (and returns [] for empty input), whereas B produces an incorrect extra row on empty or trailing-newline inputs.",
+          "restraint": "A",
+          "restraint_reason": "Candidate A stays focused on the parser behaviour and only adds minimal, justified state (fieldStarted) to meet the spec, while B's logic ends up adding unintended output (extra row) and thus shows less discipline."
+        }
+      },
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "A's test suite covers many more edge cases (empty input, empty fields, trailing newline, complex quoting patterns) and has more specific assertions, making it more likely to catch regressions.",
+          "design_quality": "A",
+          "design_quality_reason": "A's implementation is slightly more robust and explicitly tracks field/start state to avoid phantom rows and empty-input issues, resulting in clearer, correct control flow compared with B's simpler but brittle final-row logic.",
+          "spec_adherence": "A",
+          "spec_adherence_reason": "A more faithfully implements the CSV rules including quoted multi-line fields, escaped quotes, CRLF row breaks, and avoids producing phantom rows or incorrect output on empty input, whereas B unconditionally emits a final row and can produce incorrect results for empty or trailing-newline inputs.",
+          "restraint": "B",
+          "restraint_reason": "B's implementation is simpler and does not introduce extra state/behaviour beyond the core parser (whereas A adds additional handling like fieldStarted and many extra test cases beyond the minimal spec)."
+        }
+      }
+    ]
+  },
+  {
+    "pairId": "csv-parser::BvsC::csv-parser-20260511-142614_vs_csv-parser-20260511-142614",
+    "condX": "B",
+    "condY": "C",
+    "results": {
+      "test_quality": {
+        "verdict": "Y",
+        "reasons": [
+          "[C]'s test suite is broader and more targeted (adds a single-field case and a mixed CRLF/LF case) and its tests are more granular, so it covers extra edge cases that would catch regressions.",
+          "Condition C has a broader and slightly more targeted test suite (single-field, explicit comma-splitting, and a mixed CRLF/LF case) that exercises more boundary cases and realistic failures than [B]'s smaller suite.",
+          "Condition C provides a broader, more diagnostic test suite (single-field, explicit comma-splitting, and a mixed CRLF+LF case) that exercises more boundary and interaction cases than [B]’s smaller set."
+        ]
+      },
+      "design_quality": {
+        "verdict": "tie",
+        "reasons": [
+          "[C]'s parser has slightly clearer control flow (fewer nested branches) and its tests are organized into more focused cases, making the codebase marginally easier to maintain.",
+          "The implementations are effectively the same in structure, clarity, and simplicity — neither over- nor under-engineered and both are readable and maintainable.",
+          "The implementations are functionally and structurally nearly identical and both are simple and readable, so there is no clear maintainability advantage for either."
+        ]
+      },
+      "spec_adherence": {
+        "verdict": "tie",
+        "reasons": [
+          "Both implementations correctly implement the spec features (commas, newlines, quoted fields, escaped quotes, multiline quoted fields, and CRLF behavior) with equivalent behavior.",
+          "Both implementations correctly implement the CSV rules (commas, quotes, doubled quotes, multiline quoted fields) and the CRLF extension and behave consistently with the examples.",
+          "Both implementations correctly implement quoted fields, doubled quotes, multi-line quoted fields, CRLF row separators, and preservation of bare CR as required by the spec."
+        ]
+      },
+      "restraint": {
+        "verdict": "tie",
+        "reasons": [
+          "Neither candidate adds unnecessary features or heavy abstractions beyond the spec; both stick closely to the required functionality.",
+          "Neither implementation adds behavior outside the spec or unnecessary abstractions; differences are limited to test coverage rather than added features.",
+          "Neither candidate adds extraneous features or heavy abstractions beyond the spec; both stick closely to the required behavior and surface area."
+        ]
+      }
+    },
+    "raw": [
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "B's test suite is broader and more targeted (adds a single-field case and a mixed CRLF/LF case) and its tests are more granular, so it covers extra edge cases that would catch regressions.",
+          "design_quality": "B",
+          "design_quality_reason": "B's parser has slightly clearer control flow (fewer nested branches) and its tests are organized into more focused cases, making the codebase marginally easier to maintain.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement the spec features (commas, newlines, quoted fields, escaped quotes, multiline quoted fields, and CRLF behavior) with equivalent behavior.",
+          "restraint": "tie",
+          "restraint_reason": "Neither candidate adds unnecessary features or heavy abstractions beyond the spec; both stick closely to the required functionality."
+        }
+      },
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "Candidate A has a broader and slightly more targeted test suite (single-field, explicit comma-splitting, and a mixed CRLF/LF case) that exercises more boundary cases and realistic failures than B's smaller suite.",
+          "design_quality": "tie",
+          "design_quality_reason": "The implementations are effectively the same in structure, clarity, and simplicity — neither over- nor under-engineered and both are readable and maintainable.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement the CSV rules (commas, quotes, doubled quotes, multiline quoted fields) and the CRLF extension and behave consistently with the examples.",
+          "restraint": "tie",
+          "restraint_reason": "Neither implementation adds behavior outside the spec or unnecessary abstractions; differences are limited to test coverage rather than added features."
+        }
+      },
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "Candidate A provides a broader, more diagnostic test suite (single-field, explicit comma-splitting, and a mixed CRLF+LF case) that exercises more boundary and interaction cases than B’s smaller set.",
+          "design_quality": "tie",
+          "design_quality_reason": "The implementations are functionally and structurally nearly identical and both are simple and readable, so there is no clear maintainability advantage for either.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement quoted fields, doubled quotes, multi-line quoted fields, CRLF row separators, and preservation of bare CR as required by the spec.",
+          "restraint": "tie",
+          "restraint_reason": "Neither candidate adds extraneous features or heavy abstractions beyond the spec; both stick closely to the required behavior and surface area."
+        }
+      }
+    ]
+  },
+  {
+    "pairId": "csv-parser::BvsC::csv-parser-20260511-142614_vs_csv-parser-20260511-151126",
+    "condX": "B",
+    "condY": "C",
+    "results": {
+      "test_quality": {
+        "verdict": "Y",
+        "reasons": [
+          "[C]'s test suite is slightly more comprehensive (it includes mixed CRLF+LF row-separator coverage and multiple placements of bare CR), so it exercises more of the spec's edge cases.",
+          "[C]'s test suite covers all core examples plus an extra mixed CRLF/LF case and a slightly broader set of boundary checks, making it more likely to catch regressions.",
+          "[C]'s test suite covers an extra real-world case (mixed CRLF and LF separators) and includes focused edge assertions (bare CR in a field) that make it more likely to catch regressions."
+        ]
+      },
+      "design_quality": {
+        "verdict": "X",
+        "reasons": [
+          "[B]'s parser has a clearer separation of inQuotes vs out-of-quotes logic, with fewer repeated conditions and more straightforward control flow, making it easier to read and maintain.",
+          "[[C]]'s parsing code has a clearer, more explicit inQuotes branch structure and straightforward control flow that is easier to read and maintain.",
+          "[[C]] keeps the parsing logic clearly separated with an explicit inQuotes branch, making the control flow easier to read and reason about than [C]'s many early-continues."
+        ]
+      },
+      "spec_adherence": {
+        "verdict": "tie",
+        "reasons": [
+          "Both implementations correctly implement the required CSV behaviours (commas, quoted fields, doubled quotes, multiline quoted fields, CRLF as row separator, and preserving bare CR), so neither is measurably more faithful to the spec.",
+          "Both implementations correctly handle commas, newlines, quoted fields, doubled quotes, multiline quoted fields, and CRLF per the spec; neither omits required behavior.",
+          "Both implementations correctly implement commas/newlines, quoted fields, doubled-quote escaping, multi-line quoted fields, CRLF row separators, and preservation of bare CR, and their tests confirm the required behaviours."
+        ]
+      },
+      "restraint": {
+        "verdict": "tie",
+        "reasons": [
+          "Neither candidate adds features beyond the spec or over-engineers the solution; both implement the required functionality without unnecessary surface area.",
+          "Neither candidate introduces significant features beyond the spec; [C]'s additional mixed-separator test stays within the extended requirements, so both show similar restraint.",
+          "Neither implementation adds significant functionality beyond the spec or introduces unnecessary abstraction; both stick closely to the required parsing behaviour."
+        ]
+      }
+    },
+    "raw": [
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "A's test suite is slightly more comprehensive (it includes mixed CRLF+LF row-separator coverage and multiple placements of bare CR), so it exercises more of the spec's edge cases.",
+          "design_quality": "B",
+          "design_quality_reason": "B's parser has a clearer separation of inQuotes vs out-of-quotes logic, with fewer repeated conditions and more straightforward control flow, making it easier to read and maintain.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement the required CSV behaviours (commas, quoted fields, doubled quotes, multiline quoted fields, CRLF as row separator, and preserving bare CR), so neither is measurably more faithful to the spec.",
+          "restraint": "tie",
+          "restraint_reason": "Neither candidate adds features beyond the spec or over-engineers the solution; both implement the required functionality without unnecessary surface area."
+        }
+      },
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "B's test suite covers all core examples plus an extra mixed CRLF/LF case and a slightly broader set of boundary checks, making it more likely to catch regressions.",
+          "design_quality": "A",
+          "design_quality_reason": "A's parsing code has a clearer, more explicit inQuotes branch structure and straightforward control flow that is easier to read and maintain.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly handle commas, newlines, quoted fields, doubled quotes, multiline quoted fields, and CRLF per the spec; neither omits required behavior.",
+          "restraint": "tie",
+          "restraint_reason": "Neither candidate introduces significant features beyond the spec; B's additional mixed-separator test stays within the extended requirements, so both show similar restraint."
+        }
+      },
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "B's test suite covers an extra real-world case (mixed CRLF and LF separators) and includes focused edge assertions (bare CR in a field) that make it more likely to catch regressions.",
+          "design_quality": "A",
+          "design_quality_reason": "A keeps the parsing logic clearly separated with an explicit inQuotes branch, making the control flow easier to read and reason about than B's many early-continues.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement commas/newlines, quoted fields, doubled-quote escaping, multi-line quoted fields, CRLF row separators, and preservation of bare CR, and their tests confirm the required behaviours.",
+          "restraint": "tie",
+          "restraint_reason": "Neither implementation adds significant functionality beyond the spec or introduces unnecessary abstraction; both stick closely to the required parsing behaviour."
+        }
+      }
+    ]
+  },
+  {
+    "pairId": "csv-parser::BvsC::csv-parser-20260511-142614_vs_csv-parser-20260511-153335",
+    "condX": "B",
+    "condY": "C",
+    "results": {
+      "test_quality": {
+        "verdict": "Y",
+        "reasons": [
+          "[C]'s test suite includes all the same core examples plus an extra explicit test for mixed CRLF/LF separators and generally has slightly clearer, targeted assertions that would catch regressions.",
+          "Condition C's test suite is slightly more comprehensive (adds a mixed CRLF+LF separator case) and otherwise has precise assertions that cover the spec's failure modes, so it would catch more regressions.",
+          "Condition C has a slightly broader and more targeted test suite (it includes a mixed CRLF+LF separator test in addition to individual CRLF and bare-CR cases), giving better coverage of plausible failure modes."
+        ]
+      },
+      "design_quality": {
+        "verdict": "X",
+        "reasons": [
+          "[C]'s while/continue style and explicit i += 2 for escaped quotes produces clearer, less error-prone control flow and is easier for a maintainer to follow than [[C]]'s for-loop with implicit increments.",
+          "Condition [B]'s implementation is slightly clearer and more concise (clean for-loop, fewer manual index manipulations and continues), making it easier to read and maintain.",
+          "Condition [B] has clearer, flatter control flow (for-loop with fewer early continues) and slightly cleaner handling of index advances, making it easier to read and maintain."
+        ]
+      },
+      "spec_adherence": {
+        "verdict": "tie",
+        "reasons": [
+          "Both implementations correctly implement quoted fields, doubled-quote escaping, multiline quoted fields, CRLF row separation, and preservation of bare CR, matching the spec and examples.",
+          "Both implementations correctly implement the CSV rules including quoted fields, escaped quotes, multi-line quoted fields, CRLF row separators, and bare CR preservation, so they equally satisfy the spec.",
+          "Both implementations correctly implement the CSV rules including quoted fields, doubled quotes, multiline quoted fields, CRLF as a separator, and preservation of bare CR, and their tests exercise those behaviours."
+        ]
+      },
+      "restraint": {
+        "verdict": "tie",
+        "reasons": [
+          "Neither candidate adds functionality beyond the spec or introduces unnecessary abstractions—both implement the required behavior straightforwardly.",
+          "Condition [B] stays a bit more minimal and focused (simpler control flow and no extra mixed-separator test), showing slightly more discipline about not adding beyond the spec.",
+          "Neither candidate adds functionality outside the spec or unnecessary abstractions; both implement the required behaviour and tests without evident scope creep."
+        ]
+      }
+    },
+    "raw": [
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "B's test suite includes all the same core examples plus an extra explicit test for mixed CRLF/LF separators and generally has slightly clearer, targeted assertions that would catch regressions.",
+          "design_quality": "B",
+          "design_quality_reason": "B's while/continue style and explicit i += 2 for escaped quotes produces clearer, less error-prone control flow and is easier for a maintainer to follow than A's for-loop with implicit increments.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement quoted fields, doubled-quote escaping, multiline quoted fields, CRLF row separation, and preservation of bare CR, matching the spec and examples.",
+          "restraint": "tie",
+          "restraint_reason": "Neither candidate adds functionality beyond the spec or introduces unnecessary abstractions—both implement the required behavior straightforwardly."
+        }
+      },
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "Candidate A's test suite is slightly more comprehensive (adds a mixed CRLF+LF separator case) and otherwise has precise assertions that cover the spec's failure modes, so it would catch more regressions.",
+          "design_quality": "B",
+          "design_quality_reason": "Candidate B's implementation is slightly clearer and more concise (clean for-loop, fewer manual index manipulations and continues), making it easier to read and maintain.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement the CSV rules including quoted fields, escaped quotes, multi-line quoted fields, CRLF row separators, and bare CR preservation, so they equally satisfy the spec.",
+          "restraint": "B",
+          "restraint_reason": "Candidate B stays a bit more minimal and focused (simpler control flow and no extra mixed-separator test), showing slightly more discipline about not adding beyond the spec."
+        }
+      },
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "Candidate A has a slightly broader and more targeted test suite (it includes a mixed CRLF+LF separator test in addition to individual CRLF and bare-CR cases), giving better coverage of plausible failure modes.",
+          "design_quality": "B",
+          "design_quality_reason": "Candidate B has clearer, flatter control flow (for-loop with fewer early continues) and slightly cleaner handling of index advances, making it easier to read and maintain.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement the CSV rules including quoted fields, doubled quotes, multiline quoted fields, CRLF as a separator, and preservation of bare CR, and their tests exercise those behaviours.",
+          "restraint": "tie",
+          "restraint_reason": "Neither candidate adds functionality outside the spec or unnecessary abstractions; both implement the required behaviour and tests without evident scope creep."
+        }
+      }
+    ]
+  },
+  {
+    "pairId": "csv-parser::BvsC::csv-parser-20260511-151126_vs_csv-parser-20260511-142614",
+    "condX": "B",
+    "condY": "C",
+    "results": {
+      "test_quality": {
+        "verdict": "Y",
+        "reasons": [
+          "Condition C's test suite is broader and more targeted (explicit single-field and comma-splitting tests plus a mixed CRLF/LF case), covering more edge cases and likely catching more regressions.",
+          "Condition C has a slightly more comprehensive test suite (includes a single-field case and a mixed CRLF+LF separators test) that covers additional plausible edge cases missing from [B].",
+          "Condition C's test suite is slightly broader and more targeted (includes single-field, explicit comma-splitting, and mixed CRLF/LF cases) so it would catch a few regressions [B]'s suite might miss."
+        ]
+      },
+      "design_quality": {
+        "verdict": "tie",
+        "reasons": [
+          "The implementations are essentially the same in structure and clarity (simple state machine, clear names, no dead code), so neither shows a maintainability advantage.",
+          "Both implementations are nearly identical in structure, clarity, and simplicity with no unnecessary abstractions or dead code, so neither has a clear design advantage.",
+          "Both implementations are nearly identical, but [C]'s control flow is marginally flatter and its tests are better organized, making it a touch easier to read and maintain."
+        ]
+      },
+      "spec_adherence": {
+        "verdict": "tie",
+        "reasons": [
+          "Both implementations correctly handle commas, quoted fields, doubled quotes, multiline quoted fields, CRLF row endings, and bare CR preservation as required by the spec.",
+          "Both implementations correctly implement the CSV rules (commas, quotes, doubled quotes, multiline quoted fields) and the CRLF extension as required.",
+          "Both parsers correctly implement quoted fields, doubled quotes, multiline quoted fields, CRLF row separation, and preservation of bare CR as the spec requires."
+        ]
+      },
+      "restraint": {
+        "verdict": "tie",
+        "reasons": [
+          "Neither implementation introduces features or defensive complexity beyond the spec; both stay narrowly focused on the required CSV parsing behavior.",
+          "Neither candidate adds functionality beyond the spec or over-engineers the parser; both stick closely to the required behaviour.",
+          "Neither implementation adds unnecessary features, abstractions, or error handling beyond the spec — both stick closely to the required behaviour."
+        ]
+      }
+    },
+    "raw": [
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "Candidate A's test suite is broader and more targeted (explicit single-field and comma-splitting tests plus a mixed CRLF/LF case), covering more edge cases and likely catching more regressions.",
+          "design_quality": "tie",
+          "design_quality_reason": "The implementations are essentially the same in structure and clarity (simple state machine, clear names, no dead code), so neither shows a maintainability advantage.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly handle commas, quoted fields, doubled quotes, multiline quoted fields, CRLF row endings, and bare CR preservation as required by the spec.",
+          "restraint": "tie",
+          "restraint_reason": "Neither implementation introduces features or defensive complexity beyond the spec; both stay narrowly focused on the required CSV parsing behavior."
+        }
+      },
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "Candidate A has a slightly more comprehensive test suite (includes a single-field case and a mixed CRLF+LF separators test) that covers additional plausible edge cases missing from B.",
+          "design_quality": "tie",
+          "design_quality_reason": "Both implementations are nearly identical in structure, clarity, and simplicity with no unnecessary abstractions or dead code, so neither has a clear design advantage.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement the CSV rules (commas, quotes, doubled quotes, multiline quoted fields) and the CRLF extension as required.",
+          "restraint": "tie",
+          "restraint_reason": "Neither candidate adds functionality beyond the spec or over-engineers the parser; both stick closely to the required behaviour."
+        }
+      },
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "Candidate A's test suite is slightly broader and more targeted (includes single-field, explicit comma-splitting, and mixed CRLF/LF cases) so it would catch a few regressions B's suite might miss.",
+          "design_quality": "A",
+          "design_quality_reason": "Both implementations are nearly identical, but A's control flow is marginally flatter and its tests are better organized, making it a touch easier to read and maintain.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both parsers correctly implement quoted fields, doubled quotes, multiline quoted fields, CRLF row separation, and preservation of bare CR as the spec requires.",
+          "restraint": "tie",
+          "restraint_reason": "Neither implementation adds unnecessary features, abstractions, or error handling beyond the spec — both stick closely to the required behaviour."
+        }
+      }
+    ]
+  },
+  {
+    "pairId": "csv-parser::BvsC::csv-parser-20260511-151126_vs_csv-parser-20260511-151126",
+    "condX": "B",
+    "condY": "C",
+    "results": {
+      "test_quality": {
+        "verdict": "Y",
+        "reasons": [
+          "Condition C's test suite covers the same core cases as [B] plus an additional mixed CRLF/LF separators test and a clear bare-CR test, giving slightly broader, more diagnostic coverage.",
+          "Condition C's test suite covers more edge cases (mixed CRLF/LF, bare CR preservation) and includes explicit assertions that would catch regressions in newline/CRLF handling.",
+          "Condition C's test suite is slightly broader (includes mixed CRLF/LF separators and an explicit bare-CR preservation test) and would catch more plausible regressions."
+        ]
+      },
+      "design_quality": {
+        "verdict": "X",
+        "reasons": [
+          "Condition [B] has a clearer control flow by separating the inQuotes branch up front and using a concise if/else chain, which is easier to read and maintain than [C]'s scattered continues.",
+          "Condition [B]'s parser has clearer, more maintainable control flow by separating inQuotes vs out-of-quotes logic and avoids repeated conditional juggling, making it easier to read and reason about.",
+          "Condition [B] separates quoted vs unquoted handling cleanly (single inQuotes branch) which makes the control flow and intent clearer and easier to maintain."
+        ]
+      },
+      "spec_adherence": {
+        "verdict": "tie",
+        "reasons": [
+          "Both implementations correctly implement quoted fields, escaped quotes, multiline quoted fields, CRLF row separators, and preservation of bare CR, satisfying the spec and extension.",
+          "Both implementations correctly implement the required CSV semantics (commas, quoted fields, escaped quotes, multiline quoted fields) including the CRLF extension, with no observable deviations from the spec.",
+          "Both implementations correctly handle commas, quoted fields, escaped double quotes, multiline quoted fields, LF and CRLF row separators, and preserve bare CR as required."
+        ]
+      },
+      "restraint": {
+        "verdict": "tie",
+        "reasons": [
+          "Neither candidate adds functionality beyond the spec or introduces unnecessary abstractions; both implement the required behaviour without notable scope creep.",
+          "Neither candidate adds functionality beyond the spec or introduces unnecessary configuration or surface area; both stick to the required behavior and minimal structure.",
+          "Neither implementation introduces features beyond the spec or unnecessary abstraction; both stick closely to the required behavior."
+        ]
+      }
+    },
+    "raw": [
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "Candidate A's test suite covers the same core cases as B plus an additional mixed CRLF/LF separators test and a clear bare-CR test, giving slightly broader, more diagnostic coverage.",
+          "design_quality": "B",
+          "design_quality_reason": "Candidate B has a clearer control flow by separating the inQuotes branch up front and using a concise if/else chain, which is easier to read and maintain than A's scattered continues.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement quoted fields, escaped quotes, multiline quoted fields, CRLF row separators, and preservation of bare CR, satisfying the spec and extension.",
+          "restraint": "tie",
+          "restraint_reason": "Neither candidate adds functionality beyond the spec or introduces unnecessary abstractions; both implement the required behaviour without notable scope creep."
+        }
+      },
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "Candidate A's test suite covers more edge cases (mixed CRLF/LF, bare CR preservation) and includes explicit assertions that would catch regressions in newline/CRLF handling.",
+          "design_quality": "B",
+          "design_quality_reason": "Candidate B's parser has clearer, more maintainable control flow by separating inQuotes vs out-of-quotes logic and avoids repeated conditional juggling, making it easier to read and reason about.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement the required CSV semantics (commas, quoted fields, escaped quotes, multiline quoted fields) including the CRLF extension, with no observable deviations from the spec.",
+          "restraint": "tie",
+          "restraint_reason": "Neither candidate adds functionality beyond the spec or introduces unnecessary configuration or surface area; both stick to the required behavior and minimal structure."
+        }
+      },
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "Candidate A's test suite is slightly broader (includes mixed CRLF/LF separators and an explicit bare-CR preservation test) and would catch more plausible regressions.",
+          "design_quality": "B",
+          "design_quality_reason": "Candidate B separates quoted vs unquoted handling cleanly (single inQuotes branch) which makes the control flow and intent clearer and easier to maintain.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly handle commas, quoted fields, escaped double quotes, multiline quoted fields, LF and CRLF row separators, and preserve bare CR as required.",
+          "restraint": "tie",
+          "restraint_reason": "Neither implementation introduces features beyond the spec or unnecessary abstraction; both stick closely to the required behavior."
+        }
+      }
+    ]
+  },
+  {
+    "pairId": "csv-parser::BvsC::csv-parser-20260511-151126_vs_csv-parser-20260511-153335",
+    "condX": "B",
+    "condY": "C",
+    "results": {
+      "test_quality": {
+        "verdict": "Y",
+        "reasons": [
+          "[C]'s test suite includes all the same core cases plus an explicit mixed CRLF/LF separator test, giving slightly better coverage of plausible line-ending permutations that would catch regressions.",
+          "[C]'s test suite includes all core cases plus an extra explicit test for mixed CRLF and LF separators (a real-world edge case) and generally has focused, specific assertions that would catch regressions.",
+          "Condition C's test suite is slightly more comprehensive (it includes an explicit mixed CRLF+LF case in addition to CRLF, LF, quoted-newline and bare-CR cases) and contains clear, specific assertions that would catch regressions."
+        ]
+      },
+      "design_quality": {
+        "verdict": "Y",
+        "reasons": [
+          "[C]'s implementation has clearer, linear control flow (explicit index management and early continues) and more straightforward separation of cases, making it easier to read and maintain than [[C]]'s for-loop with scattered increments.",
+          "[C]'s implementation has clearer, more explicit control flow (explicit index management and early continues) that avoids subtle interactions with loop increment semantics, making it easier to reason about and maintain.",
+          "Condition [B]'s implementation is slightly cleaner and more concise (a single for-loop with a straightforward if/else structure and fewer explicit continues/branching), making the control flow easier to follow for a maintainer."
+        ]
+      },
+      "spec_adherence": {
+        "verdict": "tie",
+        "reasons": [
+          "Both implementations correctly implement the CSV rules including quoted fields, doubled quotes, multi-line quoted fields, CRLF as a separator, and preserving bare CR, so neither has a clear correctness advantage.",
+          "Both implementations correctly implement the CSV rules including quoted fields, escaped quotes, multi-line quoted fields, CRLF row separators, and preservation of bare CR, matching the spec examples and requirements.",
+          "Both implementations correctly implement quoted fields, doubled-quote escaping, multi-line quoted fields, CRLF as a separator, and preservation of bare CR, matching the spec's behaviour."
+        ]
+      },
+      "restraint": {
+        "verdict": "tie",
+        "reasons": [
+          "Neither candidate adds functionality beyond the spec nor introduces unnecessary abstractions; both implement the required features without evident scope creep.",
+          "Neither implementation adds functionality beyond the spec or unnecessary abstractions; both are minimal and focused on the required parsing behaviour.",
+          "Neither implementation adds functionality beyond the spec or introduces unnecessary abstractions or error handling; both stick closely to the required behavior."
+        ]
+      }
+    },
+    "raw": [
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "B's test suite includes all the same core cases plus an explicit mixed CRLF/LF separator test, giving slightly better coverage of plausible line-ending permutations that would catch regressions.",
+          "design_quality": "B",
+          "design_quality_reason": "B's implementation has clearer, linear control flow (explicit index management and early continues) and more straightforward separation of cases, making it easier to read and maintain than A's for-loop with scattered increments.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement the CSV rules including quoted fields, doubled quotes, multi-line quoted fields, CRLF as a separator, and preserving bare CR, so neither has a clear correctness advantage.",
+          "restraint": "tie",
+          "restraint_reason": "Neither candidate adds functionality beyond the spec nor introduces unnecessary abstractions; both implement the required features without evident scope creep."
+        }
+      },
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "B's test suite includes all core cases plus an extra explicit test for mixed CRLF and LF separators (a real-world edge case) and generally has focused, specific assertions that would catch regressions.",
+          "design_quality": "B",
+          "design_quality_reason": "B's implementation has clearer, more explicit control flow (explicit index management and early continues) that avoids subtle interactions with loop increment semantics, making it easier to reason about and maintain.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement the CSV rules including quoted fields, escaped quotes, multi-line quoted fields, CRLF row separators, and preservation of bare CR, matching the spec examples and requirements.",
+          "restraint": "tie",
+          "restraint_reason": "Neither implementation adds functionality beyond the spec or unnecessary abstractions; both are minimal and focused on the required parsing behaviour."
+        }
+      },
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "Candidate A's test suite is slightly more comprehensive (it includes an explicit mixed CRLF+LF case in addition to CRLF, LF, quoted-newline and bare-CR cases) and contains clear, specific assertions that would catch regressions.",
+          "design_quality": "B",
+          "design_quality_reason": "Candidate B's implementation is slightly cleaner and more concise (a single for-loop with a straightforward if/else structure and fewer explicit continues/branching), making the control flow easier to follow for a maintainer.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement quoted fields, doubled-quote escaping, multi-line quoted fields, CRLF as a separator, and preservation of bare CR, matching the spec's behaviour.",
+          "restraint": "tie",
+          "restraint_reason": "Neither implementation adds functionality beyond the spec or introduces unnecessary abstractions or error handling; both stick closely to the required behavior."
+        }
+      }
+    ]
+  },
+  {
+    "pairId": "csv-parser::BvsC::csv-parser-20260511-153335_vs_csv-parser-20260511-142614",
+    "condX": "B",
+    "condY": "C",
+    "results": {
+      "test_quality": {
+        "verdict": "Y",
+        "reasons": [
+          "[C]'s test suite is slightly more granular and diagnostic (separate single-field and comma/row-splitting tests) while covering the same edge cases [[C]] covers, so it's more useful as a regression net.",
+          "Condition C's test suite includes an extra single-field test plus a distinct newline-splitting test and otherwise covers the same edge cases (CRLF, bare CR, mixed separators), giving slightly broader and more targeted coverage.",
+          "[C] has a slightly broader and more targeted test suite (includes a single-field test plus clear, focused cases) that would catch small regressions the other suite might miss."
+        ]
+      },
+      "design_quality": {
+        "verdict": "Y",
+        "reasons": [
+          "[C]'s parser source is marginally clearer (flat else-if chain, slightly cleaner control flow) while providing the same behavior as [[C]]; [[C]]'s nested branching is a bit harder to read.",
+          "The implementations are effectively the same in structure, naming, and complexity (only minor stylistic differences) and share the same small shortcomings, so neither is clearly better designed.",
+          "[C]'s implementation is marginally cleaner with a flatter else-if structure and clearer control flow, making it easier to read and maintain."
+        ]
+      },
+      "spec_adherence": {
+        "verdict": "tie",
+        "reasons": [
+          "Both implementations correctly implement the spec and extension (commas, newlines, quoted fields, doubled quotes, multiline quoted fields, CRLF as separator, and bare CR preservation) with equivalent behavior.",
+          "Both implementations faithfully implement the required CSV behaviours (commas, quotes, doubled quotes, multiline quoted fields, CRLF handling and bare CR preservation) with no observable difference in correctness against the spec.",
+          "Both implementations correctly implement the CSV rules including quoted fields, doubled quotes, multiline quotes, CRLF row separators and preserving bare CR, so neither is measurably more faithful to the spec."
+        ]
+      },
+      "restraint": {
+        "verdict": "tie",
+        "reasons": [
+          "Neither candidate adds functionality beyond the spec or introduces unnecessary abstractions — differences are limited to minor test organization and stylistic choices.",
+          "Neither implementation introduces functionality beyond the spec or unnecessary abstraction; both stick close to the required behaviour and scope.",
+          "Neither implementation or test suite adds functionality beyond the spec or introduces unnecessary complexity; both stick closely to the requirements."
+        ]
+      }
+    },
+    "raw": [
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "B's test suite is slightly more granular and diagnostic (separate single-field and comma/row-splitting tests) while covering the same edge cases A covers, so it's more useful as a regression net.",
+          "design_quality": "B",
+          "design_quality_reason": "B's parser source is marginally clearer (flat else-if chain, slightly cleaner control flow) while providing the same behavior as A; A's nested branching is a bit harder to read.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement the spec and extension (commas, newlines, quoted fields, doubled quotes, multiline quoted fields, CRLF as separator, and bare CR preservation) with equivalent behavior.",
+          "restraint": "tie",
+          "restraint_reason": "Neither candidate adds functionality beyond the spec or introduces unnecessary abstractions — differences are limited to minor test organization and stylistic choices."
+        }
+      },
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "Candidate A's test suite includes an extra single-field test plus a distinct newline-splitting test and otherwise covers the same edge cases (CRLF, bare CR, mixed separators), giving slightly broader and more targeted coverage.",
+          "design_quality": "tie",
+          "design_quality_reason": "The implementations are effectively the same in structure, naming, and complexity (only minor stylistic differences) and share the same small shortcomings, so neither is clearly better designed.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations faithfully implement the required CSV behaviours (commas, quotes, doubled quotes, multiline quoted fields, CRLF handling and bare CR preservation) with no observable difference in correctness against the spec.",
+          "restraint": "tie",
+          "restraint_reason": "Neither implementation introduces functionality beyond the spec or unnecessary abstraction; both stick close to the required behaviour and scope."
+        }
+      },
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "B has a slightly broader and more targeted test suite (includes a single-field test plus clear, focused cases) that would catch small regressions the other suite might miss.",
+          "design_quality": "B",
+          "design_quality_reason": "B's implementation is marginally cleaner with a flatter else-if structure and clearer control flow, making it easier to read and maintain.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement the CSV rules including quoted fields, doubled quotes, multiline quotes, CRLF row separators and preserving bare CR, so neither is measurably more faithful to the spec.",
+          "restraint": "tie",
+          "restraint_reason": "Neither implementation or test suite adds functionality beyond the spec or introduces unnecessary complexity; both stick closely to the requirements."
+        }
+      }
+    ]
+  },
+  {
+    "pairId": "csv-parser::BvsC::csv-parser-20260511-153335_vs_csv-parser-20260511-151126",
+    "condX": "B",
+    "condY": "C",
+    "results": {
+      "test_quality": {
+        "verdict": "tie",
+        "reasons": [
+          "Both test suites exercise the same behaviours from the spec (commas, newlines, quoted fields, escaped quotes, multiline quoted fields, CRLF, bare CR and mixed separators) with specific assertions and no obvious redundant/trivial tests, so neither is clearly stronger.",
+          "Both test suites cover the same required behaviours (commas, quoted fields, escaped quotes, multiline quoted fields, CRLF and mixed separators, and bare CR preservation) with clear assertions; neither provides significantly broader coverage (e.g., empty input, empty fields, or malformed CSV cases).",
+          "Both test suites cover the same functional cases (commas, quotes, escaped quotes, multiline quoted fields, CRLF vs LF, and bare CR) with precise assertions and no obvious redundancies, so neither clearly out-tests the other."
+        ]
+      },
+      "design_quality": {
+        "verdict": "Y",
+        "reasons": [
+          "Condition C has a slightly clearer, flatter control flow (early continues, explicit !inQuotes checks for separators) and is easier to read and maintain than [[C]]'s more nested branching.",
+          "Condition [B] separates inQuotes vs non-quoted logic into distinct branches which yields clearer, less error-prone control flow and easier readability/maintenance than [C]'s interleaved if/continue style.",
+          "Condition C has a flatter, clearer control flow with early-continue branches that separate concerns cleanly, making it slightly more readable and maintainable than [[C]]'s nested if/else structure."
+        ]
+      },
+      "spec_adherence": {
+        "verdict": "tie",
+        "reasons": [
+          "Both implementations and their tests correctly implement the required CSV behaviours including quoted fields, escaped quotes, multiline quoted fields, CRLF row separators, and preserving bare CR, so they equally satisfy the spec.",
+          "Both implementations implement the spec features (field separators, quoted fields, escaped quotes, multiline quotes, CRLF handling, and bare CR preservation) consistently and appear to satisfy the examples and extension equally well.",
+          "Both implementations implement the required CSV behaviours (commas, quotes, escape quotes, multiline quoted fields, CRLF handling, and bare CR preservation) and their tests exercise the same spec cases, so neither shows superior adherence."
+        ]
+      },
+      "restraint": {
+        "verdict": "tie",
+        "reasons": [
+          "Neither candidate adds functionality beyond the spec or unnecessary configuration/abstractions; both implement the parser logic directly without evident scope creep.",
+          "Neither candidate adds features or configuration beyond the spec nor introduces unnecessary abstractions; both implement only the behavior the spec requires.",
+          "Neither implementation adds features beyond the spec or over-engineers the solution; both implement only the parsing behaviour required without extraneous surface area."
+        ]
+      }
+    },
+    "raw": [
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "tie",
+          "test_quality_reason": "Both test suites exercise the same behaviours from the spec (commas, newlines, quoted fields, escaped quotes, multiline quoted fields, CRLF, bare CR and mixed separators) with specific assertions and no obvious redundant/trivial tests, so neither is clearly stronger.",
+          "design_quality": "B",
+          "design_quality_reason": "Candidate B has a slightly clearer, flatter control flow (early continues, explicit !inQuotes checks for separators) and is easier to read and maintain than A's more nested branching.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations and their tests correctly implement the required CSV behaviours including quoted fields, escaped quotes, multiline quoted fields, CRLF row separators, and preserving bare CR, so they equally satisfy the spec.",
+          "restraint": "tie",
+          "restraint_reason": "Neither candidate adds functionality beyond the spec or unnecessary configuration/abstractions; both implement the parser logic directly without evident scope creep."
+        }
+      },
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "tie",
+          "test_quality_reason": "Both test suites cover the same required behaviours (commas, quoted fields, escaped quotes, multiline quoted fields, CRLF and mixed separators, and bare CR preservation) with clear assertions; neither provides significantly broader coverage (e.g., empty input, empty fields, or malformed CSV cases).",
+          "design_quality": "B",
+          "design_quality_reason": "Candidate B separates inQuotes vs non-quoted logic into distinct branches which yields clearer, less error-prone control flow and easier readability/maintenance than A's interleaved if/continue style.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations implement the spec features (field separators, quoted fields, escaped quotes, multiline quotes, CRLF handling, and bare CR preservation) consistently and appear to satisfy the examples and extension equally well.",
+          "restraint": "tie",
+          "restraint_reason": "Neither candidate adds features or configuration beyond the spec nor introduces unnecessary abstractions; both implement only the behavior the spec requires."
+        }
+      },
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "tie",
+          "test_quality_reason": "Both test suites cover the same functional cases (commas, quotes, escaped quotes, multiline quoted fields, CRLF vs LF, and bare CR) with precise assertions and no obvious redundancies, so neither clearly out-tests the other.",
+          "design_quality": "B",
+          "design_quality_reason": "Candidate B has a flatter, clearer control flow with early-continue branches that separate concerns cleanly, making it slightly more readable and maintainable than A's nested if/else structure.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations implement the required CSV behaviours (commas, quotes, escape quotes, multiline quoted fields, CRLF handling, and bare CR preservation) and their tests exercise the same spec cases, so neither shows superior adherence.",
+          "restraint": "tie",
+          "restraint_reason": "Neither implementation adds features beyond the spec or over-engineers the solution; both implement only the parsing behaviour required without extraneous surface area."
+        }
+      }
+    ]
+  },
+  {
+    "pairId": "csv-parser::BvsC::csv-parser-20260511-153335_vs_csv-parser-20260511-153335",
+    "condX": "B",
+    "condY": "C",
+    "results": {
+      "test_quality": {
+        "verdict": "tie",
+        "reasons": [
+          "Both test suites exercise the same set of behaviours (comma separation, newlines, quoted fields, escaped quotes, multiline quoted fields, CRLF, bare CR, and mixed separators) with clear, specific assertions, so neither provides a noticeably stronger regression net.",
+          "Both test suites cover the same core behaviours (commas, quoted fields, doubled quotes, multiline quoted fields, CRLF, mixed separators, and bare CR) with precise assertions, so neither provides clearly stronger regression coverage.",
+          "Both test suites exercise the same behaviors (commas, quoted fields, escaped quotes, multiline quoted fields, CRLF, mixed separators, and bare CR) with explicit toEqual assertions and neither adds noticeably broader or weaker coverage."
+        ]
+      },
+      "design_quality": {
+        "verdict": "X",
+        "reasons": [
+          "[C] has clearer, more explicit control flow (while loop with explicit index increments and continues) that makes quote/escape handling less subtle and easier to follow than [[C]]'s reliance on implicit for-loop increments.",
+          "Condition [B] has a simpler, more linear control flow (for-loop, fewer explicit continues) and slightly clearer handling of state which makes it easier to read and maintain.",
+          "Condition [B] has clearer, flatter control flow (for-loop with fewer continues and simpler branch structure), making it easier to read and maintain than [C]'s while/continue-heavy implementation."
+        ]
+      },
+      "spec_adherence": {
+        "verdict": "tie",
+        "reasons": [
+          "Both implementations faithfully implement the spec and its CRLF extension (commas, newlines/CRLF as separators, quoted fields, doubled-quote escaping, multiline quoted fields, and preservation of bare CR).",
+          "Both implementations correctly implement the spec including quoted fields, doubled quotes, multiline quoted fields, CRLF row separators, and preservation of bare CR, and the tests confirm those behaviours.",
+          "Both implementations follow the spec: they handle field separation, quoted fields, doubled quotes, multiline quoted fields, CRLF row separators, and preserve bare CR as required by the extension."
+        ]
+      },
+      "restraint": {
+        "verdict": "tie",
+        "reasons": [
+          "Neither candidate adds functionality beyond the spec or introduces unnecessary abstraction or error handling; both stick closely to the required parsing behaviour.",
+          "Neither candidate adds features beyond the spec or unnecessary abstractions; both implement the parser and tests narrowly for the required behaviour.",
+          "Neither candidate adds features beyond the spec or over-engineers the solution; both implement the required behavior without extraneous functionality."
+        ]
+      }
+    },
+    "raw": [
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "tie",
+          "test_quality_reason": "Both test suites exercise the same set of behaviours (comma separation, newlines, quoted fields, escaped quotes, multiline quoted fields, CRLF, bare CR, and mixed separators) with clear, specific assertions, so neither provides a noticeably stronger regression net.",
+          "design_quality": "B",
+          "design_quality_reason": "B has clearer, more explicit control flow (while loop with explicit index increments and continues) that makes quote/escape handling less subtle and easier to follow than A's reliance on implicit for-loop increments.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations faithfully implement the spec and its CRLF extension (commas, newlines/CRLF as separators, quoted fields, doubled-quote escaping, multiline quoted fields, and preservation of bare CR).",
+          "restraint": "tie",
+          "restraint_reason": "Neither candidate adds functionality beyond the spec or introduces unnecessary abstraction or error handling; both stick closely to the required parsing behaviour."
+        }
+      },
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "tie",
+          "test_quality_reason": "Both test suites cover the same core behaviours (commas, quoted fields, doubled quotes, multiline quoted fields, CRLF, mixed separators, and bare CR) with precise assertions, so neither provides clearly stronger regression coverage.",
+          "design_quality": "B",
+          "design_quality_reason": "Candidate B has a simpler, more linear control flow (for-loop, fewer explicit continues) and slightly clearer handling of state which makes it easier to read and maintain.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement the spec including quoted fields, doubled quotes, multiline quoted fields, CRLF row separators, and preservation of bare CR, and the tests confirm those behaviours.",
+          "restraint": "tie",
+          "restraint_reason": "Neither candidate adds features beyond the spec or unnecessary abstractions; both implement the parser and tests narrowly for the required behaviour."
+        }
+      },
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "tie",
+          "test_quality_reason": "Both test suites exercise the same behaviors (commas, quoted fields, escaped quotes, multiline quoted fields, CRLF, mixed separators, and bare CR) with explicit toEqual assertions and neither adds noticeably broader or weaker coverage.",
+          "design_quality": "B",
+          "design_quality_reason": "Candidate B has clearer, flatter control flow (for-loop with fewer continues and simpler branch structure), making it easier to read and maintain than A's while/continue-heavy implementation.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations follow the spec: they handle field separation, quoted fields, doubled quotes, multiline quoted fields, CRLF row separators, and preserve bare CR as required by the extension.",
+          "restraint": "tie",
+          "restraint_reason": "Neither candidate adds features beyond the spec or over-engineers the solution; both implement the required behavior without extraneous functionality."
+        }
+      }
+    ]
+  }
+]

@@ -30,7 +30,7 @@ const CONDITION_DIRS: Record<Condition, string> = {
   C: 'C-tdd-guard',
 }
 
-const MODEL = 'gpt-5'
+const MODEL = 'gpt-5-mini'
 const RUNS = 3
 const JUDGE_ATTEMPTS = 3
 
@@ -196,26 +196,44 @@ async function judgePair(pair: ReturnType<typeof generatePairs>[number]): Promis
 }> {
   const bundleX = readBundle(pair.pathX)
   const bundleY = readBundle(pair.pathY)
-  const raw: Array<{ slotAisX: boolean; out: JudgeOutput }> = []
-  for (let run = 0; run < RUNS; run++) {
-    // Random slot assignment per call to control position bias.
-    const slotAisX = Math.random() < 0.5
-    const cA = slotAisX ? bundleX : bundleY
-    const cB = slotAisX ? bundleY : bundleX
-    const prompt = buildPrompt(pair.task, cA, cB)
-    const out = await callJudge(prompt)
-    raw.push({ slotAisX, out })
+  // Run all RUNS calls concurrently — they're independent.
+  const t0 = Date.now()
+  console.log(`    ${RUNS} calls in parallel...`)
+  const raw = await Promise.all(
+    Array.from({ length: RUNS }, async (_, run) => {
+      const slotAisX = Math.random() < 0.5
+      const cA = slotAisX ? bundleX : bundleY
+      const cB = slotAisX ? bundleY : bundleX
+      const prompt = buildPrompt(pair.task, cA, cB)
+      const out = await callJudge(prompt)
+      console.log(`      run ${run + 1}/${RUNS} done at ${Math.round((Date.now() - t0) / 1000)}s`)
+      return { slotAisX, out }
+    }),
+  )
+
+  // Replace slot labels ("Candidate A"/"A"/"Candidate B"/"B") in reason text with
+  // the actual condition name, based on this call's random slot assignment.
+  const relabel = (text: string, slotAisX: boolean): string => {
+    const slotAName = slotAisX ? pair.condX : pair.condY
+    const slotBName = slotAisX ? pair.condY : pair.condX
+    return text
+      .replace(/Candidate A\b/g, `Condition ${slotAName}`)
+      .replace(/Candidate B\b/g, `Condition ${slotBName}`)
+      .replace(/\bA\b/g, `[${slotAName}]`)
+      .replace(/\bB\b/g, `[${slotBName}]`)
   }
 
   const results = Object.fromEntries(
     DIMENSIONS.map((d) => {
       const decoded = raw
         .map((r) => {
+          const reasonRaw = r.out[`${d}_reason` as keyof JudgeOutput] as string
+          const reason = relabel(reasonRaw, r.slotAisX)
           const v = r.out[d as Dimension] as 'A' | 'B' | 'tie'
-          if (v === 'tie') return { verdict: 'tie' as const, reason: r.out[`${d}_reason` as keyof JudgeOutput] as string }
+          if (v === 'tie') return { verdict: 'tie' as const, reason }
           // Decode slot back to X/Y.
           const isX = (v === 'A' && r.slotAisX) || (v === 'B' && !r.slotAisX)
-          return { verdict: isX ? ('X' as const) : ('Y' as const), reason: r.out[`${d}_reason` as keyof JudgeOutput] as string }
+          return { verdict: isX ? ('X' as const) : ('Y' as const), reason }
         })
       const counts: Record<'X' | 'Y' | 'tie', number> = { X: 0, Y: 0, tie: 0 }
       decoded.forEach((d) => counts[d.verdict]++)

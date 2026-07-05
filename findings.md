@@ -14,6 +14,7 @@ Across **3 task shapes × 3 enforcement conditions × 2 rounds × 3 runs (54 run
 - **TDD discipline produces more predictable output.** A's test-count variance is 1.4–2× within-condition; B and C vary by less than 30%. Discipline trades exploration for consistency.
 - **tdd-guard intervenes 1–3 times per round.** Not constantly fighting the agent — only at the moments the agent tries to skip a step.
 - **Round-2 inversion:** A's broader baseline gives it head starts on extensions that match its anticipatory tests, *but* B and C's discipline forces them to accumulate focused tests for the new behaviour. A makes the impl change and walks away without adding regression tests.
+- **LLM judge confirms the trade.** Pairwise tournament (gpt-5-mini, 243 calls) finds A wins `test_quality` and `design_quality` decisively, TDD conditions win `restraint` decisively, and all three are tied on `spec_adherence`. Same A traits that score "good design" are scored as "scope creep" — TDD discipline trades design richness for spec fidelity.
 
 The honest single-line claim:
 
@@ -233,6 +234,47 @@ The rubric **strongly validates the convergence claim**. After paying 2-4× the 
 What the rubric does *not* test, by design: concurrent calls, non-monotonic clock, memory bounds, integer overflow — these were excluded as not deterministically testable in JS. If the value of TDD lives in those dimensions, this rubric won't see it.
 
 The strongest signal is on rate-limiter `2.1 fixed zero allowance` — **none of the 9 impls handle it**. The spec is technically explicit (`max: 0` means deny everything), but every condition wrote a counter-and-window scheme that doesn't special-case zero. TDD discipline did not protect against this; nor did its absence reveal it.
+
+---
+
+## LLM judge (pairwise quality evaluation)
+
+The behavioural rubric proves the impls are correctness-equivalent. To probe whether they differ on qualitative dimensions (test quality, design quality, spec adherence, restraint) we ran an LLM-judge pairwise tournament: for each task, every A/B/C run × every other-condition run, judged 3× by `gpt-5-mini` with random slot assignment for position-bias control (243 judge calls total). The rubric is at `rubric/judge-rubric.md`. Full per-pair tables live in `findings/judge-<spec>.md`.
+
+### Win rates (majority verdict, n=9 pairs per condition pair per task)
+
+| Task | A vs B | A vs C | B vs C |
+|------|--------|--------|--------|
+| | tq · dq · sa · r | tq · dq · sa · r | tq · dq · sa · r |
+| rate-limiter | A · A · = · B | A · A · = · C | C · B · = · C |
+| csv-parser   | A · A · A · B | A · A · A · C | C · = · = · = |
+| retry        | A · A · = · B | A · A · = · C | C · C · = · B |
+
+Legend: `tq` = test_quality, `dq` = design_quality, `sa` = spec_adherence, `r` = restraint. Letter = condition that won the majority of 9 pairs; `=` = tie (no majority).
+
+### Three robust signals
+
+1. **No-instruction (A) wins test_quality and design_quality decisively.** Across all 6 cells where A is involved, A wins both dimensions in 5/6 (the exception: csv-parser test_quality A-vs-C ties). The judge consistently flags A's broader test coverage and richer code structure (extra exports, dependency injection, helper functions like `computeDelay`, `extractRetryAfterMs`) as good design.
+
+2. **TDD conditions (B, C) win restraint decisively.** B and C each win restraint in 3/3 of their pair matchups against A. The judge flags A's extra exports and injected dependencies as scope creep.
+
+3. **spec_adherence is almost always tie.** All three conditions hit the functional spec. Matches the rubric finding.
+
+### The honest contradiction
+
+`gpt-5-mini` praises A's helpers, exports, and dependency injection as "clearer separation of concerns" on `design_quality`, and punishes those *exact same traits* as scope creep on `restraint`. That's not a judge bug — it's the actual tradeoff.
+
+**TDD discipline trades design richness for spec fidelity.** Whether that trade is a win depends on whether you want code that strictly implements the spec interface or code that reaches a bit beyond it. Neither dimension is objectively "better."
+
+### B vs C (within the TDD conditions)
+
+C tends to beat B on `test_quality` (3/3 tasks); on `design_quality` B and C trade wins task-by-task; `spec_adherence` is always tie. The two TDD conditions are closer to each other than either is to A.
+
+### Caveats
+
+- gpt-5-mini may systematically conflate "more code structure" with "better design." Repeating with a stronger judge (gpt-5, claude-opus-4-8) would test for judge sensitivity. Direction of the signal is unlikely to flip — the patterns are 9/9 or 8/9 across 9 pairs.
+- The judge sees both candidates' src + tests and the spec + followup. It does NOT see cost, turn counts, or behavioural rubric results.
+- Position-bias controlled via per-call random slot assignment + decode-and-relabel.
 
 ---
 

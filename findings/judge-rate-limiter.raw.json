@@ -1,0 +1,2162 @@
+[
+  {
+    "pairId": "rate-limiter::AvsB::rate-limiter-20260511-143320_vs_rate-limiter-20260511-143320",
+    "condX": "A",
+    "condY": "B",
+    "results": {
+      "test_quality": {
+        "verdict": "Y",
+        "reasons": [
+          "Condition [A]'s tests explicitly cover the required reset behaviour (for both modes) and basic failure modes while Condition [[A]], although having stronger timing/boundary checks, omits any tests for reset so [[A]]'s suite is more directly protective of the spec extension.",
+          "[B]'s test suite explicitly covers the new per-key reset behaviour and includes targeted tests for both modes and edge timing, whereas [A]'s tests are thorough for timing but omit any tests for reset (the new requirement).",
+          "Condition [A]'s test suite explicitly covers the reset extension and includes mode-specific and key-isolation tests, while Condition [[A]]'s suite—though thorough on timing boundaries—omits any tests for the required reset behavior."
+        ]
+      },
+      "design_quality": {
+        "verdict": "X",
+        "reasons": [
+          "Condition [[A]]'s implementation is slightly cleaner and more efficient (sliding window trims with a single slice/index instead of repeated shifts, clearer naming) while remaining straightforward and readable.",
+          "[B] is slightly better organised and more maintainable (injectable now function for deterministic time in tests, consistent naming and simpler control flow), while [A] uses direct Date.now which hinders test isolation.",
+          "Condition [[A]] has clearer naming (fixedBuckets/slidingTimestamps), slightly cleaner immutability in sliding logic (slice instead of repeated shift) and well-structured tests that exercise boundaries, resulting in a more maintainable shape."
+        ]
+      },
+      "spec_adherence": {
+        "verdict": "tie",
+        "reasons": [
+          "Both implementations correctly implement fixed and sliding modes, per-key tracking, and the required reset semantics, matching the spec's behaviors and boundary treatment.",
+          "Both implementations correctly implement fixed and sliding semantics, per-key tracking, and the reset method; neither misses or misimplements the specified behaviours.",
+          "Both implementations correctly implement fixed and sliding semantics, per-key isolation, and the reset method behavior described in the spec; neither omits required functionality."
+        ]
+      },
+      "restraint": {
+        "verdict": "X",
+        "reasons": [
+          "Condition [[A]] sticks closely to the spec (uses Date.now, no extra test hooks or extra API surface), whereas Condition [A] added an injected now() option beyond the required interface.",
+          "[A] stays closer to the spec without adding extras (no injected time function), whereas [B] adds an optional now() hook beyond the requirements.",
+          "Condition [A] added an extra injectable now() option (useful for testing) beyond the spec, whereas Condition [[A]] sticks to the minimal API the spec requested."
+        ]
+      }
+    },
+    "raw": [
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "Candidate A's tests explicitly cover the required reset behaviour (for both modes) and basic failure modes while Candidate B, although having stronger timing/boundary checks, omits any tests for reset so A's suite is more directly protective of the spec extension.",
+          "design_quality": "B",
+          "design_quality_reason": "Candidate B's implementation is slightly cleaner and more efficient (sliding window trims with a single slice/index instead of repeated shifts, clearer naming) while remaining straightforward and readable.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement fixed and sliding modes, per-key tracking, and the required reset semantics, matching the spec's behaviors and boundary treatment.",
+          "restraint": "B",
+          "restraint_reason": "Candidate B sticks closely to the spec (uses Date.now, no extra test hooks or extra API surface), whereas Candidate A added an injected now() option beyond the required interface."
+        }
+      },
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "B's test suite explicitly covers the new per-key reset behaviour and includes targeted tests for both modes and edge timing, whereas A's tests are thorough for timing but omit any tests for reset (the new requirement).",
+          "design_quality": "B",
+          "design_quality_reason": "B is slightly better organised and more maintainable (injectable now function for deterministic time in tests, consistent naming and simpler control flow), while A uses direct Date.now which hinders test isolation.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement fixed and sliding semantics, per-key tracking, and the reset method; neither misses or misimplements the specified behaviours.",
+          "restraint": "A",
+          "restraint_reason": "A stays closer to the spec without adding extras (no injected time function), whereas B adds an optional now() hook beyond the requirements."
+        }
+      },
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "Candidate A's test suite explicitly covers the reset extension and includes mode-specific and key-isolation tests, while Candidate B's suite—though thorough on timing boundaries—omits any tests for the required reset behavior.",
+          "design_quality": "B",
+          "design_quality_reason": "Candidate B has clearer naming (fixedBuckets/slidingTimestamps), slightly cleaner immutability in sliding logic (slice instead of repeated shift) and well-structured tests that exercise boundaries, resulting in a more maintainable shape.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement fixed and sliding semantics, per-key isolation, and the reset method behavior described in the spec; neither omits required functionality.",
+          "restraint": "B",
+          "restraint_reason": "Candidate A added an extra injectable now() option (useful for testing) beyond the spec, whereas Candidate B sticks to the minimal API the spec requested."
+        }
+      }
+    ]
+  },
+  {
+    "pairId": "rate-limiter::AvsB::rate-limiter-20260511-143320_vs_rate-limiter-20260511-151731",
+    "condX": "A",
+    "condY": "B",
+    "results": {
+      "test_quality": {
+        "verdict": "X",
+        "reasons": [
+          "Condition [A]'s test suite is broader and checks many edge cases (window boundaries, mid-window behaviour, half-open semantics, independent keys) making it more likely to catch regressions, whereas [B]'s suite is smaller (though it does include a reset test and deterministic time injection).",
+          "[A]'s test suite exercises both fixed and sliding modes thoroughly (boundary times, mid-window behaviour, independent keys) with precise assertions, while [B]'s tests are narrower and include some trivial cases and miss certain boundary scenarios (and reset coverage for sliding).",
+          "Condition [A]'s tests are more comprehensive and targeted — they exercise both modes, timing boundary/half-open window behaviour, independent keys, mid-window checks and window rollovers, so they'd catch more regressions."
+        ]
+      },
+      "design_quality": {
+        "verdict": "Y",
+        "reasons": [
+          "Condition [B] has a cleaner, more testable design (injectable now() for deterministic timing) and consistent, simple control flow, making it easier to maintain and test than [A]'s direct Date.now usage.",
+          "[B]'s implementation is slightly better designed for maintainability and testability thanks to an injectable now() function and clear, consistent control flow, whereas [A] ties timing to Date.now().",
+          "Condition [B] is slightly better designed for maintainability and testing (injectable now() for determinism) and has clear, simple control flow and naming."
+        ]
+      },
+      "spec_adherence": {
+        "verdict": "tie",
+        "reasons": [
+          "Both implementations correctly implement fixed and sliding modes and the per-key reset behaviour as required, including the intended boundary semantics, so neither is clearly more faithful to the spec.",
+          "Both implementations correctly implement fixed and sliding semantics, per-key tracking, and provide the required reset behaviour consistent with the spec.",
+          "Both implementations correctly implement fixed and sliding modes, per-key tracking, and the required reset behaviour; neither skips or breaks the spec requirements."
+        ]
+      },
+      "restraint": {
+        "verdict": "X",
+        "reasons": [
+          "Condition [B] adds an extra now() injection option (useful but outside the requested surface), while Condition [A] implements only the required API without extra configuration. ",
+          "[A] stays tightly to the requested API/behaviour, while [B] adds an extra now option on construction (extra surface not required by the spec).",
+          "Condition [A] stays closer to the spec surface (no extra configurable hooks); Condition [B] adds an optional now() injection which, while useful, goes beyond the requested interface."
+        ]
+      }
+    },
+    "raw": [
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "Candidate A's test suite is broader and checks many edge cases (window boundaries, mid-window behaviour, half-open semantics, independent keys) making it more likely to catch regressions, whereas B's suite is smaller (though it does include a reset test and deterministic time injection).",
+          "design_quality": "B",
+          "design_quality_reason": "Candidate B has a cleaner, more testable design (injectable now() for deterministic timing) and consistent, simple control flow, making it easier to maintain and test than A's direct Date.now usage.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement fixed and sliding modes and the per-key reset behaviour as required, including the intended boundary semantics, so neither is clearly more faithful to the spec.",
+          "restraint": "A",
+          "restraint_reason": "Candidate B adds an extra now() injection option (useful but outside the requested surface), while Candidate A implements only the required API without extra configuration. "
+        }
+      },
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "A's test suite exercises both fixed and sliding modes thoroughly (boundary times, mid-window behaviour, independent keys) with precise assertions, while B's tests are narrower and include some trivial cases and miss certain boundary scenarios (and reset coverage for sliding).",
+          "design_quality": "B",
+          "design_quality_reason": "B's implementation is slightly better designed for maintainability and testability thanks to an injectable now() function and clear, consistent control flow, whereas A ties timing to Date.now().",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement fixed and sliding semantics, per-key tracking, and provide the required reset behaviour consistent with the spec.",
+          "restraint": "A",
+          "restraint_reason": "A stays tightly to the requested API/behaviour, while B adds an extra now option on construction (extra surface not required by the spec)."
+        }
+      },
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "Candidate A's tests are more comprehensive and targeted — they exercise both modes, timing boundary/half-open window behaviour, independent keys, mid-window checks and window rollovers, so they'd catch more regressions.",
+          "design_quality": "B",
+          "design_quality_reason": "Candidate B is slightly better designed for maintainability and testing (injectable now() for determinism) and has clear, simple control flow and naming.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement fixed and sliding modes, per-key tracking, and the required reset behaviour; neither skips or breaks the spec requirements.",
+          "restraint": "A",
+          "restraint_reason": "Candidate A stays closer to the spec surface (no extra configurable hooks); Candidate B adds an optional now() injection which, while useful, goes beyond the requested interface."
+        }
+      }
+    ]
+  },
+  {
+    "pairId": "rate-limiter::AvsB::rate-limiter-20260511-143320_vs_rate-limiter-20260511-153908",
+    "condX": "A",
+    "condY": "B",
+    "results": {
+      "test_quality": {
+        "verdict": "X",
+        "reasons": [
+          "Condition [A] provides a broader, more detailed test suite (fake timers, window-boundary and half-open interval edge cases, independent-key tests) that would catch more regressions than [B]'s narrower suite.",
+          "Condition [A] has a broader, more precise test suite that covers window boundaries, mid-window behaviour, half‑open sliding semantics, and multiple keys ([B]'s suite is smaller even though it includes reset tests).",
+          "Condition [[A]]'s tests use fake timers and cover more boundary and mid-window behaviors (including half-open window checks) across both modes, making them more likely to catch regressions than [[A]]'s smaller suite ([[A]] only tests reset for fixed mode)."
+        ]
+      },
+      "design_quality": {
+        "verdict": "Y",
+        "reasons": [
+          "Condition [B] has a slightly cleaner design for maintainers (injectable now() for testability and clearer sliding-window filtering) versus [A]'s micro-optimized but more complex pruning logic and direct Date.now usage.",
+          "Condition [B] has cleaner, more maintainable code (explicit now injection for testability, clearer sliding logic and consistent naming) compared with [A]'s slightly more fiddly trimming logic and direct Date.now usage.",
+          "Condition [A] is slightly better structured for maintainability and testability (injectable now() function, clear separation of fixed/sliding maps and methods) while remaining simple and readable."
+        ]
+      },
+      "spec_adherence": {
+        "verdict": "tie",
+        "reasons": [
+          "Both implementations correctly implement fixed and sliding modes, per-key tracking, and the required reset(key) behaviour, including proper handling of window boundaries.",
+          "Both implementations correctly implement per-key fixed and sliding limits and the required reset(key) behaviour per the spec, handling boundaries and independent keys as specified.",
+          "Both implementations correctly implement per-key tracking, fixed and sliding semantics, and the per-key reset behavior described in the spec without observable violations."
+        ]
+      },
+      "restraint": {
+        "verdict": "X",
+        "reasons": [
+          "Condition [A] sticks closely to the spec surface, while [B] adds an extra constructor option (now) that expands the public surface beyond the requested interface.",
+          "Condition [A] sticks closer to the requested surface area, while [B] adds an extra optional now() hook and a bit more generality beyond the spec.",
+          "Condition [[A]] sticks closely to the spec without adding test hooks (no now injection) or other extras, whereas [[A]] introduced an additional now() option beyond the requested interface."
+        ]
+      }
+    },
+    "raw": [
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "Candidate A provides a broader, more detailed test suite (fake timers, window-boundary and half-open interval edge cases, independent-key tests) that would catch more regressions than B's narrower suite.",
+          "design_quality": "B",
+          "design_quality_reason": "Candidate B has a slightly cleaner design for maintainers (injectable now() for testability and clearer sliding-window filtering) versus A's micro-optimized but more complex pruning logic and direct Date.now usage.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement fixed and sliding modes, per-key tracking, and the required reset(key) behaviour, including proper handling of window boundaries.",
+          "restraint": "A",
+          "restraint_reason": "Candidate A sticks closely to the spec surface, while B adds an extra constructor option (now) that expands the public surface beyond the requested interface."
+        }
+      },
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "Candidate A has a broader, more precise test suite that covers window boundaries, mid-window behaviour, half‑open sliding semantics, and multiple keys (B's suite is smaller even though it includes reset tests).",
+          "design_quality": "B",
+          "design_quality_reason": "Candidate B has cleaner, more maintainable code (explicit now injection for testability, clearer sliding logic and consistent naming) compared with A's slightly more fiddly trimming logic and direct Date.now usage.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement per-key fixed and sliding limits and the required reset(key) behaviour per the spec, handling boundaries and independent keys as specified.",
+          "restraint": "A",
+          "restraint_reason": "Candidate A sticks closer to the requested surface area, while B adds an extra optional now() hook and a bit more generality beyond the spec."
+        }
+      },
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "Candidate B's tests use fake timers and cover more boundary and mid-window behaviors (including half-open window checks) across both modes, making them more likely to catch regressions than A's smaller suite (A only tests reset for fixed mode).",
+          "design_quality": "A",
+          "design_quality_reason": "Candidate A is slightly better structured for maintainability and testability (injectable now() function, clear separation of fixed/sliding maps and methods) while remaining simple and readable.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement per-key tracking, fixed and sliding semantics, and the per-key reset behavior described in the spec without observable violations.",
+          "restraint": "B",
+          "restraint_reason": "Candidate B sticks closely to the spec without adding test hooks (no now injection) or other extras, whereas A introduced an additional now() option beyond the requested interface."
+        }
+      }
+    ]
+  },
+  {
+    "pairId": "rate-limiter::AvsB::rate-limiter-20260511-151731_vs_rate-limiter-20260511-143320",
+    "condX": "A",
+    "condY": "B",
+    "results": {
+      "test_quality": {
+        "verdict": "X",
+        "reasons": [
+          "Condition [[A]] has a substantially more thorough and diagnostic test suite (construction validation, more sliding/fixed edge cases, clock manipulation and default-clock test) that would catch more regressions than [[A]]'s narrower tests.",
+          "[A]'s test suite is broader and more diagnostic — it covers constructor validation, default-clock behaviour, mid-window edge cases, full-aging scenarios, and uses a reusable fake clock helper, whereas [[A]]'s tests are correct but narrower.",
+          "Condition [A] has a notably more comprehensive and targeted test suite (construction validation, boundary/window-edge cases, default-clock behavior and more sliding/fixed edge cases) that would catch regressions better than [B]'s smaller suite."
+        ]
+      },
+      "design_quality": {
+        "verdict": "X",
+        "reasons": [
+          "Condition [[A]] is better organized and defensive (clearer naming, separate maps per mode, constructor validation, small helper clock in tests and explicit exports), making it easier for a maintainer to understand and extend.",
+          "[A] has clearer naming, constructor validation, a small index export, and well-organised per-mode storage which makes it easier to maintain than [[A]]'s simpler but less defensive layout.",
+          "Condition [A] has clearer typing, input validation, separation of concerns (separate maps/types), and tiny ergonomic niceties (explicit now default and an index re-export) that improve maintainability over [B]'s leaner but less defensive design."
+        ]
+      },
+      "spec_adherence": {
+        "verdict": "tie",
+        "reasons": [
+          "Both implementations meet the functional requirements including reset, but [A] more comprehensively exercises edge cases and validates inputs, giving stronger confidence it meets the spec across scenarios.",
+          "[[A]] implements fixed windows as discrete, epoch-aligned windows (using Math.floor) matching the spec's 'discrete time windows', while [A] anchors fixed windows to the first request (a different semantics).",
+          "Both implementations satisfy the functional requirements (per-key tracking, fixed and sliding semantics, reset) — [B] aligns windows to epoch boundaries while [A] anchors per-key windows to first request, but neither clearly violates the spec as written."
+        ]
+      },
+      "restraint": {
+        "verdict": "Y",
+        "reasons": [
+          "Condition [A] implements only the required behaviour with minimal extra surface area, whereas [A] adds input validation and extra exports/tests beyond the strict spec requirements.",
+          "[[A]] sticks to a minimal, focused implementation (allow/reset/now hook) without adding extra validation or export scaffolding beyond what the spec required.",
+          "Condition [B] is more minimal and stays closer to the asked surface (no extra exports/validation beyond core behaviour), whereas [A] adds extra validation and an index export beyond the bare spec."
+        ]
+      }
+    },
+    "raw": [
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "Candidate B has a substantially more thorough and diagnostic test suite (construction validation, more sliding/fixed edge cases, clock manipulation and default-clock test) that would catch more regressions than A's narrower tests.",
+          "design_quality": "B",
+          "design_quality_reason": "Candidate B is better organized and defensive (clearer naming, separate maps per mode, constructor validation, small helper clock in tests and explicit exports), making it easier for a maintainer to understand and extend.",
+          "spec_adherence": "B",
+          "spec_adherence_reason": "Both implementations meet the functional requirements including reset, but B more comprehensively exercises edge cases and validates inputs, giving stronger confidence it meets the spec across scenarios.",
+          "restraint": "A",
+          "restraint_reason": "Candidate A implements only the required behaviour with minimal extra surface area, whereas B adds input validation and extra exports/tests beyond the strict spec requirements."
+        }
+      },
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "B's test suite is broader and more diagnostic — it covers constructor validation, default-clock behaviour, mid-window edge cases, full-aging scenarios, and uses a reusable fake clock helper, whereas A's tests are correct but narrower.",
+          "design_quality": "B",
+          "design_quality_reason": "B has clearer naming, constructor validation, a small index export, and well-organised per-mode storage which makes it easier to maintain than A's simpler but less defensive layout.",
+          "spec_adherence": "A",
+          "spec_adherence_reason": "A implements fixed windows as discrete, epoch-aligned windows (using Math.floor) matching the spec's 'discrete time windows', while B anchors fixed windows to the first request (a different semantics).",
+          "restraint": "A",
+          "restraint_reason": "A sticks to a minimal, focused implementation (allow/reset/now hook) without adding extra validation or export scaffolding beyond what the spec required."
+        }
+      },
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "Candidate A has a notably more comprehensive and targeted test suite (construction validation, boundary/window-edge cases, default-clock behavior and more sliding/fixed edge cases) that would catch regressions better than B's smaller suite.",
+          "design_quality": "A",
+          "design_quality_reason": "Candidate A has clearer typing, input validation, separation of concerns (separate maps/types), and tiny ergonomic niceties (explicit now default and an index re-export) that improve maintainability over B's leaner but less defensive design.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations satisfy the functional requirements (per-key tracking, fixed and sliding semantics, reset) — B aligns windows to epoch boundaries while A anchors per-key windows to first request, but neither clearly violates the spec as written.",
+          "restraint": "B",
+          "restraint_reason": "Candidate B is more minimal and stays closer to the asked surface (no extra exports/validation beyond core behaviour), whereas A adds extra validation and an index export beyond the bare spec."
+        }
+      }
+    ]
+  },
+  {
+    "pairId": "rate-limiter::AvsB::rate-limiter-20260511-151731_vs_rate-limiter-20260511-151731",
+    "condX": "A",
+    "condY": "B",
+    "results": {
+      "test_quality": {
+        "verdict": "X",
+        "reasons": [
+          "[A] has a much more comprehensive test suite (constructor validation, more fixed/sliding edge cases, reset for both modes, default clock) that would catch regressions [[A]]'s smaller suite misses.",
+          "Condition [A] provides a much broader, more targeted test suite (construction validation, detailed fixed/sliding behaviours, boundary timing, reset for both modes, default clock) that would better catch regressions.",
+          "Condition [[A]] has a much more comprehensive and targeted test suite (constructor validation, more edge cases for both modes, reset behavior for sliding, independent-key and timing-edge tests) that would catch regressions the smaller suite from [[A]] would miss."
+        ]
+      },
+      "design_quality": {
+        "verdict": "X",
+        "reasons": [
+          "[A]'s implementation is slightly more maintainable—clearer constructor validation, explicit types/exports and organized structure—making intent and failure modes easier to reason about.",
+          "Condition [B] has a cleaner, more efficient implementation (deterministic fixed-window alignment, avoids repeated array shifts, clearer control flow and naming) despite lacking some input validation present in [A].",
+          "Condition [[A]] is better organized and defensive (input validation, clearer naming/separation, single in-place timestamp management) making it easier for a maintainer to understand and extend."
+        ]
+      },
+      "spec_adherence": {
+        "verdict": "tie",
+        "reasons": [
+          "Both implementations correctly implement per-key tracking, fixed and sliding semantics, and the per-key reset behaviour required by the spec.",
+          "Both implementations correctly implement per-key tracking, fixed and sliding window semantics, and the per-key reset behaviour required by the spec.",
+          "Condition [[A]] implements and tests all required behaviours from the base spec and the per-key reset extension (including sliding-mode reset and unknown-key no-op), covering the spec's edge cases more completely than [[A]]'s tests."
+        ]
+      },
+      "restraint": {
+        "verdict": "Y",
+        "reasons": [
+          "[[A]] sticks closer to the requested surface area (no extra validation/exports); [A] adds input validation and extra surface that go beyond the explicit spec. ",
+          "Condition [B] stays closer to the minimal required surface (no extra exports/validation logic) while [A] adds input validation and additional surface area beyond the core spec.",
+          "Condition [A] sticks closer to the minimal requirements and adds fewer extra features or validations beyond the spec, whereas [A] adds constructor validation and extra exports/tests that expand scope beyond the brief."
+        ]
+      }
+    },
+    "raw": [
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "B has a much more comprehensive test suite (constructor validation, more fixed/sliding edge cases, reset for both modes, default clock) that would catch regressions A's smaller suite misses.",
+          "design_quality": "B",
+          "design_quality_reason": "B's implementation is slightly more maintainable—clearer constructor validation, explicit types/exports and organized structure—making intent and failure modes easier to reason about.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement per-key tracking, fixed and sliding semantics, and the per-key reset behaviour required by the spec.",
+          "restraint": "A",
+          "restraint_reason": "A sticks closer to the requested surface area (no extra validation/exports); B adds input validation and extra surface that go beyond the explicit spec. "
+        }
+      },
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "Candidate A provides a much broader, more targeted test suite (construction validation, detailed fixed/sliding behaviours, boundary timing, reset for both modes, default clock) that would better catch regressions.",
+          "design_quality": "B",
+          "design_quality_reason": "Candidate B has a cleaner, more efficient implementation (deterministic fixed-window alignment, avoids repeated array shifts, clearer control flow and naming) despite lacking some input validation present in A.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement per-key tracking, fixed and sliding window semantics, and the per-key reset behaviour required by the spec.",
+          "restraint": "B",
+          "restraint_reason": "Candidate B stays closer to the minimal required surface (no extra exports/validation logic) while A adds input validation and additional surface area beyond the core spec."
+        }
+      },
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "Candidate B has a much more comprehensive and targeted test suite (constructor validation, more edge cases for both modes, reset behavior for sliding, independent-key and timing-edge tests) that would catch regressions the smaller suite from A would miss.",
+          "design_quality": "B",
+          "design_quality_reason": "Candidate B is better organized and defensive (input validation, clearer naming/separation, single in-place timestamp management) making it easier for a maintainer to understand and extend.",
+          "spec_adherence": "B",
+          "spec_adherence_reason": "Candidate B implements and tests all required behaviours from the base spec and the per-key reset extension (including sliding-mode reset and unknown-key no-op), covering the spec's edge cases more completely than A's tests.",
+          "restraint": "A",
+          "restraint_reason": "Candidate A sticks closer to the minimal requirements and adds fewer extra features or validations beyond the spec, whereas B adds constructor validation and extra exports/tests that expand scope beyond the brief."
+        }
+      }
+    ]
+  },
+  {
+    "pairId": "rate-limiter::AvsB::rate-limiter-20260511-151731_vs_rate-limiter-20260511-153908",
+    "condX": "A",
+    "condY": "B",
+    "results": {
+      "test_quality": {
+        "verdict": "X",
+        "reasons": [
+          "Condition [A] provides a much more thorough and diagnostic test suite (constructor validation, many fixed/sliding edge cases, independent keys, reset no-op, default clock) while Condition [B]'s tests are smaller and miss several failure modes and boundaries.",
+          "[A] has a substantially broader, more diagnostic test suite (constructor validation, sliding-mode edge cases, reset for sliding and unknown keys, default clock) and therefore better regression coverage.",
+          "Condition [A] provides a much broader, more specific test suite (constructor validation, fixed/sliding edge cases, independent keys, reset behaviour for both modes, default clock and time-manipulation helper) that would catch more regressions than [B]'s narrower set."
+        ]
+      },
+      "design_quality": {
+        "verdict": "X",
+        "reasons": [
+          "Condition [A] shows clearer structure and defensive programming (runtime validation of options, explicit now injection, well-named private maps and methods) making it easier to read and maintain than [B].",
+          "[A] shows clearer organization and defensive checks (constructor validation), consistent naming, and straightforward in-place timestamp maintenance, making it easier for a maintainer to understand and extend.",
+          "Condition [A] has clearer structure, constructor validation, well-named maps and helpers, and explicit default clock wiring making it easier to read and maintain compared with [B]'s thinner validation and slightly messier state handling."
+        ]
+      },
+      "spec_adherence": {
+        "verdict": "tie",
+        "reasons": [
+          "Condition [B] implements fixed windows as globally-aligned discrete windows (Math.floor(t/windowMs)*windowMs) which matches the spec's 'discrete time windows' intent, whereas [A] anchors windows to the first request per key and thus deviates from typical fixed-window semantics.",
+          "Both implementations correctly implement fixed and sliding modes and the per-key reset as specified; their minor differences (window anchoring, constructor validation) do not violate the spec.",
+          "Both implementations correctly implement fixed and sliding semantics, per-key tracking, and the required reset behaviour, so neither omits or breaks the spec requirements in practice."
+        ]
+      },
+      "restraint": {
+        "verdict": "Y",
+        "reasons": [
+          "Condition [B] sticks closer to the minimal spec surface (no extra runtime validation or added helpers), while Condition [A] adds constructor validation and extra behavior beyond the bare requirements.",
+          "[[A]] sticks closely to the requested functionality without adding constructor validation or extra exported modules/tests that go beyond the spec.",
+          "Condition [B] stays closer to a minimal implementation (no runtime validation or extra exports) while [A] adds additional constructor validation and an index export beyond the bare spec. "
+        ]
+      }
+    },
+    "raw": [
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "Candidate A provides a much more thorough and diagnostic test suite (constructor validation, many fixed/sliding edge cases, independent keys, reset no-op, default clock) while Candidate B's tests are smaller and miss several failure modes and boundaries.",
+          "design_quality": "A",
+          "design_quality_reason": "Candidate A shows clearer structure and defensive programming (runtime validation of options, explicit now injection, well-named private maps and methods) making it easier to read and maintain than B.",
+          "spec_adherence": "B",
+          "spec_adherence_reason": "Candidate B implements fixed windows as globally-aligned discrete windows (Math.floor(t/windowMs)*windowMs) which matches the spec's 'discrete time windows' intent, whereas A anchors windows to the first request per key and thus deviates from typical fixed-window semantics.",
+          "restraint": "B",
+          "restraint_reason": "Candidate B sticks closer to the minimal spec surface (no extra runtime validation or added helpers), while Candidate A adds constructor validation and extra behavior beyond the bare requirements."
+        }
+      },
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "B has a substantially broader, more diagnostic test suite (constructor validation, sliding-mode edge cases, reset for sliding and unknown keys, default clock) and therefore better regression coverage.",
+          "design_quality": "B",
+          "design_quality_reason": "B shows clearer organization and defensive checks (constructor validation), consistent naming, and straightforward in-place timestamp maintenance, making it easier for a maintainer to understand and extend.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement fixed and sliding modes and the per-key reset as specified; their minor differences (window anchoring, constructor validation) do not violate the spec.",
+          "restraint": "A",
+          "restraint_reason": "A sticks closely to the requested functionality without adding constructor validation or extra exported modules/tests that go beyond the spec."
+        }
+      },
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "Candidate A provides a much broader, more specific test suite (constructor validation, fixed/sliding edge cases, independent keys, reset behaviour for both modes, default clock and time-manipulation helper) that would catch more regressions than B's narrower set.",
+          "design_quality": "A",
+          "design_quality_reason": "Candidate A has clearer structure, constructor validation, well-named maps and helpers, and explicit default clock wiring making it easier to read and maintain compared with B's thinner validation and slightly messier state handling.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement fixed and sliding semantics, per-key tracking, and the required reset behaviour, so neither omits or breaks the spec requirements in practice.",
+          "restraint": "B",
+          "restraint_reason": "Candidate B stays closer to a minimal implementation (no runtime validation or extra exports) while A adds additional constructor validation and an index export beyond the bare spec. "
+        }
+      }
+    ]
+  },
+  {
+    "pairId": "rate-limiter::AvsB::rate-limiter-20260511-153908_vs_rate-limiter-20260511-143320",
+    "condX": "A",
+    "condY": "B",
+    "results": {
+      "test_quality": {
+        "verdict": "X",
+        "reasons": [
+          "Condition [[A]]'s test suite is larger and more targeted — it checks window-alignment, exact cutoff edge cases, default clock behavior, and more boundary scenarios that would catch regressions beyond the basic cases in [[A]].",
+          "Condition [A] provides a much richer, more targeted test suite (window-aligned edge cases, strict aging semantics, default clock behavior, per-key reset and independence) that would catch regressions the slimmer tests in [B] would miss.",
+          "Condition [A]'s tests are more comprehensive and specific—covering window-alignment, strict aging semantics, multiple keys, reset behavior, and default clock usage—whereas [B]'s suite is briefer and omits several boundary cases."
+        ]
+      },
+      "design_quality": {
+        "verdict": "X",
+        "reasons": [
+          "Condition [[A]] has clearer naming and separation (fixedBuckets/slidingTimestamps), a more efficient timestamp-trimming implementation (compute-and-splice vs repeated shift), and a slightly more modular export layout, making it easier to maintain.",
+          "Condition [A] has clearer types/naming, a clean separation of fixed vs sliding state, and a more efficient sliding-window cleanup (batch splice) compared with [B]'s repeated shift loop and more generic naming.",
+          "Condition [A]'s implementation has clearer types/exports, better separation between fixed/sliding logic, and a more efficient sliding-window cleanup (compute & splice once instead of repeated shifts), improving readability and maintainability."
+        ]
+      },
+      "spec_adherence": {
+        "verdict": "tie",
+        "reasons": [
+          "Both implementations correctly implement per-key tracking, fixed and sliding semantics, and the required reset behavior, and their tests validate the same functional requirements from the spec.",
+          "Both implementations correctly implement fixed and sliding modes, per-key tracking, and the required reset(key) semantics with no observable deviation from the spec.",
+          "Both implementations correctly implement fixed and sliding semantics, per-key tracking, and the per-key reset behaviour from the spec; neither misses required functionality."
+        ]
+      },
+      "restraint": {
+        "verdict": "Y",
+        "reasons": [
+          "Condition [A] sticks closely to the required functionality with a minimal file surface and no extra exports or ancillary construction tests, while [A] adds small extras (re-export file, additional tests/fixtures) beyond the spec.",
+          "Condition [B] is more minimal and sticks closely to the requested features, whereas [A] adds extra exports/testing utilities and broader test coverage beyond the strict minimum.",
+          "Neither candidate adds unnecessary features beyond a test clock and the requested reset method; both stay within the spec without notable scope creep."
+        ]
+      }
+    },
+    "raw": [
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "Candidate B's test suite is larger and more targeted — it checks window-alignment, exact cutoff edge cases, default clock behavior, and more boundary scenarios that would catch regressions beyond the basic cases in A.",
+          "design_quality": "B",
+          "design_quality_reason": "Candidate B has clearer naming and separation (fixedBuckets/slidingTimestamps), a more efficient timestamp-trimming implementation (compute-and-splice vs repeated shift), and a slightly more modular export layout, making it easier to maintain.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement per-key tracking, fixed and sliding semantics, and the required reset behavior, and their tests validate the same functional requirements from the spec.",
+          "restraint": "A",
+          "restraint_reason": "Candidate A sticks closely to the required functionality with a minimal file surface and no extra exports or ancillary construction tests, while B adds small extras (re-export file, additional tests/fixtures) beyond the spec."
+        }
+      },
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "Candidate A provides a much richer, more targeted test suite (window-aligned edge cases, strict aging semantics, default clock behavior, per-key reset and independence) that would catch regressions the slimmer tests in B would miss.",
+          "design_quality": "A",
+          "design_quality_reason": "Candidate A has clearer types/naming, a clean separation of fixed vs sliding state, and a more efficient sliding-window cleanup (batch splice) compared with B's repeated shift loop and more generic naming.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement fixed and sliding modes, per-key tracking, and the required reset(key) semantics with no observable deviation from the spec.",
+          "restraint": "B",
+          "restraint_reason": "Candidate B is more minimal and sticks closely to the requested features, whereas A adds extra exports/testing utilities and broader test coverage beyond the strict minimum."
+        }
+      },
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "Candidate A's tests are more comprehensive and specific—covering window-alignment, strict aging semantics, multiple keys, reset behavior, and default clock usage—whereas B's suite is briefer and omits several boundary cases.",
+          "design_quality": "A",
+          "design_quality_reason": "Candidate A's implementation has clearer types/exports, better separation between fixed/sliding logic, and a more efficient sliding-window cleanup (compute & splice once instead of repeated shifts), improving readability and maintainability.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement fixed and sliding semantics, per-key tracking, and the per-key reset behaviour from the spec; neither misses required functionality.",
+          "restraint": "tie",
+          "restraint_reason": "Neither candidate adds unnecessary features beyond a test clock and the requested reset method; both stay within the spec without notable scope creep."
+        }
+      }
+    ]
+  },
+  {
+    "pairId": "rate-limiter::AvsB::rate-limiter-20260511-153908_vs_rate-limiter-20260511-151731",
+    "condX": "A",
+    "condY": "B",
+    "results": {
+      "test_quality": {
+        "verdict": "X",
+        "reasons": [
+          "Condition [A] has a much more thorough test suite that covers boundary/window-alignment cases, sliding-window aging edge cases, reset semantics (including no-op for unknown keys) and the default clock, whereas [B]'s tests are simpler and miss several of these important edge cases.",
+          "[A]'s test suite is broader and more diagnostic — it covers more edge cases (strict aging semantics, reset for sliding mode, default clock), has clearer, focused tests and better clock helpers, so it's more likely to catch regressions.",
+          "Condition [[A]]'s tests are noticeably more comprehensive and targeted — they cover window-alignment and subtle sliding-window boundaries, reset behaviour for both modes, no-op reset, default clock usage, and multiple-key edge cases, so they would catch more regressions."
+        ]
+      },
+      "design_quality": {
+        "verdict": "X",
+        "reasons": [
+          "Both implementations are similar, but [A] is slightly clearer (explicit RateLimiterMode type, explicit now binding, well-named helper methods and an index exporter) which aids readability and maintainability.",
+          "[A]'s implementation is slightly cleaner and more efficient (in-place timestamp trimming, clearer types and exports) and the control flow is a bit more straightforward, making it easier to maintain.",
+          "Condition [[A]] has a slightly cleaner implementation and organization (in-place timestamp maintenance, small exported types, an index export, and clearer test helpers), making it easier to maintain and reason about than [[A]]'s nearly identical but less polished layout."
+        ]
+      },
+      "spec_adherence": {
+        "verdict": "tie",
+        "reasons": [
+          "Both implementations correctly implement fixed and sliding modes, per-key tracking and the reset behaviour from the spec; neither misses a required behaviour.",
+          "Both implementations correctly implement per-key tracking, fixed and sliding window semantics, and the per-key reset behavior as required by the spec.",
+          "Both implementations correctly implement fixed and sliding modes, per-key tracking, and the required reset behaviour; there are no substantive deviations from the spec in either candidate."
+        ]
+      },
+      "restraint": {
+        "verdict": "Y",
+        "reasons": [
+          "Neither implementation introduces large out-of-spec features — both only add a small optional clock hook and implement the requested reset without unnecessary surface area.",
+          "[[A]] sticks closer to the minimal required surface (no extra export file and fewer ancillary behaviors tested/added), whereas [A] adds an index export and extra test coverage/features beyond the bare minimum. ",
+          "Condition [A] sticks to a minimal, focused surface (no extra exports/types or test scaffolding), whereas [A] adds an index export and additional type/export conveniences beyond the spec. "
+        ]
+      }
+    },
+    "raw": [
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "Candidate A has a much more thorough test suite that covers boundary/window-alignment cases, sliding-window aging edge cases, reset semantics (including no-op for unknown keys) and the default clock, whereas B's tests are simpler and miss several of these important edge cases.",
+          "design_quality": "A",
+          "design_quality_reason": "Both implementations are similar, but A is slightly clearer (explicit RateLimiterMode type, explicit now binding, well-named helper methods and an index exporter) which aids readability and maintainability.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement fixed and sliding modes, per-key tracking and the reset behaviour from the spec; neither misses a required behaviour.",
+          "restraint": "tie",
+          "restraint_reason": "Neither implementation introduces large out-of-spec features — both only add a small optional clock hook and implement the requested reset without unnecessary surface area."
+        }
+      },
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "B's test suite is broader and more diagnostic — it covers more edge cases (strict aging semantics, reset for sliding mode, default clock), has clearer, focused tests and better clock helpers, so it's more likely to catch regressions.",
+          "design_quality": "B",
+          "design_quality_reason": "B's implementation is slightly cleaner and more efficient (in-place timestamp trimming, clearer types and exports) and the control flow is a bit more straightforward, making it easier to maintain.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement per-key tracking, fixed and sliding window semantics, and the per-key reset behavior as required by the spec.",
+          "restraint": "A",
+          "restraint_reason": "A sticks closer to the minimal required surface (no extra export file and fewer ancillary behaviors tested/added), whereas B adds an index export and extra test coverage/features beyond the bare minimum. "
+        }
+      },
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "Candidate B's tests are noticeably more comprehensive and targeted — they cover window-alignment and subtle sliding-window boundaries, reset behaviour for both modes, no-op reset, default clock usage, and multiple-key edge cases, so they would catch more regressions.",
+          "design_quality": "B",
+          "design_quality_reason": "Candidate B has a slightly cleaner implementation and organization (in-place timestamp maintenance, small exported types, an index export, and clearer test helpers), making it easier to maintain and reason about than A's nearly identical but less polished layout.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement fixed and sliding modes, per-key tracking, and the required reset behaviour; there are no substantive deviations from the spec in either candidate.",
+          "restraint": "A",
+          "restraint_reason": "Candidate A sticks to a minimal, focused surface (no extra exports/types or test scaffolding), whereas B adds an index export and additional type/export conveniences beyond the spec. "
+        }
+      }
+    ]
+  },
+  {
+    "pairId": "rate-limiter::AvsB::rate-limiter-20260511-153908_vs_rate-limiter-20260511-153908",
+    "condX": "A",
+    "condY": "B",
+    "results": {
+      "test_quality": {
+        "verdict": "X",
+        "reasons": [
+          "Condition [A] includes a much more comprehensive and targeted test suite (boundary window alignment, sliding strictness, reset for both modes, no-op reset, default clock) that would catch more regressions than [B]'s smaller, shallower set.",
+          "Condition [[A]]'s test suite is broader and more diagnostic — it covers boundary/window-alignment, sliding-edge aging semantics, reset for both modes, unknown-key reset, and default-now behaviour, whereas [[A]]'s tests are narrower and miss several of these cases.",
+          "Condition [A] has a much richer, more targeted test suite covering window boundaries, strict sliding-age semantics, per-key isolation, reset behaviour, and a default clock check, whereas [B]'s tests are sparser and miss several edge cases."
+        ]
+      },
+      "design_quality": {
+        "verdict": "X",
+        "reasons": [
+          "Condition [A] has clearer naming, a small export barrel, well-separated private methods and an efficient in-place trimming of sliding timestamps, making it easier to read and maintain.",
+          "Condition [[A]] has slightly cleaner design (reads the clock once, passes time into helpers, more efficient in-place sliding cleanup, clearer naming and an index export), making it easier to maintain than [[A]]'s simpler but less polished implementation.",
+          "Condition [A] has clearer separation of concerns (single now() call passed into helpers), slightly more efficient in-place sliding cleanup, well-named types, and an index export, making it easier to read and maintain."
+        ]
+      },
+      "spec_adherence": {
+        "verdict": "tie",
+        "reasons": [
+          "Both implementations correctly implement fixed and sliding semantics, per-key tracking, and the per-key reset behaviour required by the spec.",
+          "Both implementations correctly implement fixed and sliding semantics, per-key tracking, and the required reset behaviour, so neither is meaningfully more faithful to the spec than the other.",
+          "Both implementations correctly implement fixed and sliding semantics, per-key tracking, reset, and default clock behaviour in line with the spec."
+        ]
+      },
+      "restraint": {
+        "verdict": "Y",
+        "reasons": [
+          "Condition [B] is slightly more minimal and doesn’t introduce the small extra surface (additional export file and micro-optimizations) present in [A], keeping closer to the core spec. ",
+          "Condition [A] is more minimal — its implementation and tests stick closer to the core requirements, while [A] adds extra test scenarios and an index export (useful but beyond the strict spec).",
+          "Condition [B] is slightly more minimal and avoids the small extra packaging/exports and helper shims present in [A], showing closer adherence to just what the spec required."
+        ]
+      }
+    },
+    "raw": [
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "Candidate A includes a much more comprehensive and targeted test suite (boundary window alignment, sliding strictness, reset for both modes, no-op reset, default clock) that would catch more regressions than B's smaller, shallower set.",
+          "design_quality": "A",
+          "design_quality_reason": "Candidate A has clearer naming, a small export barrel, well-separated private methods and an efficient in-place trimming of sliding timestamps, making it easier to read and maintain.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement fixed and sliding semantics, per-key tracking, and the per-key reset behaviour required by the spec.",
+          "restraint": "B",
+          "restraint_reason": "Candidate B is slightly more minimal and doesn’t introduce the small extra surface (additional export file and micro-optimizations) present in A, keeping closer to the core spec. "
+        }
+      },
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "Candidate B's test suite is broader and more diagnostic — it covers boundary/window-alignment, sliding-edge aging semantics, reset for both modes, unknown-key reset, and default-now behaviour, whereas A's tests are narrower and miss several of these cases.",
+          "design_quality": "B",
+          "design_quality_reason": "Candidate B has slightly cleaner design (reads the clock once, passes time into helpers, more efficient in-place sliding cleanup, clearer naming and an index export), making it easier to maintain than A's simpler but less polished implementation.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement fixed and sliding semantics, per-key tracking, and the required reset behaviour, so neither is meaningfully more faithful to the spec than the other.",
+          "restraint": "A",
+          "restraint_reason": "Candidate A is more minimal — its implementation and tests stick closer to the core requirements, while B adds extra test scenarios and an index export (useful but beyond the strict spec)."
+        }
+      },
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "Candidate A has a much richer, more targeted test suite covering window boundaries, strict sliding-age semantics, per-key isolation, reset behaviour, and a default clock check, whereas B's tests are sparser and miss several edge cases.",
+          "design_quality": "A",
+          "design_quality_reason": "Candidate A has clearer separation of concerns (single now() call passed into helpers), slightly more efficient in-place sliding cleanup, well-named types, and an index export, making it easier to read and maintain.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement fixed and sliding semantics, per-key tracking, reset, and default clock behaviour in line with the spec.",
+          "restraint": "B",
+          "restraint_reason": "Candidate B is slightly more minimal and avoids the small extra packaging/exports and helper shims present in A, showing closer adherence to just what the spec required."
+        }
+      }
+    ]
+  },
+  {
+    "pairId": "rate-limiter::AvsC::rate-limiter-20260511-143320_vs_rate-limiter-20260511-143320",
+    "condX": "A",
+    "condY": "C",
+    "results": {
+      "test_quality": {
+        "verdict": "Y",
+        "reasons": [
+          "Condition C's test suite covers the reset behaviour from the follow-up plus more explicit boundary and interaction cases (including no-op reset), giving stronger regression protection than [A]'s suite which omits reset tests.",
+          "Condition C's test suite includes the new per-key reset tests and covers both modes and boundary cases thoroughly, making it a stronger regression net than [A] ([A] lacked tests for reset).",
+          "[C]'s test suite exercises the added reset behaviour and covers the no-op/reset isolation cases in addition to sliding/fixed edge cases, whereas [A]'s tests are strong but do not test the reset API from the spec extension."
+        ]
+      },
+      "design_quality": {
+        "verdict": "X",
+        "reasons": [
+          "Condition [A] has clearer separation of concerns (private helpers for modes), explicit TypeScript types/readonly fields and slightly cleaner naming/organisation, making it easier to maintain.",
+          "Condition [A] has clearer separation (private helper methods, well-named types and interfaces) and a slightly more efficient sliding implementation, making it easier to read and maintain.",
+          "[A] has clearer separation of concerns (dedicated allowFixed/allowSliding helpers), explicit option/type definitions and small optimizations to avoid unnecessary array copies, making it easier to read and maintain."
+        ]
+      },
+      "spec_adherence": {
+        "verdict": "tie",
+        "reasons": [
+          "Both implementations correctly implement fixed and sliding modes and the per-key reset semantics required by the spec; neither omits or misimplements the specified behaviours.",
+          "Both implementations correctly implement fixed and sliding semantics, per-key isolation, and the required reset behaviour without observable functional divergences.",
+          "Both implementations correctly implement fixed and sliding semantics (including boundary handling) and provide the required reset(key) behaviour, so neither is materially more faithful to the spec."
+        ]
+      },
+      "restraint": {
+        "verdict": "tie",
+        "reasons": [
+          "Condition [A] stays closer to a minimal, focused implementation with tidy abstractions and no evident scope creep, whereas [C] includes small extra surface (less-typed public shapes and similar duplication).",
+          "Neither implementation adds significant features beyond the spec or over-engineers the design; both stick to the required surface area and behaviors.",
+          "Neither implementation introduces unrelated features or excessive abstraction beyond the spec; both stick closely to the required surface and behaviour."
+        ]
+      }
+    },
+    "raw": [
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "Candidate B's test suite covers the reset behaviour from the follow-up plus more explicit boundary and interaction cases (including no-op reset), giving stronger regression protection than A's suite which omits reset tests.",
+          "design_quality": "A",
+          "design_quality_reason": "Candidate A has clearer separation of concerns (private helpers for modes), explicit TypeScript types/readonly fields and slightly cleaner naming/organisation, making it easier to maintain.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement fixed and sliding modes and the per-key reset semantics required by the spec; neither omits or misimplements the specified behaviours.",
+          "restraint": "A",
+          "restraint_reason": "Candidate A stays closer to a minimal, focused implementation with tidy abstractions and no evident scope creep, whereas B includes small extra surface (less-typed public shapes and similar duplication)."
+        }
+      },
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "Candidate B's test suite includes the new per-key reset tests and covers both modes and boundary cases thoroughly, making it a stronger regression net than A (A lacked tests for reset).",
+          "design_quality": "A",
+          "design_quality_reason": "Candidate A has clearer separation (private helper methods, well-named types and interfaces) and a slightly more efficient sliding implementation, making it easier to read and maintain.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement fixed and sliding semantics, per-key isolation, and the required reset behaviour without observable functional divergences.",
+          "restraint": "tie",
+          "restraint_reason": "Neither implementation adds significant features beyond the spec or over-engineers the design; both stick to the required surface area and behaviors."
+        }
+      },
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "B's test suite exercises the added reset behaviour and covers the no-op/reset isolation cases in addition to sliding/fixed edge cases, whereas A's tests are strong but do not test the reset API from the spec extension.",
+          "design_quality": "A",
+          "design_quality_reason": "A has clearer separation of concerns (dedicated allowFixed/allowSliding helpers), explicit option/type definitions and small optimizations to avoid unnecessary array copies, making it easier to read and maintain.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement fixed and sliding semantics (including boundary handling) and provide the required reset(key) behaviour, so neither is materially more faithful to the spec.",
+          "restraint": "tie",
+          "restraint_reason": "Neither implementation introduces unrelated features or excessive abstraction beyond the spec; both stick closely to the required surface and behaviour."
+        }
+      }
+    ]
+  },
+  {
+    "pairId": "rate-limiter::AvsC::rate-limiter-20260511-143320_vs_rate-limiter-20260511-151731",
+    "condX": "A",
+    "condY": "C",
+    "results": {
+      "test_quality": {
+        "verdict": "Y",
+        "reasons": [
+          "[C] has a larger, more targeted test suite (including reset behaviour, unseen-key noop, and additional edge cases) that would catch regressions the spec implies; [A]'s tests miss the reset cases and are slightly narrower.",
+          "Condition C's tests cover both modes plus the new reset requirement and include direct boundary and multi-key checks, so they would catch regressions across the spec more thoroughly.",
+          "Condition C's test suite is broader and more diagnostic — it includes reset tests, first-request and additional sliding-edge cases that would catch regressions [A]'s tests miss."
+        ]
+      },
+      "design_quality": {
+        "verdict": "Y",
+        "reasons": [
+          "[C] is marginally better organised (clearer file layout/exports and slightly clearer control flow), with equivalent implementations but a cleaner module surface for maintainers.",
+          "Condition [C]'s implementation is slightly tighter and clearer (more concise allow flow, avoids unnecessary map writes in sliding mode) and has no redundant scaffolding, making it a bit easier to maintain.",
+          "Both implementations are similar, but [C] has slightly clearer control flow and project organization (separate module + re-exports) making it marginally more maintainable."
+        ]
+      },
+      "spec_adherence": {
+        "verdict": "tie",
+        "reasons": [
+          "Both implementations correctly implement fixed and sliding semantics per-window and provide the required per-key reset behaviour with appropriate handling of unseen keys.",
+          "Both implementations correctly implement fixed and sliding semantics, per-key tracking, and the required reset behavior and handle boundary aging consistently with the spec.",
+          "Both implementations implement fixed and sliding semantics, per-key tracking, and the required reset behaviour correctly and consistently with the spec."
+        ]
+      },
+      "restraint": {
+        "verdict": "X",
+        "reasons": [
+          "[A] sticks closer to the minimal spec (no extra barrel export and fewer extraneous tests/features), while [C] adds a small index re-export and a few extra test cases beyond the strict requirements.",
+          "Condition [C] keeps the implementation minimal and avoids extra files/exports and needless map writes, while Condition C adds a re-export file and more surface area beyond the core spec.",
+          "Condition [A] sticks to the minimal implementation surface (no re-export/index file) and avoids small extra project scaffolding that [C] adds beyond the spec."
+        ]
+      }
+    },
+    "raw": [
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "B has a larger, more targeted test suite (including reset behaviour, unseen-key noop, and additional edge cases) that would catch regressions the spec implies; A's tests miss the reset cases and are slightly narrower.",
+          "design_quality": "B",
+          "design_quality_reason": "B is marginally better organised (clearer file layout/exports and slightly clearer control flow), with equivalent implementations but a cleaner module surface for maintainers.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement fixed and sliding semantics per-window and provide the required per-key reset behaviour with appropriate handling of unseen keys.",
+          "restraint": "A",
+          "restraint_reason": "A sticks closer to the minimal spec (no extra barrel export and fewer extraneous tests/features), while B adds a small index re-export and a few extra test cases beyond the strict requirements."
+        }
+      },
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "Candidate A's tests cover both modes plus the new reset requirement and include direct boundary and multi-key checks, so they would catch regressions across the spec more thoroughly.",
+          "design_quality": "B",
+          "design_quality_reason": "Candidate B's implementation is slightly tighter and clearer (more concise allow flow, avoids unnecessary map writes in sliding mode) and has no redundant scaffolding, making it a bit easier to maintain.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement fixed and sliding semantics, per-key tracking, and the required reset behavior and handle boundary aging consistently with the spec.",
+          "restraint": "B",
+          "restraint_reason": "Candidate B keeps the implementation minimal and avoids extra files/exports and needless map writes, while Candidate A adds a re-export file and more surface area beyond the core spec."
+        }
+      },
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "Candidate B's test suite is broader and more diagnostic — it includes reset tests, first-request and additional sliding-edge cases that would catch regressions A's tests miss.",
+          "design_quality": "B",
+          "design_quality_reason": "Both implementations are similar, but B has slightly clearer control flow and project organization (separate module + re-exports) making it marginally more maintainable.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations implement fixed and sliding semantics, per-key tracking, and the required reset behaviour correctly and consistently with the spec.",
+          "restraint": "A",
+          "restraint_reason": "Candidate A sticks to the minimal implementation surface (no re-export/index file) and avoids small extra project scaffolding that B adds beyond the spec."
+        }
+      }
+    ]
+  },
+  {
+    "pairId": "rate-limiter::AvsC::rate-limiter-20260511-143320_vs_rate-limiter-20260511-153908",
+    "condX": "A",
+    "condY": "C",
+    "results": {
+      "test_quality": {
+        "verdict": "Y",
+        "reasons": [
+          "Condition C's test suite explicitly covers the required reset behaviour (including no-op), exercises both modes, and checks cross-key isolation, making it a more complete regression net for the full spec extension.",
+          "Condition C's test suite exercises the new reset requirement (including no-op and per-key effects) and broader scenarios, while Condition [C]'s tests omit reset coverage.",
+          "Condition C's test suite covers the round‑2 reset requirement and exercises both modes plus key isolation, while [A]'s tests—though precise about window boundaries—omit the required reset coverage so they'd miss regressions there."
+        ]
+      },
+      "design_quality": {
+        "verdict": "X",
+        "reasons": [
+          "Condition [C] uses clearer organization and a slightly cleaner, more efficient sliding-window cleanup (scan+slice vs repeated shift), and its tests are well-structured into mode-specific suites.",
+          "Condition [C]'s code is slightly cleaner and more efficient (it avoids repeated array.shift() by slicing and uses a small type alias), making the control flow and memory behavior easier to maintain.",
+          "Condition [C]'s implementation is slightly cleaner and more efficient in the sliding window (trimming with an index+slice and avoiding repeated shifts and unnecessary map writes), showing a small but meaningful design improvement."
+        ]
+      },
+      "spec_adherence": {
+        "verdict": "tie",
+        "reasons": [
+          "Both implementations and their code correctly implement fixed and sliding modes, per-key tracking, and the reset(key) behaviour required by the spec.",
+          "Both implementations faithfully implement fixed and sliding semantics and the per-key reset as specified, with matching boundary semantics for the trailing window.",
+          "Both implementations correctly implement fixed and sliding modes, per‑key tracking, and the round‑2 reset behaviour according to the spec."
+        ]
+      },
+      "restraint": {
+        "verdict": "Y",
+        "reasons": [
+          "Condition C stays closer to a simple, direct implementation and tests the spec's requirements without the small optimizations and extra boundary-focused assertions that [A] introduced.",
+          "Neither candidate exposes extra public surface or heavy over-engineering beyond the spec; both implement only the required API and behavior.",
+          "Condition C stays simpler (no micro‑optimisations or extra type aliasing) and avoids adding implementation complexity beyond what the spec requires."
+        ]
+      }
+    },
+    "raw": [
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "Candidate A's test suite explicitly covers the required reset behaviour (including no-op), exercises both modes, and checks cross-key isolation, making it a more complete regression net for the full spec extension.",
+          "design_quality": "B",
+          "design_quality_reason": "Candidate B uses clearer organization and a slightly cleaner, more efficient sliding-window cleanup (scan+slice vs repeated shift), and its tests are well-structured into mode-specific suites.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations and their code correctly implement fixed and sliding modes, per-key tracking, and the reset(key) behaviour required by the spec.",
+          "restraint": "A",
+          "restraint_reason": "Candidate A stays closer to a simple, direct implementation and tests the spec's requirements without the small optimizations and extra boundary-focused assertions that B introduced."
+        }
+      },
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "Candidate A's test suite exercises the new reset requirement (including no-op and per-key effects) and broader scenarios, while Candidate B's tests omit reset coverage.",
+          "design_quality": "B",
+          "design_quality_reason": "Candidate B's code is slightly cleaner and more efficient (it avoids repeated array.shift() by slicing and uses a small type alias), making the control flow and memory behavior easier to maintain.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations faithfully implement fixed and sliding semantics and the per-key reset as specified, with matching boundary semantics for the trailing window.",
+          "restraint": "tie",
+          "restraint_reason": "Neither candidate exposes extra public surface or heavy over-engineering beyond the spec; both implement only the required API and behavior."
+        }
+      },
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "Candidate A's test suite covers the round‑2 reset requirement and exercises both modes plus key isolation, while B's tests—though precise about window boundaries—omit the required reset coverage so they'd miss regressions there.",
+          "design_quality": "B",
+          "design_quality_reason": "Candidate B's implementation is slightly cleaner and more efficient in the sliding window (trimming with an index+slice and avoiding repeated shifts and unnecessary map writes), showing a small but meaningful design improvement.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement fixed and sliding modes, per‑key tracking, and the round‑2 reset behaviour according to the spec.",
+          "restraint": "A",
+          "restraint_reason": "Candidate A stays simpler (no micro‑optimisations or extra type aliasing) and avoids adding implementation complexity beyond what the spec requires."
+        }
+      }
+    ]
+  },
+  {
+    "pairId": "rate-limiter::AvsC::rate-limiter-20260511-151731_vs_rate-limiter-20260511-143320",
+    "condX": "A",
+    "condY": "C",
+    "results": {
+      "test_quality": {
+        "verdict": "X",
+        "reasons": [
+          "[A]'s test suite is broader and more diagnostic — it validates constructor errors, default-clock behavior, mid-window edge cases and timestamp-aging scenarios in addition to the core cases covered by [C], so it would catch more regressions.",
+          "Condition [C]'s test suite is more comprehensive and diagnostic — it includes constructor validation, a pluggable clock for precise timing tests, more edge cases (mid-window behavior, full-aging scenarios) and a default-clock check, whereas [C]'s tests cover the basics but miss several of these cases.",
+          "Condition [A] provides a broader, more diagnostic test suite (constructor validation, injected clock, default clock, many edge cases for both modes, reset semantics and independent-key checks) that would catch more regressions."
+        ]
+      },
+      "design_quality": {
+        "verdict": "X",
+        "reasons": [
+          "[A] has clearer separation of concerns (allowFixed/allowSliding), option validation, a pluggable clock for deterministic testing, and overall cleaner, more maintainable structure than [C]'s smaller but flatter implementation.",
+          "Condition [C] shows clearer separation of concerns, better naming, private helper methods, input validation and an injectable clock for testability, making it easier to maintain than [C]'s simpler but less-structured implementation.",
+          "Condition [A] is better structured and documented (TypeScript types, input validation, injected clock for testability, clear separation of fixed/sliding logic and small private methods) making it easier to maintain."
+        ]
+      },
+      "spec_adherence": {
+        "verdict": "tie",
+        "reasons": [
+          "Both implementations correctly implement per-key tracking, fixed and sliding behaviour, and the reset(key) requirement with matching observable behaviour, so neither is meaningfully more faithful to the spec.",
+          "Both implementations correctly implement fixed and sliding modes, per-key tracking and the required reset behaviour and handle the windowing semantics in ways consistent with the spec.",
+          "Condition C implements fixed mode with globally aligned discrete windows (Math.floor(now/windowMs)), which more closely matches the spec phrase “discrete time windows”; Condition [A] anchors windows per-key at first request instead."
+        ]
+      },
+      "restraint": {
+        "verdict": "Y",
+        "reasons": [
+          "[C] implements the requested functionality with minimal surface area, whereas [A] adds extra features (option validation, an injectable clock, an export file) beyond the spec.",
+          "Condition C sticks closely to the requested surface (allow/reset and two modes) while [A] adds constructor validation, a pluggable now() clock, and extra exports/tests beyond what the spec required.",
+          "Condition C sticks closer to the minimal required surface (no extra clock injection or exported index/validation logic), whereas Condition [A] adds validation and a test clock option beyond the strict spec."
+        ]
+      }
+    },
+    "raw": [
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "B's test suite is broader and more diagnostic — it validates constructor errors, default-clock behavior, mid-window edge cases and timestamp-aging scenarios in addition to the core cases covered by A, so it would catch more regressions.",
+          "design_quality": "B",
+          "design_quality_reason": "B has clearer separation of concerns (allowFixed/allowSliding), option validation, a pluggable clock for deterministic testing, and overall cleaner, more maintainable structure than A's smaller but flatter implementation.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement per-key tracking, fixed and sliding behaviour, and the reset(key) requirement with matching observable behaviour, so neither is meaningfully more faithful to the spec.",
+          "restraint": "A",
+          "restraint_reason": "A implements the requested functionality with minimal surface area, whereas B adds extra features (option validation, an injectable clock, an export file) beyond the spec."
+        }
+      },
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "Candidate B's test suite is more comprehensive and diagnostic — it includes constructor validation, a pluggable clock for precise timing tests, more edge cases (mid-window behavior, full-aging scenarios) and a default-clock check, whereas A's tests cover the basics but miss several of these cases.",
+          "design_quality": "B",
+          "design_quality_reason": "Candidate B shows clearer separation of concerns, better naming, private helper methods, input validation and an injectable clock for testability, making it easier to maintain than A's simpler but less-structured implementation.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement fixed and sliding modes, per-key tracking and the required reset behaviour and handle the windowing semantics in ways consistent with the spec.",
+          "restraint": "A",
+          "restraint_reason": "Candidate A sticks closely to the requested surface (allow/reset and two modes) while B adds constructor validation, a pluggable now() clock, and extra exports/tests beyond what the spec required."
+        }
+      },
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "Candidate A provides a broader, more diagnostic test suite (constructor validation, injected clock, default clock, many edge cases for both modes, reset semantics and independent-key checks) that would catch more regressions.",
+          "design_quality": "A",
+          "design_quality_reason": "Candidate A is better structured and documented (TypeScript types, input validation, injected clock for testability, clear separation of fixed/sliding logic and small private methods) making it easier to maintain.",
+          "spec_adherence": "B",
+          "spec_adherence_reason": "Candidate B implements fixed mode with globally aligned discrete windows (Math.floor(now/windowMs)), which more closely matches the spec phrase “discrete time windows”; Candidate A anchors windows per-key at first request instead.",
+          "restraint": "B",
+          "restraint_reason": "Candidate B sticks closer to the minimal required surface (no extra clock injection or exported index/validation logic), whereas Candidate A adds validation and a test clock option beyond the strict spec."
+        }
+      }
+    ]
+  },
+  {
+    "pairId": "rate-limiter::AvsC::rate-limiter-20260511-151731_vs_rate-limiter-20260511-151731",
+    "condX": "A",
+    "condY": "C",
+    "results": {
+      "test_quality": {
+        "verdict": "X",
+        "reasons": [
+          "Condition [A] supplies a broader, more targeted test suite (constructor validation, default clock, mid-window behavior, and detailed sliding+reset cases) that exercises edge cases and would catch regressions more effectively.",
+          "Condition [A]'s test suite is more comprehensive and defensive — it exercises constructor validation, default clock behavior, mid-window/boundary cases, both modes, per-key isolation and reset semantics, so it would catch more regressions.",
+          "[A]'s test suite is broader and more rigorous — it includes constructor validation, more boundary cases (mid-window behaviour, full restore after all timestamps age out), and a deterministic injected clock helper; [C]'s tests cover core behaviours but are narrower."
+        ]
+      },
+      "design_quality": {
+        "verdict": "X",
+        "reasons": [
+          "Condition [A] is better structured for maintainability — it validates inputs, injects a controllable clock for testability, and keeps clear per-mode data structures and methods.",
+          "Condition [A] shows clearer separation of concerns, explicit input validation and an injected clock for testability, making the code easier to reason about and maintain.",
+          "[A] shows better design: clear separation of concerns, input validation, an injectable clock for testability, and tidy naming/organisation, whereas [C] is simpler but less extensible."
+        ]
+      },
+      "spec_adherence": {
+        "verdict": "tie",
+        "reasons": [
+          "Condition C implements fixed windows as epoch-aligned discrete windows (Math.floor(now/windowMs)*windowMs), which more directly matches the spec's \"discrete time windows\" interpretation.",
+          "Condition [A] more faithfully implements the spec and its edge cases (validates inputs, enforces mode choices, correct fixed/sliding semantics and reset), whereas [C] omits constructor validation and would silently accept invalid modes.",
+          "Both implementations correctly implement per-key tracking, fixed and sliding rate logic, and the reset(key) behaviour required by the spec; their small differences (window anchoring) do not violate the spec."
+        ]
+      },
+      "restraint": {
+        "verdict": "Y",
+        "reasons": [
+          "Condition C sticks closer to the requested surface area (no optional clock injection or extra validation logic), while Condition [A] adds convenience/test features beyond the spec.",
+          "Condition C sticks closer to the minimal requested surface area (no injected clock or extra validation) and thus adds less beyond the spec.",
+          "[C] implements only what the spec requires (no constructor validation or extra options), while [A] adds extra features (input validation and an injectable clock) beyond the requested interface."
+        ]
+      }
+    },
+    "raw": [
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "Candidate A supplies a broader, more targeted test suite (constructor validation, default clock, mid-window behavior, and detailed sliding+reset cases) that exercises edge cases and would catch regressions more effectively.",
+          "design_quality": "A",
+          "design_quality_reason": "Candidate A is better structured for maintainability — it validates inputs, injects a controllable clock for testability, and keeps clear per-mode data structures and methods.",
+          "spec_adherence": "B",
+          "spec_adherence_reason": "Candidate B implements fixed windows as epoch-aligned discrete windows (Math.floor(now/windowMs)*windowMs), which more directly matches the spec's \"discrete time windows\" interpretation.",
+          "restraint": "B",
+          "restraint_reason": "Candidate B sticks closer to the requested surface area (no optional clock injection or extra validation logic), while Candidate A adds convenience/test features beyond the spec."
+        }
+      },
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "Candidate A's test suite is more comprehensive and defensive — it exercises constructor validation, default clock behavior, mid-window/boundary cases, both modes, per-key isolation and reset semantics, so it would catch more regressions.",
+          "design_quality": "A",
+          "design_quality_reason": "Candidate A shows clearer separation of concerns, explicit input validation and an injected clock for testability, making the code easier to reason about and maintain.",
+          "spec_adherence": "A",
+          "spec_adherence_reason": "Candidate A more faithfully implements the spec and its edge cases (validates inputs, enforces mode choices, correct fixed/sliding semantics and reset), whereas B omits constructor validation and would silently accept invalid modes.",
+          "restraint": "B",
+          "restraint_reason": "Candidate B sticks closer to the minimal requested surface area (no injected clock or extra validation) and thus adds less beyond the spec."
+        }
+      },
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "B's test suite is broader and more rigorous — it includes constructor validation, more boundary cases (mid-window behaviour, full restore after all timestamps age out), and a deterministic injected clock helper; A's tests cover core behaviours but are narrower.",
+          "design_quality": "B",
+          "design_quality_reason": "B shows better design: clear separation of concerns, input validation, an injectable clock for testability, and tidy naming/organisation, whereas A is simpler but less extensible.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement per-key tracking, fixed and sliding rate logic, and the reset(key) behaviour required by the spec; their small differences (window anchoring) do not violate the spec.",
+          "restraint": "A",
+          "restraint_reason": "A implements only what the spec requires (no constructor validation or extra options), while B adds extra features (input validation and an injectable clock) beyond the requested interface."
+        }
+      }
+    ]
+  },
+  {
+    "pairId": "rate-limiter::AvsC::rate-limiter-20260511-151731_vs_rate-limiter-20260511-153908",
+    "condX": "A",
+    "condY": "C",
+    "results": {
+      "test_quality": {
+        "verdict": "X",
+        "reasons": [
+          "Condition [C]'s test suite is broader and more diagnostic — it validates constructor errors, exercises mid-window boundary behavior, injects a deterministic clock, and checks default-clock behavior, catching more plausible regressions than [C]'s suite.",
+          "Condition [C] has a broader, more diagnostic test suite (constructor validation, mid-window behavior, independent-clock tests, default-clock check) that covers more edge cases and real regressions than [C]'s narrower set.",
+          "Condition [A]'s test suite is broader and more defensive — it includes constructor validation, default-clock checks, mid-window boundary tests and more sliding/fixed edge cases that would catch regressions that [C]'s suite misses."
+        ]
+      },
+      "design_quality": {
+        "verdict": "X",
+        "reasons": [
+          "Condition [C] shows clearer organization, better naming, input validation and a pluggable clock for testability, making it easier to maintain than [C]'s flatter implementation.",
+          "Condition [C] shows clearer design (input validation, dependency-injectable clock, organized exports and consistent naming) making it easier to maintain and test than [C]'s minimal but tightly coupled implementation.",
+          "Condition [A] shows clearer design: constructor validation, injectable clock for testability, well-named maps and methods, and a tidy separation between fixed/sliding logic."
+        ]
+      },
+      "spec_adherence": {
+        "verdict": "tie",
+        "reasons": [
+          "Condition C implements the fixed-window semantics as discrete windows aligned to epoch boundaries as implied by the spec, whereas [A] uses per-key window starts (anchored to first request) which deviates from the described fixed-window behaviour.",
+          "Both implementations correctly implement fixed and sliding modes, per-key tracking and the per-key reset semantics from the spec; neither omits or breaks the required behaviors.",
+          "Both implementations correctly implement fixed and sliding semantics, per-key tracking and the required reset behaviour, so neither misses the spec's functional requirements."
+        ]
+      },
+      "restraint": {
+        "verdict": "Y",
+        "reasons": [
+          "Condition C sticks closely to the requested API and behaviour, while Condition [C] adds extra features (input validation, injectable clock, extra exports) beyond the spec. ",
+          "Condition C stays closer to the given requirements with a minimal API and no extra configuration or validation, whereas [A] adds option validation, a pluggable clock and extra exports beyond the spec.",
+          "Condition C implements only the required behaviour without extra features (no injected clock or extra exports and no additional validation), staying closer to the spec's surface area."
+        ]
+      }
+    },
+    "raw": [
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "Candidate B's test suite is broader and more diagnostic — it validates constructor errors, exercises mid-window boundary behavior, injects a deterministic clock, and checks default-clock behavior, catching more plausible regressions than A's suite.",
+          "design_quality": "B",
+          "design_quality_reason": "Candidate B shows clearer organization, better naming, input validation and a pluggable clock for testability, making it easier to maintain than A's flatter implementation.",
+          "spec_adherence": "A",
+          "spec_adherence_reason": "Candidate A implements the fixed-window semantics as discrete windows aligned to epoch boundaries as implied by the spec, whereas B uses per-key window starts (anchored to first request) which deviates from the described fixed-window behaviour.",
+          "restraint": "A",
+          "restraint_reason": "Candidate A sticks closely to the requested API and behaviour, while Candidate B adds extra features (input validation, injectable clock, extra exports) beyond the spec. "
+        }
+      },
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "Candidate B has a broader, more diagnostic test suite (constructor validation, mid-window behavior, independent-clock tests, default-clock check) that covers more edge cases and real regressions than A's narrower set.",
+          "design_quality": "B",
+          "design_quality_reason": "Candidate B shows clearer design (input validation, dependency-injectable clock, organized exports and consistent naming) making it easier to maintain and test than A's minimal but tightly coupled implementation.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement fixed and sliding modes, per-key tracking and the per-key reset semantics from the spec; neither omits or breaks the required behaviors.",
+          "restraint": "A",
+          "restraint_reason": "Candidate A stays closer to the given requirements with a minimal API and no extra configuration or validation, whereas B adds option validation, a pluggable clock and extra exports beyond the spec."
+        }
+      },
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "Candidate A's test suite is broader and more defensive — it includes constructor validation, default-clock checks, mid-window boundary tests and more sliding/fixed edge cases that would catch regressions that B's suite misses.",
+          "design_quality": "A",
+          "design_quality_reason": "Candidate A shows clearer design: constructor validation, injectable clock for testability, well-named maps and methods, and a tidy separation between fixed/sliding logic.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement fixed and sliding semantics, per-key tracking and the required reset behaviour, so neither misses the spec's functional requirements.",
+          "restraint": "B",
+          "restraint_reason": "Candidate B implements only the required behaviour without extra features (no injected clock or extra exports and no additional validation), staying closer to the spec's surface area."
+        }
+      }
+    ]
+  },
+  {
+    "pairId": "rate-limiter::AvsC::rate-limiter-20260511-153908_vs_rate-limiter-20260511-143320",
+    "condX": "A",
+    "condY": "C",
+    "results": {
+      "test_quality": {
+        "verdict": "X",
+        "reasons": [
+          "Condition [A]'s test suite is broader and more diagnostic — it covers window-boundary alignment, strict ageing semantics, reset no-op and default-clock behavior, catching edge cases Condition C's tests miss.",
+          "Condition [A]'s tests are more comprehensive and targeted (clock injection, window-boundary and precise sliding-edge cases, default behavior and reset) and would catch more regressions than [C]'s narrower suite.",
+          "Condition [A] supplies a wider, more precise test suite (window-alignment edge cases, detailed sliding aging behavior, and a default-now test) that would catch more regressions than [C]'s narrower coverage."
+        ]
+      },
+      "design_quality": {
+        "verdict": "X",
+        "reasons": [
+          "Condition [A] has clearer structure and naming (separate allowFixed/allowSliding methods), explicit TypeScript types and an injectable clock for testability, making it easier to read and maintain.",
+          "Condition [A] has clearer separation of concerns (allowFixed/allowSliding), explicit types, and an injectable clock for testability, making the code easier to read and maintain than [C]'s flatter implementation.",
+          "Condition [A] is better structured and readable (separate helper methods, clear types, injection of now for testability, and clean separation of fixed/sliding state)."
+        ]
+      },
+      "spec_adherence": {
+        "verdict": "X",
+        "reasons": [
+          "Both implementations meet the functional requirements (modes, per-key tracking, reset), but Condition [A] more fully exercises and encodes the spec (including default Date.now behaviour and precise window semantics).",
+          "Both implementations correctly implement per-key tracking, fixed and sliding semantics, and the per-key reset behavior required by the spec with no obvious deviations.",
+          "Both implement the required fixed/sliding semantics and per-key reset, but [A] more explicitly and testably captures the edge behaviours the spec implies (window alignment and aging semantics)."
+        ]
+      },
+      "restraint": {
+        "verdict": "Y",
+        "reasons": [
+          "Condition C stays closer to the minimal spec surface (no test-only clock injection or extra exports) while Condition [A] adds a now hook and extra wiring that go beyond the strict requirements.",
+          "Condition C implements the required functionality without adding an injectable clock or extra exports/helpers that [A] includes, so it stays closer to the spec surface area.",
+          "Condition C is more minimal and stays closer to the prompt (no test-clock injection or extra export indirection), adding less surface area beyond the spec."
+        ]
+      }
+    },
+    "raw": [
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "Candidate A's test suite is broader and more diagnostic — it covers window-boundary alignment, strict ageing semantics, reset no-op and default-clock behavior, catching edge cases Candidate B's tests miss.",
+          "design_quality": "A",
+          "design_quality_reason": "Candidate A has clearer structure and naming (separate allowFixed/allowSliding methods), explicit TypeScript types and an injectable clock for testability, making it easier to read and maintain.",
+          "spec_adherence": "A",
+          "spec_adherence_reason": "Both implementations meet the functional requirements (modes, per-key tracking, reset), but Candidate A more fully exercises and encodes the spec (including default Date.now behaviour and precise window semantics).",
+          "restraint": "B",
+          "restraint_reason": "Candidate B stays closer to the minimal spec surface (no test-only clock injection or extra exports) while Candidate A adds a now hook and extra wiring that go beyond the strict requirements."
+        }
+      },
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "Candidate A's tests are more comprehensive and targeted (clock injection, window-boundary and precise sliding-edge cases, default behavior and reset) and would catch more regressions than B's narrower suite.",
+          "design_quality": "A",
+          "design_quality_reason": "Candidate A has clearer separation of concerns (allowFixed/allowSliding), explicit types, and an injectable clock for testability, making the code easier to read and maintain than B's flatter implementation.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement per-key tracking, fixed and sliding semantics, and the per-key reset behavior required by the spec with no obvious deviations.",
+          "restraint": "B",
+          "restraint_reason": "Candidate B implements the required functionality without adding an injectable clock or extra exports/helpers that A includes, so it stays closer to the spec surface area."
+        }
+      },
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "Candidate A supplies a wider, more precise test suite (window-alignment edge cases, detailed sliding aging behavior, and a default-now test) that would catch more regressions than B's narrower coverage.",
+          "design_quality": "A",
+          "design_quality_reason": "Candidate A is better structured and readable (separate helper methods, clear types, injection of now for testability, and clean separation of fixed/sliding state).",
+          "spec_adherence": "A",
+          "spec_adherence_reason": "Both implement the required fixed/sliding semantics and per-key reset, but A more explicitly and testably captures the edge behaviours the spec implies (window alignment and aging semantics).",
+          "restraint": "B",
+          "restraint_reason": "Candidate B is more minimal and stays closer to the prompt (no test-clock injection or extra export indirection), adding less surface area beyond the spec."
+        }
+      }
+    ]
+  },
+  {
+    "pairId": "rate-limiter::AvsC::rate-limiter-20260511-153908_vs_rate-limiter-20260511-151731",
+    "condX": "A",
+    "condY": "C",
+    "results": {
+      "test_quality": {
+        "verdict": "X",
+        "reasons": [
+          "[A]'s test suite is more thorough and diagnostic — it includes finer boundary checks for sliding windows, verifies window-aligned semantics and the default Date.now behaviour, and is better organized, whereas [C]'s tests are good but cover fewer edge cases.",
+          "[A] has a broader, more precise test suite (edge cases for window alignment and strict aging, explicit clock injection tests, and a default-now check) that would catch subtle regressions better than [C]'s coverage.",
+          "Condition [C]'s tests are more thorough and targeted (covering window-alignment edge cases, strict sliding cutoff behavior, a default-construction case) and exercise subtle failure modes, making the suite more likely to catch regressions."
+        ]
+      },
+      "design_quality": {
+        "verdict": "X",
+        "reasons": [
+          "[A]'s implementation is cleaner and more maintainable (injectable clock for testability, in-place timestamp maintenance, clearer separation and naming), while [C] is simpler but less flexible.",
+          "[A]'s implementation is cleaner and more maintainable (injectable clock for testability, clearer naming, in-place timestamp pruning) compared with [C]'s flatter but less flexible design.",
+          "Condition [C]'s design is cleaner and more maintainable (injectable clock for testability, in-place pruning of timestamps, clearer separation of concerns) compared with [C]'s direct Date.now usage and less flexible structure."
+        ]
+      },
+      "spec_adherence": {
+        "verdict": "tie",
+        "reasons": [
+          "Both implementations correctly implement fixed and sliding modes, per-key tracking, and the reset behaviour as required by the spec.",
+          "Both implementations correctly implement fixed and sliding semantics, per-key tracking, and the required reset behaviour, handling boundary conditions consistently.",
+          "Both implementations correctly implement fixed and sliding semantics, per-key tracking, and the per-key reset behavior required by the spec with no observable deviations."
+        ]
+      },
+      "restraint": {
+        "verdict": "Y",
+        "reasons": [
+          "[C] sticks closely to the requested API and behaviour, while [A] adds an extra optional now clock in the constructor (useful but beyond the spec).",
+          "[C] sticks closely to the spec without adding extras, whereas [A] adds an optional now clock and small API extensions beyond what was requested.",
+          "Condition C sticks closely to the requested API and behaviour, while Condition [C] adds an extra optional now() option (API surface beyond the spec)."
+        ]
+      }
+    },
+    "raw": [
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "B's test suite is more thorough and diagnostic — it includes finer boundary checks for sliding windows, verifies window-aligned semantics and the default Date.now behaviour, and is better organized, whereas A's tests are good but cover fewer edge cases.",
+          "design_quality": "B",
+          "design_quality_reason": "B's implementation is cleaner and more maintainable (injectable clock for testability, in-place timestamp maintenance, clearer separation and naming), while A is simpler but less flexible.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement fixed and sliding modes, per-key tracking, and the reset behaviour as required by the spec.",
+          "restraint": "A",
+          "restraint_reason": "A sticks closely to the requested API and behaviour, while B adds an extra optional now clock in the constructor (useful but beyond the spec)."
+        }
+      },
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "B has a broader, more precise test suite (edge cases for window alignment and strict aging, explicit clock injection tests, and a default-now check) that would catch subtle regressions better than A's coverage.",
+          "design_quality": "B",
+          "design_quality_reason": "B's implementation is cleaner and more maintainable (injectable clock for testability, clearer naming, in-place timestamp pruning) compared with A's flatter but less flexible design.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement fixed and sliding semantics, per-key tracking, and the required reset behaviour, handling boundary conditions consistently.",
+          "restraint": "A",
+          "restraint_reason": "A sticks closely to the spec without adding extras, whereas B adds an optional now clock and small API extensions beyond what was requested."
+        }
+      },
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "Candidate B's tests are more thorough and targeted (covering window-alignment edge cases, strict sliding cutoff behavior, a default-construction case) and exercise subtle failure modes, making the suite more likely to catch regressions.",
+          "design_quality": "B",
+          "design_quality_reason": "Candidate B's design is cleaner and more maintainable (injectable clock for testability, in-place pruning of timestamps, clearer separation of concerns) compared with A's direct Date.now usage and less flexible structure.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement fixed and sliding semantics, per-key tracking, and the per-key reset behavior required by the spec with no observable deviations.",
+          "restraint": "A",
+          "restraint_reason": "Candidate A sticks closely to the requested API and behaviour, while Candidate B adds an extra optional now() option (API surface beyond the spec)."
+        }
+      }
+    ]
+  },
+  {
+    "pairId": "rate-limiter::AvsC::rate-limiter-20260511-153908_vs_rate-limiter-20260511-153908",
+    "condX": "A",
+    "condY": "C",
+    "results": {
+      "test_quality": {
+        "verdict": "X",
+        "reasons": [
+          "[A]'s test suite is more comprehensive and targeted—it exercises tricky boundary cases (exact window boundaries, precise sliding cutoff behavior), isolates modes with clear describe blocks, and includes a default-clock construction test, so it's more likely to catch regressions.",
+          "Condition [C]'s tests are more comprehensive and targeted (boundary/window-alignment cases, nuanced sliding-age semantics, multiple-key checks, and a default-construction test) and would catch more regressions than [C]'s narrower suite.",
+          "Condition [C]'s tests are more thorough and deterministic (injectable clock), exercising edge cases like window-aligned semantics and strict aging boundaries that would catch subtle regressions."
+        ]
+      },
+      "design_quality": {
+        "verdict": "X",
+        "reasons": [
+          "[A] shows cleaner design (injectable clock for deterministic tests, small performance-minded pruning using splice instead of repeated shift, clearer exports and types), making it easier to maintain and reason about.",
+          "Condition [C] has better design choices (injectable clock for testability, more efficient bulk cleanup of timestamps, clearer exports and types) making it easier to maintain and reason about.",
+          "Condition [C] is slightly better structured—supports clock injection for testability, avoids repeated shifting by computing a splice index, and has clearer exports—making it easier to maintain."
+        ]
+      },
+      "spec_adherence": {
+        "verdict": "tie",
+        "reasons": [
+          "Both implementations correctly implement per-key tracking, fixed and sliding semantics, and the new per-key reset behaviour as required by the spec.",
+          "Both implementations correctly implement fixed and sliding modes, per-key tracking, and the per-key reset behaviour required by the spec.",
+          "Both implementations correctly implement fixed and sliding modes, per-key tracking and the reset(key) behaviour described in the spec with no missing requirements."
+        ]
+      },
+      "restraint": {
+        "verdict": "Y",
+        "reasons": [
+          "[C] sticks closely to the requested API and behaviour, whereas [A] adds extras (an injectable now() clock and an index export) beyond the spec. ",
+          "Condition C sticks closely to the requested API and behaviour, whereas [A] adds extras (an optional now clock and an index export) beyond what the spec required.",
+          "Condition C sticks closely to the spec surface with no extra features, whereas Condition [C] adds an injectable clock and an index re-export beyond the requested interface."
+        ]
+      }
+    },
+    "raw": [
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "B's test suite is more comprehensive and targeted—it exercises tricky boundary cases (exact window boundaries, precise sliding cutoff behavior), isolates modes with clear describe blocks, and includes a default-clock construction test, so it's more likely to catch regressions.",
+          "design_quality": "B",
+          "design_quality_reason": "B shows cleaner design (injectable clock for deterministic tests, small performance-minded pruning using splice instead of repeated shift, clearer exports and types), making it easier to maintain and reason about.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement per-key tracking, fixed and sliding semantics, and the new per-key reset behaviour as required by the spec.",
+          "restraint": "A",
+          "restraint_reason": "A sticks closely to the requested API and behaviour, whereas B adds extras (an injectable now() clock and an index export) beyond the spec. "
+        }
+      },
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "Candidate B's tests are more comprehensive and targeted (boundary/window-alignment cases, nuanced sliding-age semantics, multiple-key checks, and a default-construction test) and would catch more regressions than A's narrower suite.",
+          "design_quality": "B",
+          "design_quality_reason": "Candidate B has better design choices (injectable clock for testability, more efficient bulk cleanup of timestamps, clearer exports and types) making it easier to maintain and reason about.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement fixed and sliding modes, per-key tracking, and the per-key reset behaviour required by the spec.",
+          "restraint": "A",
+          "restraint_reason": "Candidate A sticks closely to the requested API and behaviour, whereas B adds extras (an optional now clock and an index export) beyond what the spec required."
+        }
+      },
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "Candidate B's tests are more thorough and deterministic (injectable clock), exercising edge cases like window-aligned semantics and strict aging boundaries that would catch subtle regressions.",
+          "design_quality": "B",
+          "design_quality_reason": "Candidate B is slightly better structured—supports clock injection for testability, avoids repeated shifting by computing a splice index, and has clearer exports—making it easier to maintain.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement fixed and sliding modes, per-key tracking and the reset(key) behaviour described in the spec with no missing requirements.",
+          "restraint": "A",
+          "restraint_reason": "Candidate A sticks closely to the spec surface with no extra features, whereas Candidate B adds an injectable clock and an index re-export beyond the requested interface."
+        }
+      }
+    ]
+  },
+  {
+    "pairId": "rate-limiter::BvsC::rate-limiter-20260511-143320_vs_rate-limiter-20260511-143320",
+    "condX": "B",
+    "condY": "C",
+    "results": {
+      "test_quality": {
+        "verdict": "Y",
+        "reasons": [
+          "Condition C's tests exercise more boundary conditions and sequences (fake timers, window-boundary cases, full re-capacity after reset, and separate-key checks), giving better regression coverage.",
+          "[C]'s tests use deterministic fake timers, cover more precise boundary scenarios and have explicit per-step assertions (better regression coverage) compared with [[C]]'s smaller/time-injected suite.",
+          "Condition C's tests use fake timers and cover more boundary cases (window boundaries, ageing, per-mode reset and unknown-key noop) with explicit assertions, making them more likely to catch regressions."
+        ]
+      },
+      "design_quality": {
+        "verdict": "X",
+        "reasons": [
+          "Condition [B]'s implementation is better structured and documented (clear types, injected now() for testability, and separated allowFixed/allowSliding methods), which improves readability and maintainability.",
+          "[[C]] cleanly separates fixed/sliding logic into private helpers, accepts an injectable now() for testability, and uses clear types and naming making the implementation easier to read and maintain.",
+          "Condition [B] has clearer structure (private helpers for modes), stronger TypeScript usage (readonly fields, types), and a testable now injection, making it easier to read and maintain."
+        ]
+      },
+      "spec_adherence": {
+        "verdict": "tie",
+        "reasons": [
+          "Both implementations correctly implement per-key tracking, fixed and sliding semantics, and the per-key reset behavior as specified with no observable deviations.",
+          "Both implementations correctly implement fixed and sliding semantics, per-key tracking, and the required reset behaviour with consistent boundary handling.",
+          "Both implementations correctly implement fixed and sliding semantics, per-key tracking, and the reset(key) behaviour required by the spec without observable deviations."
+        ]
+      },
+      "restraint": {
+        "verdict": "Y",
+        "reasons": [
+          "Condition [B] introduces extra testability support (now injection) and additional abstractions beyond the spec, while Condition C sticks closer to the requested surface area.",
+          "[[C]] adds an extra injectable now() option and maintains both internal maps even when unused, whereas [C] sticks closer to the minimal spec without extra configuration. ",
+          "Condition C sticks to the minimal required API and logic, whereas Condition [B] adds a now injection and extra abstractions beyond the spec (useful but outside the requested surface)."
+        ]
+      }
+    },
+    "raw": [
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "Candidate A's tests exercise more boundary conditions and sequences (fake timers, window-boundary cases, full re-capacity after reset, and separate-key checks), giving better regression coverage.",
+          "design_quality": "B",
+          "design_quality_reason": "Candidate B's implementation is better structured and documented (clear types, injected now() for testability, and separated allowFixed/allowSliding methods), which improves readability and maintainability.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement per-key tracking, fixed and sliding semantics, and the per-key reset behavior as specified with no observable deviations.",
+          "restraint": "A",
+          "restraint_reason": "Candidate B introduces extra testability support (now injection) and additional abstractions beyond the spec, while Candidate A sticks closer to the requested surface area."
+        }
+      },
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "B's tests use deterministic fake timers, cover more precise boundary scenarios and have explicit per-step assertions (better regression coverage) compared with A's smaller/time-injected suite.",
+          "design_quality": "A",
+          "design_quality_reason": "A cleanly separates fixed/sliding logic into private helpers, accepts an injectable now() for testability, and uses clear types and naming making the implementation easier to read and maintain.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement fixed and sliding semantics, per-key tracking, and the required reset behaviour with consistent boundary handling.",
+          "restraint": "B",
+          "restraint_reason": "A adds an extra injectable now() option and maintains both internal maps even when unused, whereas B sticks closer to the minimal spec without extra configuration. "
+        }
+      },
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "Candidate A's tests use fake timers and cover more boundary cases (window boundaries, ageing, per-mode reset and unknown-key noop) with explicit assertions, making them more likely to catch regressions.",
+          "design_quality": "B",
+          "design_quality_reason": "Candidate B has clearer structure (private helpers for modes), stronger TypeScript usage (readonly fields, types), and a testable now injection, making it easier to read and maintain.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement fixed and sliding semantics, per-key tracking, and the reset(key) behaviour required by the spec without observable deviations.",
+          "restraint": "A",
+          "restraint_reason": "Candidate A sticks to the minimal required API and logic, whereas Candidate B adds a now injection and extra abstractions beyond the spec (useful but outside the requested surface)."
+        }
+      }
+    ]
+  },
+  {
+    "pairId": "rate-limiter::BvsC::rate-limiter-20260511-143320_vs_rate-limiter-20260511-151731",
+    "condX": "B",
+    "condY": "C",
+    "results": {
+      "test_quality": {
+        "verdict": "Y",
+        "reasons": [
+          "Condition C's tests cover the same behaviors as [B] plus additional nuanced cases (e.g., sliding behaviour across window boundaries), and use fake timers to exercise time-based transitions, giving broader regression coverage.",
+          "Condition C provides a broader, more explicit test suite (more timing edge cases, both modes, per-key independence, reset behaviour, and use of fake timers) that would catch regressions more reliably.",
+          "Condition C's test suite is more thorough and precise: it uses fake timers, asserts sequences at multiple points, includes cross-boundary sliding-window edge cases, and would catch more regressions than [[C]]'s smaller, less-detailed tests."
+        ]
+      },
+      "design_quality": {
+        "verdict": "X",
+        "reasons": [
+          "Condition [B] has a cleaner internal API (injectable now()), clearer separation of concerns and well-named structures which improves testability and maintainability.",
+          "Condition [B] is slightly better structured for maintainability (injectable now function for testability, clear separation of concerns and straightforward control flow).",
+          "Condition C has slightly clearer organization and safer timestamp handling (avoids repeated array.shift), plus clean exports and naming, making it easier to read and maintain than [[C]]'s more mutating approach."
+        ]
+      },
+      "spec_adherence": {
+        "verdict": "tie",
+        "reasons": [
+          "Both implementations correctly implement fixed and sliding modes, per-key tracking, and the required reset behaviour as exercised by their tests.",
+          "Both implementations correctly implement fixed and sliding modes, per-key tracking, and the required reset behaviour with no observable deviations from the spec.",
+          "Both implementations correctly implement per-key tracking, fixed and sliding semantics, and the per-key reset behaviour described in the spec with no observable functional deviations."
+        ]
+      },
+      "restraint": {
+        "verdict": "Y",
+        "reasons": [
+          "Condition C sticks closely to the requested surface (RateLimiter + reset, plus an index export), while [B] adds an extra now() injection option beyond the spec. ",
+          "Condition [B] introduces an extra optional 'now' parameter beyond the spec (scope creep), while Condition C sticks closely to the requested API.",
+          "Condition [C] adds a test-time 'now' injection (extra API surface) while [C] sticks closer to the minimal specified interface (aside from a harmless index re-export)."
+        ]
+      }
+    },
+    "raw": [
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "Candidate A's tests cover the same behaviors as B plus additional nuanced cases (e.g., sliding behaviour across window boundaries), and use fake timers to exercise time-based transitions, giving broader regression coverage.",
+          "design_quality": "B",
+          "design_quality_reason": "Candidate B has a cleaner internal API (injectable now()), clearer separation of concerns and well-named structures which improves testability and maintainability.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement fixed and sliding modes, per-key tracking, and the required reset behaviour as exercised by their tests.",
+          "restraint": "A",
+          "restraint_reason": "Candidate A sticks closely to the requested surface (RateLimiter + reset, plus an index export), while B adds an extra now() injection option beyond the spec. "
+        }
+      },
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "Candidate A provides a broader, more explicit test suite (more timing edge cases, both modes, per-key independence, reset behaviour, and use of fake timers) that would catch regressions more reliably.",
+          "design_quality": "B",
+          "design_quality_reason": "Candidate B is slightly better structured for maintainability (injectable now function for testability, clear separation of concerns and straightforward control flow).",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement fixed and sliding modes, per-key tracking, and the required reset behaviour with no observable deviations from the spec.",
+          "restraint": "A",
+          "restraint_reason": "Candidate B introduces an extra optional 'now' parameter beyond the spec (scope creep), while Candidate A sticks closely to the requested API."
+        }
+      },
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "Candidate B's test suite is more thorough and precise: it uses fake timers, asserts sequences at multiple points, includes cross-boundary sliding-window edge cases, and would catch more regressions than A's smaller, less-detailed tests.",
+          "design_quality": "B",
+          "design_quality_reason": "Candidate B has slightly clearer organization and safer timestamp handling (avoids repeated array.shift), plus clean exports and naming, making it easier to read and maintain than A's more mutating approach.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement per-key tracking, fixed and sliding semantics, and the per-key reset behaviour described in the spec with no observable functional deviations.",
+          "restraint": "B",
+          "restraint_reason": "Candidate A adds a test-time 'now' injection (extra API surface) while B sticks closer to the minimal specified interface (aside from a harmless index re-export)."
+        }
+      }
+    ]
+  },
+  {
+    "pairId": "rate-limiter::BvsC::rate-limiter-20260511-143320_vs_rate-limiter-20260511-153908",
+    "condX": "B",
+    "condY": "C",
+    "results": {
+      "test_quality": {
+        "verdict": "Y",
+        "reasons": [
+          "Condition C's test suite is more thorough (uses fake timers for precise timing, checks more edge cases like configurable max and cross-boundary sliding behaviour, and asserts post-reset capacity), making it more likely to catch regressions.",
+          "[C]'s test suite is broader and more diagnostic — it uses fake timers for precise time manipulation, includes extra edge-case checks (e.g. honoring configurable max, sliding behaviour across boundaries) and stronger multi-step assertions that would catch regressions.",
+          "[C] has a broader, more precise test suite (uses fake timers, checks configurable max, additional sliding-edge scenarios and more thorough post-reset assertions) that would catch more regressions."
+        ]
+      },
+      "design_quality": {
+        "verdict": "X",
+        "reasons": [
+          "Condition [C]'s implementation is slightly better structured for maintainability and testability (injectable now() for deterministic timing, clear separation of fixed/sliding state, and in-place map mutation avoids needless map writes).",
+          "[[C]]'s implementation is slightly better designed for maintainability and testability (clear separation of fixed/sliding logic and an injectable now() for deterministic behavior), with concise, readable control flow and minimal redundancy.",
+          "[[C]] has a slightly cleaner, more testable design (injectable clock, in-place timestamp arrays, clear separation of fixed vs sliding buckets) that aids maintainability."
+        ]
+      },
+      "spec_adherence": {
+        "verdict": "tie",
+        "reasons": [
+          "Both implementations correctly implement fixed and sliding modes, per-key tracking, and the per-key reset behaviour as required by the spec with no observable deviations.",
+          "Both implementations correctly implement fixed and sliding modes, per-key tracking, and the required reset semantics and handle window boundaries consistently with the spec.",
+          "Both implementations correctly implement fixed and sliding semantics, per-key tracking, and the per-key reset behaviour as specified."
+        ]
+      },
+      "restraint": {
+        "verdict": "Y",
+        "reasons": [
+          "Condition [C] adds an extra injectable now() option (useful but beyond the spec), whereas Condition C sticks closer to the minimal required surface area.",
+          "[C] stays closer to the spec surface with no extra API surface (no injectable time hook), whereas [[C]] adds an optional now() parameter beyond the required interface. ",
+          "[C] stays closer to the requested surface (no injectable clock or extra test hooks) and avoids adding features beyond the spec. "
+        ]
+      }
+    },
+    "raw": [
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "Candidate B's test suite is more thorough (uses fake timers for precise timing, checks more edge cases like configurable max and cross-boundary sliding behaviour, and asserts post-reset capacity), making it more likely to catch regressions.",
+          "design_quality": "A",
+          "design_quality_reason": "Candidate A's implementation is slightly better structured for maintainability and testability (injectable now() for deterministic timing, clear separation of fixed/sliding state, and in-place map mutation avoids needless map writes).",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement fixed and sliding modes, per-key tracking, and the per-key reset behaviour as required by the spec with no observable deviations.",
+          "restraint": "B",
+          "restraint_reason": "Candidate A adds an extra injectable now() option (useful but beyond the spec), whereas Candidate B sticks closer to the minimal required surface area."
+        }
+      },
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "B's test suite is broader and more diagnostic — it uses fake timers for precise time manipulation, includes extra edge-case checks (e.g. honoring configurable max, sliding behaviour across boundaries) and stronger multi-step assertions that would catch regressions.",
+          "design_quality": "A",
+          "design_quality_reason": "A's implementation is slightly better designed for maintainability and testability (clear separation of fixed/sliding logic and an injectable now() for deterministic behavior), with concise, readable control flow and minimal redundancy.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement fixed and sliding modes, per-key tracking, and the required reset semantics and handle window boundaries consistently with the spec.",
+          "restraint": "B",
+          "restraint_reason": "B stays closer to the spec surface with no extra API surface (no injectable time hook), whereas A adds an optional now() parameter beyond the required interface. "
+        }
+      },
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "B has a broader, more precise test suite (uses fake timers, checks configurable max, additional sliding-edge scenarios and more thorough post-reset assertions) that would catch more regressions.",
+          "design_quality": "A",
+          "design_quality_reason": "A has a slightly cleaner, more testable design (injectable clock, in-place timestamp arrays, clear separation of fixed vs sliding buckets) that aids maintainability.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement fixed and sliding semantics, per-key tracking, and the per-key reset behaviour as specified.",
+          "restraint": "B",
+          "restraint_reason": "B stays closer to the requested surface (no injectable clock or extra test hooks) and avoids adding features beyond the spec. "
+        }
+      }
+    ]
+  },
+  {
+    "pairId": "rate-limiter::BvsC::rate-limiter-20260511-151731_vs_rate-limiter-20260511-143320",
+    "condX": "B",
+    "condY": "C",
+    "results": {
+      "test_quality": {
+        "verdict": "Y",
+        "reasons": [
+          "Condition C's test suite is more comprehensive and targeted — it covers both modes, window boundaries, sliding aging, reset behaviours (including no-op and key-isolation) and uses fake timers for precise control, so it would catch more regressions.",
+          "Condition C has a broader, more targeted test suite (covers fixed/sliding modes, boundary timing, per-key behavior, reset for both modes, and no-op reset) that would catch more regressions than [B]'s smaller set of tests.",
+          "[C]'s test suite is more comprehensive and diagnostic — it uses fake timers to exercise time boundaries, covers fixed/sliding modes thoroughly, tests reset for both modes, per-key effects, and unknown-key no-op; [[C]]'s tests are narrower and miss several reset and boundary cases."
+        ]
+      },
+      "design_quality": {
+        "verdict": "X",
+        "reasons": [
+          "Condition [B] has clearer separation of concerns (private allowFixed/allowSliding), better naming, readonly fields and an injectable now() for testability, making it easier to read and maintain.",
+          "Condition [B] has a clearer, more maintainable design (now injection for deterministic time in tests, private helper methods, readonly fields, and a more efficient trimming strategy) compared with [C]'s flatter, Date.now()-dependent implementation.",
+          "[[C]] has clearer structure and separation (private allowFixed/allowSliding), explicit types and a testable now injection, making the control flow and responsibilities easier to read and maintain than [C]'s monolithic allow implementation."
+        ]
+      },
+      "spec_adherence": {
+        "verdict": "tie",
+        "reasons": [
+          "Both implementations correctly implement fixed and sliding semantics per key and the required reset(key) behaviour, with no observable violations of the spec.",
+          "Both implementations correctly implement fixed and sliding semantics, per-key tracking, and the required reset behaviour according to the spec with no observable violations.",
+          "Both implementations correctly implement fixed and sliding semantics, per-key tracking and reset behaviour and handle the relevant windowing boundaries; neither shows a functional deviation from the spec."
+        ]
+      },
+      "restraint": {
+        "verdict": "Y",
+        "reasons": [
+          "Condition C implements only the requested behaviour concisely, while Condition [B] adds extras like an injected now() option and a public options interface beyond the spec. ",
+          "Condition C implements only the requested features (plus reset) and uses simple structures, whereas [B] adds an extra now hook and additional abstractions beyond the spec. ",
+          "[C] stays closer to the minimal specified surface (no time-injection helper or extra abstractions) and avoids adding features beyond the spec, whereas [[C]] adds an optional now hook and extra internal structure not required by the spec."
+        ]
+      }
+    },
+    "raw": [
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "Candidate A's test suite is more comprehensive and targeted — it covers both modes, window boundaries, sliding aging, reset behaviours (including no-op and key-isolation) and uses fake timers for precise control, so it would catch more regressions.",
+          "design_quality": "B",
+          "design_quality_reason": "Candidate B has clearer separation of concerns (private allowFixed/allowSliding), better naming, readonly fields and an injectable now() for testability, making it easier to read and maintain.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement fixed and sliding semantics per key and the required reset(key) behaviour, with no observable violations of the spec.",
+          "restraint": "A",
+          "restraint_reason": "Candidate A implements only the requested behaviour concisely, while Candidate B adds extras like an injected now() option and a public options interface beyond the spec. "
+        }
+      },
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "Candidate A has a broader, more targeted test suite (covers fixed/sliding modes, boundary timing, per-key behavior, reset for both modes, and no-op reset) that would catch more regressions than B's smaller set of tests.",
+          "design_quality": "B",
+          "design_quality_reason": "Candidate B has a clearer, more maintainable design (now injection for deterministic time in tests, private helper methods, readonly fields, and a more efficient trimming strategy) compared with A's flatter, Date.now()-dependent implementation.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement fixed and sliding semantics, per-key tracking, and the required reset behaviour according to the spec with no observable violations.",
+          "restraint": "A",
+          "restraint_reason": "Candidate A implements only the requested features (plus reset) and uses simple structures, whereas B adds an extra now hook and additional abstractions beyond the spec. "
+        }
+      },
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "B's test suite is more comprehensive and diagnostic — it uses fake timers to exercise time boundaries, covers fixed/sliding modes thoroughly, tests reset for both modes, per-key effects, and unknown-key no-op; A's tests are narrower and miss several reset and boundary cases.",
+          "design_quality": "A",
+          "design_quality_reason": "A has clearer structure and separation (private allowFixed/allowSliding), explicit types and a testable now injection, making the control flow and responsibilities easier to read and maintain than B's monolithic allow implementation.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement fixed and sliding semantics, per-key tracking and reset behaviour and handle the relevant windowing boundaries; neither shows a functional deviation from the spec.",
+          "restraint": "B",
+          "restraint_reason": "B stays closer to the minimal specified surface (no time-injection helper or extra abstractions) and avoids adding features beyond the spec, whereas A adds an optional now hook and extra internal structure not required by the spec."
+        }
+      }
+    ]
+  },
+  {
+    "pairId": "rate-limiter::BvsC::rate-limiter-20260511-151731_vs_rate-limiter-20260511-151731",
+    "condX": "B",
+    "condY": "C",
+    "results": {
+      "test_quality": {
+        "verdict": "Y",
+        "reasons": [
+          "[C] has a broader, more diagnostic test suite (fake timers, reset behaviour for sliding mode, no-op and per-key reset checks) that would catch more regressions than [[C]]'s narrower tests.",
+          "Condition C supplies a much richer test suite (fake timers, more edge cases: sliding/fixed boundaries, reset for sliding, unseen-key no-op, per-key isolation) that would catch regressions more reliably than [B]'s smaller set.",
+          "[C]'s test suite is more comprehensive and diagnostic (uses fake timers for determinism, covers reset for sliding mode, reset-no-op, per-key isolation, and more boundary cases) while [[C]]'s tests omit several reset and edge scenarios."
+        ]
+      },
+      "design_quality": {
+        "verdict": "X",
+        "reasons": [
+          "[[C]] shows better design-for-testability and clarity by injecting a now() function and keeping mode-specific logic simple and well-separated.",
+          "Condition [B] has a cleaner, more testable design (injectable now() for time control, clear naming and separation) making it easier for a maintainer to reason about and test.",
+          "[[C]]'s implementation is slightly better designed for maintainability and testability (injectable now() hook, clear separation of fixed/sliding logic and well-named private maps) compared with [C]'s nearly identical but less-testable code."
+        ]
+      },
+      "spec_adherence": {
+        "verdict": "tie",
+        "reasons": [
+          "Both implementations correctly implement fixed and sliding semantics, per-key tracking, and the required reset behaviour, with no observed deviation from the spec.",
+          "Both implementations correctly implement fixed and sliding modes, per-key tracking, and the required per-key reset behavior as described by the spec.",
+          "Both implementations correctly implement fixed and sliding window semantics per key and provide the required reset(key) behaviour consistent with the spec."
+        ]
+      },
+      "restraint": {
+        "verdict": "Y",
+        "reasons": [
+          "[C] sticks closely to the requested API (no test-injection hooks) and only adds a small index/type export, whereas [[C]] widens the public options with a now hook that the spec did not request.",
+          "Condition [B] adds an extra constructor option (now()) beyond the spec, whereas [C] sticks closer to the requested interface and surface area. ",
+          "[C] stays closer to the spec surface (no optional now() hook or other runtime injection) while [[C]] introduces an extra now option beyond the requested interface."
+        ]
+      }
+    },
+    "raw": [
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "B has a broader, more diagnostic test suite (fake timers, reset behaviour for sliding mode, no-op and per-key reset checks) that would catch more regressions than A's narrower tests.",
+          "design_quality": "A",
+          "design_quality_reason": "A shows better design-for-testability and clarity by injecting a now() function and keeping mode-specific logic simple and well-separated.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement fixed and sliding semantics, per-key tracking, and the required reset behaviour, with no observed deviation from the spec.",
+          "restraint": "B",
+          "restraint_reason": "B sticks closely to the requested API (no test-injection hooks) and only adds a small index/type export, whereas A widens the public options with a now hook that the spec did not request."
+        }
+      },
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "Candidate A supplies a much richer test suite (fake timers, more edge cases: sliding/fixed boundaries, reset for sliding, unseen-key no-op, per-key isolation) that would catch regressions more reliably than B's smaller set.",
+          "design_quality": "B",
+          "design_quality_reason": "Candidate B has a cleaner, more testable design (injectable now() for time control, clear naming and separation) making it easier for a maintainer to reason about and test.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement fixed and sliding modes, per-key tracking, and the required per-key reset behavior as described by the spec.",
+          "restraint": "A",
+          "restraint_reason": "Candidate B adds an extra constructor option (now()) beyond the spec, whereas A sticks closer to the requested interface and surface area. "
+        }
+      },
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "B's test suite is more comprehensive and diagnostic (uses fake timers for determinism, covers reset for sliding mode, reset-no-op, per-key isolation, and more boundary cases) while A's tests omit several reset and edge scenarios.",
+          "design_quality": "A",
+          "design_quality_reason": "A's implementation is slightly better designed for maintainability and testability (injectable now() hook, clear separation of fixed/sliding logic and well-named private maps) compared with B's nearly identical but less-testable code.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement fixed and sliding window semantics per key and provide the required reset(key) behaviour consistent with the spec.",
+          "restraint": "B",
+          "restraint_reason": "B stays closer to the spec surface (no optional now() hook or other runtime injection) while A introduces an extra now option beyond the requested interface."
+        }
+      }
+    ]
+  },
+  {
+    "pairId": "rate-limiter::BvsC::rate-limiter-20260511-151731_vs_rate-limiter-20260511-153908",
+    "condX": "B",
+    "condY": "C",
+    "results": {
+      "test_quality": {
+        "verdict": "Y",
+        "reasons": [
+          "Condition C has a broader, more thorough test suite (both modes, reset behaviour including no-op and per-key isolation, boundary/time-advance cases, and fake-timer usage) while [B]'s tests are smaller and omit several edge and reset cases.",
+          "Condition C includes a broader, more thorough test suite (sliding reset, per-key reset/no-op, multiple boundary cases with fake timers) that would catch more regressions than [B]'s narrower tests.",
+          "[C]'s test suite is broader and more diagnostic — it exercises reset for sliding mode, verifies no-op reset, checks configurable max and independent keys, and uses fake timers to simulate time boundaries, so it would catch more regressions."
+        ]
+      },
+      "design_quality": {
+        "verdict": "X",
+        "reasons": [
+          "Condition [B]'s implementation is slightly cleaner and more maintainable — it accepts an injected clock for testability and trims sliding-window stamps with an index+slice (avoiding repeated shifts), leading to clearer control flow and better performance characteristics.",
+          "Condition [B] has a cleaner, more testable design (injectable now function, non-mutating sliding cleanup with slice) and slightly clearer separation of concerns than [C].",
+          "[[C]]'s implementation is slightly cleaner and more maintainable: it accepts an injectable now() for testability and its sliding-window code avoids repeated array shifts, showing better separation and performance-minded choices."
+        ]
+      },
+      "spec_adherence": {
+        "verdict": "tie",
+        "reasons": [
+          "Both implementations correctly implement per-key tracking, fixed and sliding window semantics, and the per-key reset API as required by the spec with consistent window calculations.",
+          "Both implementations correctly implement fixed and sliding modes and the per-key reset as specified, with no observable deviations from the requirements.",
+          "Both implementations correctly implement fixed and sliding semantics, per-key tracking, and the required reset behavior; neither omits or misimplements the spec requirements."
+        ]
+      },
+      "restraint": {
+        "verdict": "Y",
+        "reasons": [
+          "Condition C implements only the requested options and behaviour, whereas [B] adds an extra optional now() dependency-injection parameter (useful but beyond the spec).",
+          "Condition C sticks closely to the spec without adding extra public configuration ([B] adds a now injection option), so [C] shows more discipline in not expanding the surface area.",
+          "[C] sticks closely to the spec without adding extra options or hooks ([[C]] adds a now injection option beyond what the spec requested)."
+        ]
+      }
+    },
+    "raw": [
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "Candidate A has a broader, more thorough test suite (both modes, reset behaviour including no-op and per-key isolation, boundary/time-advance cases, and fake-timer usage) while B's tests are smaller and omit several edge and reset cases.",
+          "design_quality": "B",
+          "design_quality_reason": "Candidate B's implementation is slightly cleaner and more maintainable — it accepts an injected clock for testability and trims sliding-window stamps with an index+slice (avoiding repeated shifts), leading to clearer control flow and better performance characteristics.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement per-key tracking, fixed and sliding window semantics, and the per-key reset API as required by the spec with consistent window calculations.",
+          "restraint": "A",
+          "restraint_reason": "Candidate A implements only the requested options and behaviour, whereas B adds an extra optional now() dependency-injection parameter (useful but beyond the spec)."
+        }
+      },
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "Candidate A includes a broader, more thorough test suite (sliding reset, per-key reset/no-op, multiple boundary cases with fake timers) that would catch more regressions than B's narrower tests.",
+          "design_quality": "B",
+          "design_quality_reason": "Candidate B has a cleaner, more testable design (injectable now function, non-mutating sliding cleanup with slice) and slightly clearer separation of concerns than A.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement fixed and sliding modes and the per-key reset as specified, with no observable deviations from the requirements.",
+          "restraint": "A",
+          "restraint_reason": "Candidate A sticks closely to the spec without adding extra public configuration (B adds a now injection option), so A shows more discipline in not expanding the surface area."
+        }
+      },
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "B's test suite is broader and more diagnostic — it exercises reset for sliding mode, verifies no-op reset, checks configurable max and independent keys, and uses fake timers to simulate time boundaries, so it would catch more regressions.",
+          "design_quality": "A",
+          "design_quality_reason": "A's implementation is slightly cleaner and more maintainable: it accepts an injectable now() for testability and its sliding-window code avoids repeated array shifts, showing better separation and performance-minded choices.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement fixed and sliding semantics, per-key tracking, and the required reset behavior; neither omits or misimplements the spec requirements.",
+          "restraint": "B",
+          "restraint_reason": "B sticks closely to the spec without adding extra options or hooks (A adds a now injection option beyond what the spec requested)."
+        }
+      }
+    ]
+  },
+  {
+    "pairId": "rate-limiter::BvsC::rate-limiter-20260511-153908_vs_rate-limiter-20260511-143320",
+    "condX": "B",
+    "condY": "C",
+    "results": {
+      "test_quality": {
+        "verdict": "Y",
+        "reasons": [
+          "Condition C has a broader and more rigorous test suite (uses fake timers, tests reset for both modes, tests no-op reset and per-key isolation) that would catch more regressions than [[C]]'s narrower tests.",
+          "Condition C has a much more comprehensive test suite (fake-timer-driven tests, sliding-edge cases, per-key reset/no-op checks) that would catch more regressions than [B]’s slimmer test set.",
+          "Condition C has a broader, more deterministic test suite (uses fake timers), covers reset for both modes and no-op/side-effect cases, and checks more edge behaviors than [[C]]'s smaller test set."
+        ]
+      },
+      "design_quality": {
+        "verdict": "X",
+        "reasons": [
+          "Condition [C] has clearer typing, a pluggable now() for deterministic testing, and neatly separated fixed/sliding logic making it easier to read and maintain.",
+          "Condition [B] has cleaner separation (allowFixed/allowSliding), clearer naming, and a testable now() injection, making it easier to read and maintain than [C]’s flatter, slightly ad-hoc state handling.",
+          "Condition [C] has clearer separation of concerns (private allowFixed/allowSliding methods), explicit types and an injectable now() for deterministic time handling, making it slightly more maintainable."
+        ]
+      },
+      "spec_adherence": {
+        "verdict": "tie",
+        "reasons": [
+          "Both implementations correctly implement fixed and sliding modes, per-key tracking, and the per-key reset semantics required by the spec with no observable deviations.",
+          "Both implementations implement fixed/sliding semantics, per-key tracking and reset correctly according to the spec; neither omits required behaviour nor violates the stated examples.",
+          "Both implementations correctly implement fixed and sliding semantics, per-key tracking and reset semantics required by the spec, with no functional omissions."
+        ]
+      },
+      "restraint": {
+        "verdict": "Y",
+        "reasons": [
+          "Condition C implements the required features without adding extra injection/configuration (no now() hook) or other surface area beyond the spec.",
+          "Condition C sticks to the requested interface and behavior without adding extras (no now injection or extra public surface), whereas [B] adds an optional now parameter and extra internal structure beyond the spec.",
+          "Condition C sticks to a minimal, direct implementation without adding auxiliary injection APIs or extra surface area beyond the spec, whereas [[C]] adds an optional now() hook and extra exported types."
+        ]
+      }
+    },
+    "raw": [
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "Candidate B has a broader and more rigorous test suite (uses fake timers, tests reset for both modes, tests no-op reset and per-key isolation) that would catch more regressions than A's narrower tests.",
+          "design_quality": "A",
+          "design_quality_reason": "Candidate A has clearer typing, a pluggable now() for deterministic testing, and neatly separated fixed/sliding logic making it easier to read and maintain.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement fixed and sliding modes, per-key tracking, and the per-key reset semantics required by the spec with no observable deviations.",
+          "restraint": "B",
+          "restraint_reason": "Candidate B implements the required features without adding extra injection/configuration (no now() hook) or other surface area beyond the spec."
+        }
+      },
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "Candidate A has a much more comprehensive test suite (fake-timer-driven tests, sliding-edge cases, per-key reset/no-op checks) that would catch more regressions than B’s slimmer test set.",
+          "design_quality": "B",
+          "design_quality_reason": "Candidate B has cleaner separation (allowFixed/allowSliding), clearer naming, and a testable now() injection, making it easier to read and maintain than A’s flatter, slightly ad-hoc state handling.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations implement fixed/sliding semantics, per-key tracking and reset correctly according to the spec; neither omits required behaviour nor violates the stated examples.",
+          "restraint": "A",
+          "restraint_reason": "Candidate A sticks to the requested interface and behavior without adding extras (no now injection or extra public surface), whereas B adds an optional now parameter and extra internal structure beyond the spec."
+        }
+      },
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "Candidate B has a broader, more deterministic test suite (uses fake timers), covers reset for both modes and no-op/side-effect cases, and checks more edge behaviors than A's smaller test set.",
+          "design_quality": "A",
+          "design_quality_reason": "Candidate A has clearer separation of concerns (private allowFixed/allowSliding methods), explicit types and an injectable now() for deterministic time handling, making it slightly more maintainable.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement fixed and sliding semantics, per-key tracking and reset semantics required by the spec, with no functional omissions.",
+          "restraint": "B",
+          "restraint_reason": "Candidate B sticks to a minimal, direct implementation without adding auxiliary injection APIs or extra surface area beyond the spec, whereas A adds an optional now() hook and extra exported types."
+        }
+      }
+    ]
+  },
+  {
+    "pairId": "rate-limiter::BvsC::rate-limiter-20260511-153908_vs_rate-limiter-20260511-151731",
+    "condX": "B",
+    "condY": "C",
+    "results": {
+      "test_quality": {
+        "verdict": "Y",
+        "reasons": [
+          "Condition C's test suite is larger and more thorough (fake timers, more edge cases, reset for sliding mode and no-op behavior) and would catch more regressions than [[C]]'s smaller, less-complete tests.",
+          "Condition C has a broader and more rigorous test suite (uses fake timers, covers reset in both modes, reset-no-op, per-key isolation, and more sliding-edge cases) so it would catch more regressions.",
+          "[C]'s test suite is more comprehensive and robust (uses fake timers, covers reset for both modes, unseen-key/no-op and key-isolation cases), so it would catch more regressions than [[C]]'s narrower tests."
+        ]
+      },
+      "design_quality": {
+        "verdict": "X",
+        "reasons": [
+          "Condition C's implementation has slightly clearer naming, cleaner separation (passing now into private helpers, concise timestamp trimming) and a tidy export surface, making it marginally easier to maintain.",
+          "Condition [C]’s design is slightly more maintainable because it accepts an injectable now() for deterministic behaviour (improving testability without global timers) and keeps concise, focused methods and state per mode.",
+          "[[C]] injects time via an optional now() and cleanly separates fixed/sliding logic, improving testability and decoupling; its implementation is slightly more flexible and expressive for a maintainer."
+        ]
+      },
+      "spec_adherence": {
+        "verdict": "tie",
+        "reasons": [
+          "Both implementations correctly implement fixed/sliding semantics, per-key tracking, and the reset API from the spec with no observable departures in behavior.",
+          "Both implementations correctly implement per-key tracking, fixed and sliding semantics, and the per-key reset behaviour required by the spec.",
+          "Both implementations correctly implement per-key tracking, fixed and sliding semantics, and the per-key reset behaviour from the extension with consistent boundary handling, so neither is clearly more faithful to the spec."
+        ]
+      },
+      "restraint": {
+        "verdict": "Y",
+        "reasons": [
+          "Condition [C] added an optional now() injection (helpful but outside the spec), whereas [C] stays closer to the requested surface (only a small index export), so [C] shows marginally more restraint.",
+          "Condition C stays closer to the requested API surface (no test-time now hook) and avoids adding optional runtime hooks beyond the spec, keeping the public surface minimal.",
+          "[C] stays closer to the requested surface (no test-hook API on the public options) and only adds a small export file, whereas [[C]] added an extra now() injection hook beyond the spec. "
+        ]
+      }
+    },
+    "raw": [
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "Candidate B's test suite is larger and more thorough (fake timers, more edge cases, reset for sliding mode and no-op behavior) and would catch more regressions than A's smaller, less-complete tests.",
+          "design_quality": "B",
+          "design_quality_reason": "Candidate B's implementation has slightly clearer naming, cleaner separation (passing now into private helpers, concise timestamp trimming) and a tidy export surface, making it marginally easier to maintain.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement fixed/sliding semantics, per-key tracking, and the reset API from the spec with no observable departures in behavior.",
+          "restraint": "B",
+          "restraint_reason": "Candidate A added an optional now() injection (helpful but outside the spec), whereas B stays closer to the requested surface (only a small index export), so B shows marginally more restraint."
+        }
+      },
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "Candidate B has a broader and more rigorous test suite (uses fake timers, covers reset in both modes, reset-no-op, per-key isolation, and more sliding-edge cases) so it would catch more regressions.",
+          "design_quality": "A",
+          "design_quality_reason": "Candidate A’s design is slightly more maintainable because it accepts an injectable now() for deterministic behaviour (improving testability without global timers) and keeps concise, focused methods and state per mode.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement per-key tracking, fixed and sliding semantics, and the per-key reset behaviour required by the spec.",
+          "restraint": "B",
+          "restraint_reason": "Candidate B stays closer to the requested API surface (no test-time now hook) and avoids adding optional runtime hooks beyond the spec, keeping the public surface minimal."
+        }
+      },
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "B's test suite is more comprehensive and robust (uses fake timers, covers reset for both modes, unseen-key/no-op and key-isolation cases), so it would catch more regressions than A's narrower tests.",
+          "design_quality": "A",
+          "design_quality_reason": "A injects time via an optional now() and cleanly separates fixed/sliding logic, improving testability and decoupling; its implementation is slightly more flexible and expressive for a maintainer.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement per-key tracking, fixed and sliding semantics, and the per-key reset behaviour from the extension with consistent boundary handling, so neither is clearly more faithful to the spec.",
+          "restraint": "B",
+          "restraint_reason": "B stays closer to the requested surface (no test-hook API on the public options) and only adds a small export file, whereas A added an extra now() injection hook beyond the spec. "
+        }
+      }
+    ]
+  },
+  {
+    "pairId": "rate-limiter::BvsC::rate-limiter-20260511-153908_vs_rate-limiter-20260511-153908",
+    "condX": "B",
+    "condY": "C",
+    "results": {
+      "test_quality": {
+        "verdict": "Y",
+        "reasons": [
+          "Condition C has a broader, more diagnostic test suite (fake-timer setup, sliding and fixed edge cases, reset for sliding, unknown-key no-op and per-key isolation) that would catch more regressions than [[C]]'s narrower tests.",
+          "Condition C's tests exercise both modes, window boundaries, per-key isolation, and a comprehensive reset suite (sliding reset, fixed reset, only-affects-key, and no-op), whereas Condition [B]'s tests omit several reset scenarios making them less likely to catch regressions.",
+          "[C]'s test suite is broader and more rigorous (uses fake timers, checks fixed and sliding edge cases, tests reset for both modes, per-key/no-op reset) while [[C]]'s tests miss sliding-reset and a few edge scenarios."
+        ]
+      },
+      "design_quality": {
+        "verdict": "X",
+        "reasons": [
+          "Condition [C]'s implementation is slightly more maintainable (injectable now() for deterministic time in tests, clear types and separation of concerns) making it easier to reason about and test.",
+          "Condition [B] is more maintainable — it injects time for testability, uses clearer naming, and filters timestamps immutably (avoiding repeated array.shift() costs), yielding clearer, safer control flow and fewer performance pitfalls.",
+          "[[C]]'s code is slightly better designed for maintainability and testability (clean separation, explicit types, and a pluggable now() hook) compared with [C]'s otherwise-simple but less-flexible approach."
+        ]
+      },
+      "spec_adherence": {
+        "verdict": "tie",
+        "reasons": [
+          "Both implementations correctly implement per-key tracking, fixed and sliding behaviours, and the per-key reset semantics required by the spec.",
+          "Both implementations correctly implement per-key fixed and sliding rate limits and provide the required reset(key) behaviour as specified; no functional requirement from the spec is missing or violated in either.",
+          "Both implementations faithfully implement per-key tracking, fixed and sliding semantics, and the per-key reset behaviour required by the spec."
+        ]
+      },
+      "restraint": {
+        "verdict": "Y",
+        "reasons": [
+          "Condition C sticks closely to the spec surface without adding extras (no injected now() or expanded public types) while [[C]] introduces extra testability API surface beyond the requirements.",
+          "Condition C implements just the requested functionality, while Condition [B] adds an extra optional now() constructor hook and minor type extras beyond the spec.",
+          "[C] stays closer to the requested scope (no extra test hook or API surface) while [[C]] adds an optional now() injection and exported mode type beyond the spec."
+        ]
+      }
+    },
+    "raw": [
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "Candidate B has a broader, more diagnostic test suite (fake-timer setup, sliding and fixed edge cases, reset for sliding, unknown-key no-op and per-key isolation) that would catch more regressions than A's narrower tests.",
+          "design_quality": "A",
+          "design_quality_reason": "Candidate A's implementation is slightly more maintainable (injectable now() for deterministic time in tests, clear types and separation of concerns) making it easier to reason about and test.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement per-key tracking, fixed and sliding behaviours, and the per-key reset semantics required by the spec.",
+          "restraint": "B",
+          "restraint_reason": "Candidate B sticks closely to the spec surface without adding extras (no injected now() or expanded public types) while A introduces extra testability API surface beyond the requirements."
+        }
+      },
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "Candidate A's tests exercise both modes, window boundaries, per-key isolation, and a comprehensive reset suite (sliding reset, fixed reset, only-affects-key, and no-op), whereas Candidate B's tests omit several reset scenarios making them less likely to catch regressions.",
+          "design_quality": "B",
+          "design_quality_reason": "Candidate B is more maintainable — it injects time for testability, uses clearer naming, and filters timestamps immutably (avoiding repeated array.shift() costs), yielding clearer, safer control flow and fewer performance pitfalls.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement per-key fixed and sliding rate limits and provide the required reset(key) behaviour as specified; no functional requirement from the spec is missing or violated in either.",
+          "restraint": "A",
+          "restraint_reason": "Candidate A implements just the requested functionality, while Candidate B adds an extra optional now() constructor hook and minor type extras beyond the spec."
+        }
+      },
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "B's test suite is broader and more rigorous (uses fake timers, checks fixed and sliding edge cases, tests reset for both modes, per-key/no-op reset) while A's tests miss sliding-reset and a few edge scenarios.",
+          "design_quality": "A",
+          "design_quality_reason": "A's code is slightly better designed for maintainability and testability (clean separation, explicit types, and a pluggable now() hook) compared with B's otherwise-simple but less-flexible approach.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations faithfully implement per-key tracking, fixed and sliding semantics, and the per-key reset behaviour required by the spec.",
+          "restraint": "B",
+          "restraint_reason": "B stays closer to the requested scope (no extra test hook or API surface) while A adds an optional now() injection and exported mode type beyond the spec."
+        }
+      }
+    ]
+  }
+]

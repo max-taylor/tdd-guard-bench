@@ -1,0 +1,2162 @@
+[
+  {
+    "pairId": "retry::AvsB::retry-20260511-144230_vs_retry-20260511-144230",
+    "condX": "A",
+    "condY": "B",
+    "results": {
+      "test_quality": {
+        "verdict": "X",
+        "reasons": [
+          "Condition [A] has a broader, more targeted test suite (unit tests for computeDelay, injected sleep/random for deterministic tests, explicit checks for shouldRetry invocation and no-sleep-on-success/final-attempt) that would catch more regressions.",
+          "[A]'s tests are more focused and deterministic (injecting sleep/random), check more behavioural details (shouldRetry called, exact call counts, no-sleep cases, computeDelay unit tests) and avoid fragile timer-based assertions, making them better regression guards.",
+          "[B]'s tests exercise the server-supplied retryAfterMs, use fake timers to assert actual setTimeout delays, and check precise backoff/jitter behaviour, whereas [A]'s suite—though thorough in unit checks—omits an explicit test for the server-supplied delay."
+        ]
+      },
+      "design_quality": {
+        "verdict": "X",
+        "reasons": [
+          "Condition [A] is better structured and more maintainable (clear helper extractRetryAfterMs, separable computeDelay, and injectable sleep/random for testability) compared with [B]'s more tightly coupled implementation.",
+          "[A] is more modular and testable (injectable sleep/random, separate computeDelay and extractRetryAfterMs, clearer control flow and naming) and avoids duplicated concerns, making it easier to maintain.",
+          "[A] is better structured and more testable: it cleanly separates computeDelay/extract logic and injects sleep/random for deterministic testing, improving readability and maintainability."
+        ]
+      },
+      "spec_adherence": {
+        "verdict": "tie",
+        "reasons": [
+          "Both implement the core retry and server-delay behaviour, but [A] more consistently follows the spec (calls shouldRetry on each failure and cleanly applies server-supplied retryAfterMs without jitter); [B] skips calling shouldRetry on the final attempt and uses a non-obvious jitter formula.",
+          "Both implementations correctly implement retries, exponential backoff with jitter, respect shouldRetry and maxAttempts, and honor a finite non-negative error.retryAfterMs without applying jitter.",
+          "Both implementations correctly implement retries gated by shouldRetry, exponential backoff with jitter, honor maxAttempts, and respect a finite non-negative error.retryAfterMs as the delay without extra jitter."
+        ]
+      },
+      "restraint": {
+        "verdict": "Y",
+        "reasons": [
+          "Condition [B] sticks closer to the minimal spec surface (no extra injectable hooks or exported helpers) while [A] adds extra options and an exported computeDelay beyond what was requested.",
+          "[[A]] sticks closely to the requested interface and behaviour, while [A] adds extra public knobs (sleep/random) and an index re-export beyond the spec.}",
+          "[B] sticks closely to the spec surface (no extra injection points or exported helpers), while [A] adds optional sleep/random hooks and extra exports beyond the required interface."
+        ]
+      }
+    },
+    "raw": [
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "Candidate A has a broader, more targeted test suite (unit tests for computeDelay, injected sleep/random for deterministic tests, explicit checks for shouldRetry invocation and no-sleep-on-success/final-attempt) that would catch more regressions.",
+          "design_quality": "A",
+          "design_quality_reason": "Candidate A is better structured and more maintainable (clear helper extractRetryAfterMs, separable computeDelay, and injectable sleep/random for testability) compared with B's more tightly coupled implementation.",
+          "spec_adherence": "A",
+          "spec_adherence_reason": "Both implement the core retry and server-delay behaviour, but A more consistently follows the spec (calls shouldRetry on each failure and cleanly applies server-supplied retryAfterMs without jitter); B skips calling shouldRetry on the final attempt and uses a non-obvious jitter formula.",
+          "restraint": "B",
+          "restraint_reason": "Candidate B sticks closer to the minimal spec surface (no extra injectable hooks or exported helpers) while A adds extra options and an exported computeDelay beyond what was requested."
+        }
+      },
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "B's tests are more focused and deterministic (injecting sleep/random), check more behavioural details (shouldRetry called, exact call counts, no-sleep cases, computeDelay unit tests) and avoid fragile timer-based assertions, making them better regression guards.",
+          "design_quality": "B",
+          "design_quality_reason": "B is more modular and testable (injectable sleep/random, separate computeDelay and extractRetryAfterMs, clearer control flow and naming) and avoids duplicated concerns, making it easier to maintain.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement retries, exponential backoff with jitter, respect shouldRetry and maxAttempts, and honor a finite non-negative error.retryAfterMs without applying jitter.",
+          "restraint": "A",
+          "restraint_reason": "A sticks closely to the requested interface and behaviour, while B adds extra public knobs (sleep/random) and an index re-export beyond the spec.}"
+        }
+      },
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "B's tests exercise the server-supplied retryAfterMs, use fake timers to assert actual setTimeout delays, and check precise backoff/jitter behaviour, whereas A's suite—though thorough in unit checks—omits an explicit test for the server-supplied delay.",
+          "design_quality": "A",
+          "design_quality_reason": "A is better structured and more testable: it cleanly separates computeDelay/extract logic and injects sleep/random for deterministic testing, improving readability and maintainability.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement retries gated by shouldRetry, exponential backoff with jitter, honor maxAttempts, and respect a finite non-negative error.retryAfterMs as the delay without extra jitter.",
+          "restraint": "B",
+          "restraint_reason": "B sticks closely to the spec surface (no extra injection points or exported helpers), while A adds optional sleep/random hooks and extra exports beyond the required interface."
+        }
+      }
+    ]
+  },
+  {
+    "pairId": "retry::AvsB::retry-20260511-144230_vs_retry-20260511-152535",
+    "condX": "A",
+    "condY": "B",
+    "results": {
+      "test_quality": {
+        "verdict": "X",
+        "reasons": [
+          "[A]'s tests are more thorough and targeted (injectable sleep/random for deterministic checks, computeDelay unit tests, explicit checks for no-sleep on success and shouldRetry behavior) making them better regression detectors than [[A]]'s timer-heavy, slightly more integration-style suite.",
+          "Condition [B]'s test suite is more thorough and realistic (fake timers, setTimeout spying, explicit test for server-supplied retryAfterMs and jitter via Math.random mocking), whereas [A]'s tests miss the retryAfterMs behaviour and rely on injected helpers rather than exercising real timers.",
+          "[A] has a larger, more precise and modular test suite (including computeDelay tests, explicit checks of sleep/random interactions, call-counts, and edge cases) that would catch regressions more reliably than [[A]]'s smaller, timer-based suite."
+        ]
+      },
+      "design_quality": {
+        "verdict": "X",
+        "reasons": [
+          "[A] has cleaner separation of concerns (computeDelay, extractRetryAfterMs), dependency injection (sleep/random) and explicit types/exports, making it easier to read, test and maintain than [[A]]'s single-function implementation.",
+          "Condition [A] has clearer separation of concerns (computeDelay, extractRetryAfterMs), dependency injection for sleep/random, and exported types making the code more modular and maintainable.",
+          "[A] separates concerns (computeDelay, extractRetryAfterMs), injects sleep/random for testability, and has clearer naming and exports, making it easier to maintain than [[A]]'s inlined implementation."
+        ]
+      },
+      "spec_adherence": {
+        "verdict": "tie",
+        "reasons": [
+          "Both implementations correctly implement retry attempts, shouldRetry gating, exponential backoff with jitter, server-supplied retryAfterMs (no jitter) and final-error propagation, so they equally satisfy the spec.",
+          "Both implementations correctly implement the retry loop, shouldRetry gating, maxAttempts capping, exponential backoff with jitter, and the server-supplied retryAfterMs override per attempt, so they equally satisfy the spec.",
+          "[[A]] sticks closely to the required retry signature and implements the retryAfterMs rule and backoff/jitter behavior without adding extra API surface, matching the spec and its extension exactly."
+        ]
+      },
+      "restraint": {
+        "verdict": "Y",
+        "reasons": [
+          "[[A]] implements just the required surface (no extra helpers or injected hooks), whereas [A] adds extra APIs (computeDelay, injectable sleep/random, re-exports) beyond the spec. ",
+          "Condition [B] sticks closely to the requested API and minimal implementation, while [A] adds extra exported helpers and DI knobs (sleep/random/computeDelay) beyond the spec. ",
+          "[[A]] implements only the requested API and behavior, whereas [A] adds extra options (sleep/random), a computeDelay export and an index file, expanding surface area beyond the spec."
+        ]
+      }
+    },
+    "raw": [
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "B's tests are more thorough and targeted (injectable sleep/random for deterministic checks, computeDelay unit tests, explicit checks for no-sleep on success and shouldRetry behavior) making them better regression detectors than A's timer-heavy, slightly more integration-style suite.",
+          "design_quality": "B",
+          "design_quality_reason": "B has cleaner separation of concerns (computeDelay, extractRetryAfterMs), dependency injection (sleep/random) and explicit types/exports, making it easier to read, test and maintain than A's single-function implementation.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement retry attempts, shouldRetry gating, exponential backoff with jitter, server-supplied retryAfterMs (no jitter) and final-error propagation, so they equally satisfy the spec.",
+          "restraint": "A",
+          "restraint_reason": "A implements just the required surface (no extra helpers or injected hooks), whereas B adds extra APIs (computeDelay, injectable sleep/random, re-exports) beyond the spec. "
+        }
+      },
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "Candidate B's test suite is more thorough and realistic (fake timers, setTimeout spying, explicit test for server-supplied retryAfterMs and jitter via Math.random mocking), whereas A's tests miss the retryAfterMs behaviour and rely on injected helpers rather than exercising real timers.",
+          "design_quality": "A",
+          "design_quality_reason": "Candidate A has clearer separation of concerns (computeDelay, extractRetryAfterMs), dependency injection for sleep/random, and exported types making the code more modular and maintainable.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement the retry loop, shouldRetry gating, maxAttempts capping, exponential backoff with jitter, and the server-supplied retryAfterMs override per attempt, so they equally satisfy the spec.",
+          "restraint": "B",
+          "restraint_reason": "Candidate B sticks closely to the requested API and minimal implementation, while A adds extra exported helpers and DI knobs (sleep/random/computeDelay) beyond the spec. "
+        }
+      },
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "B has a larger, more precise and modular test suite (including computeDelay tests, explicit checks of sleep/random interactions, call-counts, and edge cases) that would catch regressions more reliably than A's smaller, timer-based suite.",
+          "design_quality": "B",
+          "design_quality_reason": "B separates concerns (computeDelay, extractRetryAfterMs), injects sleep/random for testability, and has clearer naming and exports, making it easier to maintain than A's inlined implementation.",
+          "spec_adherence": "A",
+          "spec_adherence_reason": "A sticks closely to the required retry signature and implements the retryAfterMs rule and backoff/jitter behavior without adding extra API surface, matching the spec and its extension exactly.",
+          "restraint": "A",
+          "restraint_reason": "A implements only the requested API and behavior, whereas B adds extra options (sleep/random), a computeDelay export and an index file, expanding surface area beyond the spec."
+        }
+      }
+    ]
+  },
+  {
+    "pairId": "retry::AvsB::retry-20260511-144230_vs_retry-20260511-154755",
+    "condX": "A",
+    "condY": "B",
+    "results": {
+      "test_quality": {
+        "verdict": "X",
+        "reasons": [
+          "Condition [B]'s tests explicitly cover the server-supplied retryAfterMs requirement from the spec extension and verify actual timers, while Condition [A]'s suite — though broader in other areas — omits a test for retryAfterMs so it would miss regressions for that new behaviour.",
+          "[A] has a larger, more targeted test suite (injected sleep/random for determinism, explicit shouldRetry call assertion, exact-call-count tests, unit tests for computeDelay) that would catch more regressions than [[A]]'s narrower, more global-mock-based tests.",
+          "[A]'s tests are more thorough and deterministic (injection of sleep/random), cover more edge cases (shouldRetry call, exact call counts, no-sleep-on-success, computeDelay unit tests) and would catch a wider range of regressions."
+        ]
+      },
+      "design_quality": {
+        "verdict": "X",
+        "reasons": [
+          "Condition [A] is better structured and more maintainable: it extracts computeDelay and retry-after parsing, injects sleep/random for testability, and keeps concerns separated, whereas [B] is a single monolithic function using globals.",
+          "[A] is better structured and more maintainable (clear small helpers computeDelay/extractRetryAfterMs, dependency injection for sleep/random, explicit types and exports) compared with [[A]]'s single-loop, inline implementations.",
+          "[A] has clearer separation of concerns (computeDelay, extractRetryAfterMs, injectable sleep/random), better testability and naming, and a more maintainable control flow than [[A]]'s flatter but less structured implementation."
+        ]
+      },
+      "spec_adherence": {
+        "verdict": "X",
+        "reasons": [
+          "Both implementations correctly implement the core retry semantics and the server-supplied retryAfterMs override per attempt, so neither is clearly more faithful to the spec.",
+          "[A] more faithfully follows the spec edge cases (always passes the thrown error to shouldRetry, correctly prefers a valid retryAfterMs without adding jitter, and avoids sleeping after the final attempt) while [[A]] skips calling shouldRetry when attempts are already exhausted.",
+          "[A] more closely follows the spec semantics (it always calls shouldRetry with the thrown error and implements the server-supplied retryAfterMs behavior correctly), whereas [[A]] skips shouldRetry on the final attempt."
+        ]
+      },
+      "restraint": {
+        "verdict": "Y",
+        "reasons": [
+          "Condition [B] sticks closely to the requested API and behaviour with minimal extras, while Condition [A] adds extra public hooks (sleep/random/computeDelay) and exports beyond the spec. ",
+          "[[A]] sticks closely to the spec without adding extra hooks or exported helpers, whereas [A] adds optional sleep/random injection, computeDelay and re-exports beyond the requested interface.",
+          "[[A]] sticks closely to the requested interface and options, while [A] adds extra injection hooks and exports (sleep/random/computeDelay) beyond the spec. "
+        ]
+      }
+    },
+    "raw": [
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "Candidate B's tests explicitly cover the server-supplied retryAfterMs requirement from the spec extension and verify actual timers, while Candidate A's suite — though broader in other areas — omits a test for retryAfterMs so it would miss regressions for that new behaviour.",
+          "design_quality": "A",
+          "design_quality_reason": "Candidate A is better structured and more maintainable: it extracts computeDelay and retry-after parsing, injects sleep/random for testability, and keeps concerns separated, whereas B is a single monolithic function using globals.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement the core retry semantics and the server-supplied retryAfterMs override per attempt, so neither is clearly more faithful to the spec.",
+          "restraint": "B",
+          "restraint_reason": "Candidate B sticks closely to the requested API and behaviour with minimal extras, while Candidate A adds extra public hooks (sleep/random/computeDelay) and exports beyond the spec. "
+        }
+      },
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "B has a larger, more targeted test suite (injected sleep/random for determinism, explicit shouldRetry call assertion, exact-call-count tests, unit tests for computeDelay) that would catch more regressions than A's narrower, more global-mock-based tests.",
+          "design_quality": "B",
+          "design_quality_reason": "B is better structured and more maintainable (clear small helpers computeDelay/extractRetryAfterMs, dependency injection for sleep/random, explicit types and exports) compared with A's single-loop, inline implementations.",
+          "spec_adherence": "B",
+          "spec_adherence_reason": "B more faithfully follows the spec edge cases (always passes the thrown error to shouldRetry, correctly prefers a valid retryAfterMs without adding jitter, and avoids sleeping after the final attempt) while A skips calling shouldRetry when attempts are already exhausted.",
+          "restraint": "A",
+          "restraint_reason": "A sticks closely to the spec without adding extra hooks or exported helpers, whereas B adds optional sleep/random injection, computeDelay and re-exports beyond the requested interface."
+        }
+      },
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "B's tests are more thorough and deterministic (injection of sleep/random), cover more edge cases (shouldRetry call, exact call counts, no-sleep-on-success, computeDelay unit tests) and would catch a wider range of regressions.",
+          "design_quality": "B",
+          "design_quality_reason": "B has clearer separation of concerns (computeDelay, extractRetryAfterMs, injectable sleep/random), better testability and naming, and a more maintainable control flow than A's flatter but less structured implementation.",
+          "spec_adherence": "B",
+          "spec_adherence_reason": "B more closely follows the spec semantics (it always calls shouldRetry with the thrown error and implements the server-supplied retryAfterMs behavior correctly), whereas A skips shouldRetry on the final attempt.",
+          "restraint": "A",
+          "restraint_reason": "A sticks closely to the requested interface and options, while B adds extra injection hooks and exports (sleep/random/computeDelay) beyond the spec. "
+        }
+      }
+    ]
+  },
+  {
+    "pairId": "retry::AvsB::retry-20260511-152535_vs_retry-20260511-144230",
+    "condX": "A",
+    "condY": "B",
+    "results": {
+      "test_quality": {
+        "verdict": "X",
+        "reasons": [
+          "Condition [A]'s test suite is far more comprehensive and targeted — it covers many edge cases (invalid retryAfterMs values, zero, per-attempt differences), checks jitter/backoff math, ensures no final sleep, and asserts shouldRetry receives the thrown error, whereas [B]'s tests are narrower.",
+          "Condition [[A]]'s tests are more comprehensive and deterministic (injecting sleep/random), covering many edge cases (invalid retryAfterMs values, per-attempt behavior, zero delay, shouldRetry invocation, no-final-sleep) that would catch regressions [[A]]'s suite misses.",
+          "Condition [A]'s tests are more numerous and targeted (covers invalid retryAfterMs values, zero, per-attempt behaviour, ensures shouldRetry is called, no-final-sleep) and use injected sleep/random for deterministic assertions, making them more diagnostic."
+        ]
+      },
+      "design_quality": {
+        "verdict": "X",
+        "reasons": [
+          "Condition [A] is better structured and more maintainable (clear helper for retryAfter logic, configurable sleep/random for testability, straightforward loop), while [B] is flatter and uses a less-considered jitter implementation.",
+          "Condition [[A]] has clearer, more maintainable structure (helper for retryAfter, DI for sleep/random, explicit loop and exports) that improves testability and readability compared with [[A]]'s simpler but less test-friendly design.",
+          "Condition [B] has a simpler, flatter design with clear separation (computeDelay/sleep), minimal surface area and straightforward control flow that a maintainer can reason about easily."
+        ]
+      },
+      "spec_adherence": {
+        "verdict": "X",
+        "reasons": [
+          "Condition [A] explicitly implements all specified behaviours (per-attempt decision, server-supplied retryAfterMs without added jitter, exponential backoff with jitter, correct maxAttempts handling) and tests those edge cases; [B] mostly complies but is less explicit in several edge behaviours.",
+          "Both implement retry, backoff, jitter and server-supplied retryAfterMs correctly, but [A] more closely follows the spec's intent by validating retryAfterMs robustly and invoking shouldRetry on each rejection before deciding to continue.",
+          "Condition [A] follows the spec more closely (calls shouldRetry on every failure, correctly prefers server-supplied retryAfterMs without jitter and handles edge cases validated by tests), while [B] skips calling shouldRetry on the final attempt."
+        ]
+      },
+      "restraint": {
+        "verdict": "Y",
+        "reasons": [
+          "Condition [B] sticks closely to the spec with a minimal API and no test-only hooks or extra options, while [A] adds injected sleep/random and an export wrapper beyond the requested interface.",
+          "Condition [A] stays very close to the requested API and scope, while [A] introduces extra options (sleep/random injection) and an index re-export beyond the minimal spec.",
+          "Condition [B] implements just the required interface and behaviour, whereas [A] adds extra options (sleep/random) and exports beyond the spec, increasing surface area."
+        ]
+      }
+    },
+    "raw": [
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "Candidate A's test suite is far more comprehensive and targeted — it covers many edge cases (invalid retryAfterMs values, zero, per-attempt differences), checks jitter/backoff math, ensures no final sleep, and asserts shouldRetry receives the thrown error, whereas B's tests are narrower.",
+          "design_quality": "A",
+          "design_quality_reason": "Candidate A is better structured and more maintainable (clear helper for retryAfter logic, configurable sleep/random for testability, straightforward loop), while B is flatter and uses a less-considered jitter implementation.",
+          "spec_adherence": "A",
+          "spec_adherence_reason": "Candidate A explicitly implements all specified behaviours (per-attempt decision, server-supplied retryAfterMs without added jitter, exponential backoff with jitter, correct maxAttempts handling) and tests those edge cases; B mostly complies but is less explicit in several edge behaviours.",
+          "restraint": "B",
+          "restraint_reason": "Candidate B sticks closely to the spec with a minimal API and no test-only hooks or extra options, while A adds injected sleep/random and an export wrapper beyond the requested interface."
+        }
+      },
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "Candidate B's tests are more comprehensive and deterministic (injecting sleep/random), covering many edge cases (invalid retryAfterMs values, per-attempt behavior, zero delay, shouldRetry invocation, no-final-sleep) that would catch regressions A's suite misses.",
+          "design_quality": "B",
+          "design_quality_reason": "Candidate B has clearer, more maintainable structure (helper for retryAfter, DI for sleep/random, explicit loop and exports) that improves testability and readability compared with A's simpler but less test-friendly design.",
+          "spec_adherence": "B",
+          "spec_adherence_reason": "Both implement retry, backoff, jitter and server-supplied retryAfterMs correctly, but B more closely follows the spec's intent by validating retryAfterMs robustly and invoking shouldRetry on each rejection before deciding to continue.",
+          "restraint": "A",
+          "restraint_reason": "Candidate A stays very close to the requested API and scope, while B introduces extra options (sleep/random injection) and an index re-export beyond the minimal spec."
+        }
+      },
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "Candidate A's tests are more numerous and targeted (covers invalid retryAfterMs values, zero, per-attempt behaviour, ensures shouldRetry is called, no-final-sleep) and use injected sleep/random for deterministic assertions, making them more diagnostic.",
+          "design_quality": "B",
+          "design_quality_reason": "Candidate B has a simpler, flatter design with clear separation (computeDelay/sleep), minimal surface area and straightforward control flow that a maintainer can reason about easily.",
+          "spec_adherence": "A",
+          "spec_adherence_reason": "Candidate A follows the spec more closely (calls shouldRetry on every failure, correctly prefers server-supplied retryAfterMs without jitter and handles edge cases validated by tests), while B skips calling shouldRetry on the final attempt.",
+          "restraint": "B",
+          "restraint_reason": "Candidate B implements just the required interface and behaviour, whereas A adds extra options (sleep/random) and exports beyond the spec, increasing surface area."
+        }
+      }
+    ]
+  },
+  {
+    "pairId": "retry::AvsB::retry-20260511-152535_vs_retry-20260511-152535",
+    "condX": "A",
+    "condY": "B",
+    "results": {
+      "test_quality": {
+        "verdict": "X",
+        "reasons": [
+          "Condition [[A]] has a much more comprehensive, deterministic test suite (injectable sleep/random, exact delay checks, many edge cases like invalid retryAfterMs and per-attempt behaviour) that would catch regressions more reliably than [[A]]'s smaller, less exhaustive tests.",
+          "[A]'s tests are more thorough and deterministic — they inject sleep/random to assert exact delays, cover many edge cases (invalid retryAfterMs values, per-attempt decisions, zero delay, shouldRetry being called) and check exact backoff math, while [[A]]'s suite is smaller and relies more on fake timers and looser assertions.",
+          "Condition [[A]] has a broader, more deterministic test suite that covers many edge cases (invalid retryAfterMs values, per-attempt decisions, no-sleep-after-final, shouldRetry call) and uses an injected sleep to make assertions reliable, whereas [[A]]'s tests are narrower and include potentially flaky timer-based assertions."
+        ]
+      },
+      "design_quality": {
+        "verdict": "X",
+        "reasons": [
+          "Condition [[A]] is better structured and more maintainable (clear types, small helper for retryAfter logic, dependency injection for sleep/random, and clean control flow), making it easier for a maintainer to understand and test.",
+          "[A] has clearer structure and abstractions (RetryOptions type, default helpers, getRetryAfterMs, injectable sleep/random) that make the code more readable and testable; [[A]] is a compact single-function implementation with inline logic.",
+          "Condition [[A]] is better organised and more maintainable: it extracts helpers (getRetryAfterMs), provides dependency injection for sleep/random, exports types and an index, and has clearer separation of concerns compared with [[A]]'s compact but less modular implementation."
+        ]
+      },
+      "spec_adherence": {
+        "verdict": "tie",
+        "reasons": [
+          "Both implementations correctly implement the retry semantics, exponential backoff with jitter, and the server-supplied retryAfterMs rule per attempt, matching the spec.",
+          "Both implementations faithfully implement the required behavior: they execute fn, consult shouldRetry, apply exponential backoff with jitter, honor a finite non-negative error.retryAfterMs without additional jitter, and propagate the final error after maxAttempts.",
+          "Both implementations correctly implement the retry semantics including shouldRetry gating, exponential backoff with jitter, honoring server-supplied retryAfterMs (without adding jitter), and exhausting maxAttempts; neither violates the spec requirements."
+        ]
+      },
+      "restraint": {
+        "verdict": "Y",
+        "reasons": [
+          "Condition [A] sticks closely to the spec without adding testability/configuration hooks or additional exports, whereas [A] introduced extra options/exports beyond the requested interface. ",
+          "[[A]] stays close to the spec with only the required options and minimal helpers, whereas [A] adds extra features (sleep/random injection and an index re-export) beyond what the spec asked for.",
+          "Condition [A] implements just the required behaviour with minimal surface area, while Condition [[A]] adds extra configuration/hooks and exports beyond what the spec asked for. "
+        ]
+      }
+    },
+    "raw": [
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "Candidate B has a much more comprehensive, deterministic test suite (injectable sleep/random, exact delay checks, many edge cases like invalid retryAfterMs and per-attempt behaviour) that would catch regressions more reliably than A's smaller, less exhaustive tests.",
+          "design_quality": "B",
+          "design_quality_reason": "Candidate B is better structured and more maintainable (clear types, small helper for retryAfter logic, dependency injection for sleep/random, and clean control flow), making it easier for a maintainer to understand and test.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement the retry semantics, exponential backoff with jitter, and the server-supplied retryAfterMs rule per attempt, matching the spec.",
+          "restraint": "A",
+          "restraint_reason": "Candidate A sticks closely to the spec without adding testability/configuration hooks or additional exports, whereas B introduced extra options/exports beyond the requested interface. "
+        }
+      },
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "B's tests are more thorough and deterministic — they inject sleep/random to assert exact delays, cover many edge cases (invalid retryAfterMs values, per-attempt decisions, zero delay, shouldRetry being called) and check exact backoff math, while A's suite is smaller and relies more on fake timers and looser assertions.",
+          "design_quality": "B",
+          "design_quality_reason": "B has clearer structure and abstractions (RetryOptions type, default helpers, getRetryAfterMs, injectable sleep/random) that make the code more readable and testable; A is a compact single-function implementation with inline logic.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations faithfully implement the required behavior: they execute fn, consult shouldRetry, apply exponential backoff with jitter, honor a finite non-negative error.retryAfterMs without additional jitter, and propagate the final error after maxAttempts.",
+          "restraint": "A",
+          "restraint_reason": "A stays close to the spec with only the required options and minimal helpers, whereas B adds extra features (sleep/random injection and an index re-export) beyond what the spec asked for."
+        }
+      },
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "Candidate B has a broader, more deterministic test suite that covers many edge cases (invalid retryAfterMs values, per-attempt decisions, no-sleep-after-final, shouldRetry call) and uses an injected sleep to make assertions reliable, whereas A's tests are narrower and include potentially flaky timer-based assertions.",
+          "design_quality": "B",
+          "design_quality_reason": "Candidate B is better organised and more maintainable: it extracts helpers (getRetryAfterMs), provides dependency injection for sleep/random, exports types and an index, and has clearer separation of concerns compared with A's compact but less modular implementation.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement the retry semantics including shouldRetry gating, exponential backoff with jitter, honoring server-supplied retryAfterMs (without adding jitter), and exhausting maxAttempts; neither violates the spec requirements.",
+          "restraint": "A",
+          "restraint_reason": "Candidate A implements just the required behaviour with minimal surface area, while Candidate B adds extra configuration/hooks and exports beyond what the spec asked for. "
+        }
+      }
+    ]
+  },
+  {
+    "pairId": "retry::AvsB::retry-20260511-152535_vs_retry-20260511-154755",
+    "condX": "A",
+    "condY": "B",
+    "results": {
+      "test_quality": {
+        "verdict": "X",
+        "reasons": [
+          "Condition [A] provides a much more comprehensive and targeted test suite (covers jitter determinism, invalid retryAfterMs values, per-attempt decisions, zero retryAfterMs, and that shouldRetry receives the error), so it's more likely to catch regressions than [B]'s slimmer suite.",
+          "[A]'s test suite is far more comprehensive and deterministic — it injects sleep/random to assert exact delays, covers many edge cases (invalid retryAfterMs, per-attempt differences, retryAfterMs=0) and verifies shouldRetry is called, so it's more likely to catch regressions.",
+          "Condition [A] has a much more comprehensive, deterministic test suite (edge cases for invalid retryAfterMs, per-attempt behavior, zero delay, shouldRetry call, exact delay values with injected sleep/random) while [B]'s tests are narrower and miss several important failure modes."
+        ]
+      },
+      "design_quality": {
+        "verdict": "X",
+        "reasons": [
+          "Condition [A] is better structured and more maintainable (clear helper for retryAfterMs, dependency injection for sleep/random to decouple timing and make tests deterministic, and an index export), whereas [B] is flatter and less test-friendly.",
+          "[A] is better structured and more maintainable: clear helper (getRetryAfterMs), explicit option destructuring, dependency injection for sleep/random, and a straightforward for-loop make it more readable and testable.",
+          "Condition [A] is better structured and more maintainable (clear helper for retryAfter, dependency injection for sleep/random for testability, explicit types and exports) whereas [B] is flatter and less test-friendly."
+        ]
+      },
+      "spec_adherence": {
+        "verdict": "tie",
+        "reasons": [
+          "Condition [A] implements all required behaviors (calls shouldRetry, respects server-supplied retryAfterMs without additional jitter, correct backoff and retry counting); [B] skips calling shouldRetry on the final attempt and omits injectable test seams.",
+          "Both implementations correctly implement the required semantics (retry gating via shouldRetry, exponential backoff with jitter, honoring finite non-negative retryAfterMs without extra jitter, and maxAttempts behavior).",
+          "Both implementations correctly implement the required retry/shouldRetry/maxAttempts semantics, exponential backoff with jitter, and honor server-supplied retryAfterMs without applying jitter, so neither violates the spec."
+        ]
+      },
+      "restraint": {
+        "verdict": "Y",
+        "reasons": [
+          "Condition [B] sticks closely to the minimal spec with no extra configuration or test hooks, while [A] adds optional sleep/random injections and an index export beyond what was requested.",
+          "[[A]] sticks closely to the spec with only the required options and no extra test hooks or exports, whereas [A] introduces additional options (sleep/random) and an index re-export beyond the requested interface.",
+          "Condition [B] stays minimal and implements only the requested behavior, whereas [A] adds extra options (sleep/random) and exports beyond the spec’s interface."
+        ]
+      }
+    },
+    "raw": [
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "Candidate A provides a much more comprehensive and targeted test suite (covers jitter determinism, invalid retryAfterMs values, per-attempt decisions, zero retryAfterMs, and that shouldRetry receives the error), so it's more likely to catch regressions than B's slimmer suite.",
+          "design_quality": "A",
+          "design_quality_reason": "Candidate A is better structured and more maintainable (clear helper for retryAfterMs, dependency injection for sleep/random to decouple timing and make tests deterministic, and an index export), whereas B is flatter and less test-friendly.",
+          "spec_adherence": "A",
+          "spec_adherence_reason": "Candidate A implements all required behaviors (calls shouldRetry, respects server-supplied retryAfterMs without additional jitter, correct backoff and retry counting); B skips calling shouldRetry on the final attempt and omits injectable test seams.",
+          "restraint": "B",
+          "restraint_reason": "Candidate B sticks closely to the minimal spec with no extra configuration or test hooks, while A adds optional sleep/random injections and an index export beyond what was requested."
+        }
+      },
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "B's test suite is far more comprehensive and deterministic — it injects sleep/random to assert exact delays, covers many edge cases (invalid retryAfterMs, per-attempt differences, retryAfterMs=0) and verifies shouldRetry is called, so it's more likely to catch regressions.",
+          "design_quality": "B",
+          "design_quality_reason": "B is better structured and more maintainable: clear helper (getRetryAfterMs), explicit option destructuring, dependency injection for sleep/random, and a straightforward for-loop make it more readable and testable.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement the required semantics (retry gating via shouldRetry, exponential backoff with jitter, honoring finite non-negative retryAfterMs without extra jitter, and maxAttempts behavior).",
+          "restraint": "A",
+          "restraint_reason": "A sticks closely to the spec with only the required options and no extra test hooks or exports, whereas B introduces additional options (sleep/random) and an index re-export beyond the requested interface."
+        }
+      },
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "Candidate A has a much more comprehensive, deterministic test suite (edge cases for invalid retryAfterMs, per-attempt behavior, zero delay, shouldRetry call, exact delay values with injected sleep/random) while B's tests are narrower and miss several important failure modes.",
+          "design_quality": "A",
+          "design_quality_reason": "Candidate A is better structured and more maintainable (clear helper for retryAfter, dependency injection for sleep/random for testability, explicit types and exports) whereas B is flatter and less test-friendly.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement the required retry/shouldRetry/maxAttempts semantics, exponential backoff with jitter, and honor server-supplied retryAfterMs without applying jitter, so neither violates the spec.",
+          "restraint": "B",
+          "restraint_reason": "Candidate B stays minimal and implements only the requested behavior, whereas A adds extra options (sleep/random) and exports beyond the spec’s interface."
+        }
+      }
+    ]
+  },
+  {
+    "pairId": "retry::AvsB::retry-20260511-154755_vs_retry-20260511-144230",
+    "condX": "A",
+    "condY": "B",
+    "results": {
+      "test_quality": {
+        "verdict": "X",
+        "reasons": [
+          "Condition [[A]]'s tests are more comprehensive and deterministic (injected sleep/random), cover more edge cases (invalid retryAfterMs, no-sleep-before-first-call, per-attempt decision) and make stronger assertions about behavior.",
+          "Condition [A] has a larger, more thorough and deterministic test suite (many edge cases, per-attempt checks, invalid retryAfterMs cases, injected sleep/random to avoid fragile timer mocks) that would catch more regressions.",
+          "[A]'s test suite is broader and more diagnostic — it injects sleep/random for deterministic checks, covers invalid retryAfterMs, per-attempt behaviour, jitter bounds, no-sleep-on-final-attempt, and verifies shouldRetry is called, whereas [[A]]'s tests are narrower and miss several edge cases."
+        ]
+      },
+      "design_quality": {
+        "verdict": "X",
+        "reasons": [
+          "Condition [[A]] has clearer control flow and better separation (injectable sleep/random, explicit exports), improving testability and maintainability compared with [[A]]'s simpler but more global approach.",
+          "Condition [A] is better structured for maintenance and testing (clear separation, injectable sleep/random, exported types and an index), making behaviour explicit and easy to mock despite a minor unreachable throw at the end.",
+          "[A] is better structured for maintainability (clear option destructuring, injectable sleep/random for testability, explicit exports) while [[A]] is simpler but relies on globals and offers fewer seams for testing/extension."
+        ]
+      },
+      "spec_adherence": {
+        "verdict": "tie",
+        "reasons": [
+          "Both implementations correctly implement the required retry semantics (maxAttempts, shouldRetry gating, exponential backoff with jitter, server-supplied retryAfterMs handling per attempt) and pass the spec tests.",
+          "Condition [B] follows the exact required function signature and implements the retry/retryAfter/backoff/jitter behavior succinctly without adding optional testing knobs that change the surface API.",
+          "[A] follows the spec more faithfully (calls shouldRetry on every rejection, honors per-attempt retryAfterMs and avoids sleeping after the final attempt); [[A]] checks maxAttempts before calling shouldRetry, which deviates from the spec's ordering."
+        ]
+      },
+      "restraint": {
+        "verdict": "Y",
+        "reasons": [
+          "Condition [A] implements the spec directly with minimal extras, whereas [A] adds extra options and re-exports not required by the spec, increasing surface area beyond the assignment.",
+          "Condition [B] stays narrowly within the spec (no extra options or exports), whereas Condition [A] introduces additional optional parameters and an index export beyond the requested interface.",
+          "[[A]] implements just the required behaviour with minimal extras, whereas [A] introduces optional hooks and an extra export surface beyond what the spec requested."
+        ]
+      }
+    },
+    "raw": [
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "Candidate B's tests are more comprehensive and deterministic (injected sleep/random), cover more edge cases (invalid retryAfterMs, no-sleep-before-first-call, per-attempt decision) and make stronger assertions about behavior.",
+          "design_quality": "B",
+          "design_quality_reason": "Candidate B has clearer control flow and better separation (injectable sleep/random, explicit exports), improving testability and maintainability compared with A's simpler but more global approach.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement the required retry semantics (maxAttempts, shouldRetry gating, exponential backoff with jitter, server-supplied retryAfterMs handling per attempt) and pass the spec tests.",
+          "restraint": "A",
+          "restraint_reason": "Candidate A implements the spec directly with minimal extras, whereas B adds extra options and re-exports not required by the spec, increasing surface area beyond the assignment."
+        }
+      },
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "Candidate A has a larger, more thorough and deterministic test suite (many edge cases, per-attempt checks, invalid retryAfterMs cases, injected sleep/random to avoid fragile timer mocks) that would catch more regressions.",
+          "design_quality": "A",
+          "design_quality_reason": "Candidate A is better structured for maintenance and testing (clear separation, injectable sleep/random, exported types and an index), making behaviour explicit and easy to mock despite a minor unreachable throw at the end.",
+          "spec_adherence": "B",
+          "spec_adherence_reason": "Candidate B follows the exact required function signature and implements the retry/retryAfter/backoff/jitter behavior succinctly without adding optional testing knobs that change the surface API.",
+          "restraint": "B",
+          "restraint_reason": "Candidate B stays narrowly within the spec (no extra options or exports), whereas Candidate A introduces additional optional parameters and an index export beyond the requested interface."
+        }
+      },
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "B's test suite is broader and more diagnostic — it injects sleep/random for deterministic checks, covers invalid retryAfterMs, per-attempt behaviour, jitter bounds, no-sleep-on-final-attempt, and verifies shouldRetry is called, whereas A's tests are narrower and miss several edge cases.",
+          "design_quality": "B",
+          "design_quality_reason": "B is better structured for maintainability (clear option destructuring, injectable sleep/random for testability, explicit exports) while A is simpler but relies on globals and offers fewer seams for testing/extension.",
+          "spec_adherence": "B",
+          "spec_adherence_reason": "B follows the spec more faithfully (calls shouldRetry on every rejection, honors per-attempt retryAfterMs and avoids sleeping after the final attempt); A checks maxAttempts before calling shouldRetry, which deviates from the spec's ordering.",
+          "restraint": "A",
+          "restraint_reason": "A implements just the required behaviour with minimal extras, whereas B introduces optional hooks and an extra export surface beyond what the spec requested."
+        }
+      }
+    ]
+  },
+  {
+    "pairId": "retry::AvsB::retry-20260511-154755_vs_retry-20260511-152535",
+    "condX": "A",
+    "condY": "B",
+    "results": {
+      "test_quality": {
+        "verdict": "X",
+        "reasons": [
+          "Condition [[A]]'s test suite is more comprehensive and targeted — it injects sleep/random to make assertions deterministic, covers more edge cases (invalid retryAfterMs variants, no-sleep-before-first-call, per-attempt decisions, shouldRetry invocation) and checks exact delay values and bounds, whereas [[A]]'s tests are solid but narrower.",
+          "Condition [[A]] provides a much more comprehensive, deterministic test suite (injectable sleep/random), covers many edge cases (invalid retryAfterMs, per-attempt decisions, no-sleep-before-first-call, no-sleep-after-final-attempt) and makes precise assertions, making it a stronger regression net.",
+          "Condition [[A]] has a more comprehensive, deterministic test suite (injected sleep/random, explicit edge cases like invalid retryAfterMs, per-attempt behaviour, no-sleep-before-first-call, and precise assertions) that would catch regressions more reliably than [[A]]'s smaller, timer-driven tests."
+        ]
+      },
+      "design_quality": {
+        "verdict": "X",
+        "reasons": [
+          "Condition [[A]] is better structured and more maintainable: it defines a RetryOptions type, clean control flow, and supports dependency injection (sleep/random) for testability, while [[A]] is flatter and relies on globals (Math.random/setTimeout).",
+          "Condition [[A]] is better structured and more maintainable: it defines a RetryOptions type, splits defaults (sleep/random), supports dependency injection for testability, and cleanly organizes exports.",
+          "Condition [[A]] has a clearer, more maintainable design (well-named RetryOptions, dependency injection for sleep/random, single responsibility, and an index re-export) that improves testability and readability compared with [[A]]'s minimal implementation."
+        ]
+      },
+      "spec_adherence": {
+        "verdict": "tie",
+        "reasons": [
+          "Both implementations correctly implement the required retry logic, exponential backoff with jitter, honour server-provided retryAfterMs (no extra jitter), respect shouldRetry, and stop after maxAttempts, so neither is measurably more faithful to the spec.",
+          "Both implementations correctly implement retries, shouldRetry gating, exponential backoff with jitter, honor a valid error.retryAfterMs (without additional jitter), and propagate the final error, meeting the spec.",
+          "Both implementations correctly implement the retry semantics, exponential backoff with jitter, respect shouldRetry, honor maxAttempts, and use a valid error.retryAfterMs without adding jitter, so they equally satisfy the spec."
+        ]
+      },
+      "restraint": {
+        "verdict": "Y",
+        "reasons": [
+          "Condition [A] sticks closely to the specified interface and options, whereas [A] adds optional sleep/random hooks and an export wrapper beyond the spec (helpful but scope expansion).",
+          "Condition [A] sticks closely to the requested interface and behavior with no extra injection hooks or additional exports, whereas Condition [[A]] adds sleep/random hooks and extra exports beyond the spec.",
+          "Condition [A] sticks to the minimal required surface and behaviour, while [A] adds extra API surface (sleep/random option injection and an index file) beyond what the spec requested."
+        ]
+      }
+    },
+    "raw": [
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "Candidate B's test suite is more comprehensive and targeted — it injects sleep/random to make assertions deterministic, covers more edge cases (invalid retryAfterMs variants, no-sleep-before-first-call, per-attempt decisions, shouldRetry invocation) and checks exact delay values and bounds, whereas A's tests are solid but narrower.",
+          "design_quality": "B",
+          "design_quality_reason": "Candidate B is better structured and more maintainable: it defines a RetryOptions type, clean control flow, and supports dependency injection (sleep/random) for testability, while A is flatter and relies on globals (Math.random/setTimeout).",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement the required retry logic, exponential backoff with jitter, honour server-provided retryAfterMs (no extra jitter), respect shouldRetry, and stop after maxAttempts, so neither is measurably more faithful to the spec.",
+          "restraint": "A",
+          "restraint_reason": "Candidate A sticks closely to the specified interface and options, whereas B adds optional sleep/random hooks and an export wrapper beyond the spec (helpful but scope expansion)."
+        }
+      },
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "Candidate B provides a much more comprehensive, deterministic test suite (injectable sleep/random), covers many edge cases (invalid retryAfterMs, per-attempt decisions, no-sleep-before-first-call, no-sleep-after-final-attempt) and makes precise assertions, making it a stronger regression net.",
+          "design_quality": "B",
+          "design_quality_reason": "Candidate B is better structured and more maintainable: it defines a RetryOptions type, splits defaults (sleep/random), supports dependency injection for testability, and cleanly organizes exports.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement retries, shouldRetry gating, exponential backoff with jitter, honor a valid error.retryAfterMs (without additional jitter), and propagate the final error, meeting the spec.",
+          "restraint": "A",
+          "restraint_reason": "Candidate A sticks closely to the requested interface and behavior with no extra injection hooks or additional exports, whereas Candidate B adds sleep/random hooks and extra exports beyond the spec."
+        }
+      },
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "Candidate B has a more comprehensive, deterministic test suite (injected sleep/random, explicit edge cases like invalid retryAfterMs, per-attempt behaviour, no-sleep-before-first-call, and precise assertions) that would catch regressions more reliably than A's smaller, timer-driven tests.",
+          "design_quality": "B",
+          "design_quality_reason": "Candidate B has a clearer, more maintainable design (well-named RetryOptions, dependency injection for sleep/random, single responsibility, and an index re-export) that improves testability and readability compared with A's minimal implementation.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement the retry semantics, exponential backoff with jitter, respect shouldRetry, honor maxAttempts, and use a valid error.retryAfterMs without adding jitter, so they equally satisfy the spec.",
+          "restraint": "A",
+          "restraint_reason": "Candidate A sticks to the minimal required surface and behaviour, while B adds extra API surface (sleep/random option injection and an index file) beyond what the spec requested."
+        }
+      }
+    ]
+  },
+  {
+    "pairId": "retry::AvsB::retry-20260511-154755_vs_retry-20260511-154755",
+    "condX": "A",
+    "condY": "B",
+    "results": {
+      "test_quality": {
+        "verdict": "X",
+        "reasons": [
+          "Condition [[A]]'s tests are more thorough and precise (dependency-injected sleep/random, checks for no pre-call sleep, per-attempt retryAfterMs behaviour, invalid values, and shouldRetry argument), making them better regression guards.",
+          "[A]'s test suite is broader and more thorough — it exercises per-attempt decisioning, invalid retryAfterMs cases, boundaries (no pre-call sleep, no post-final sleep), jitter bounds, and uses injected sleep/random for deterministic checks, so it would catch more regressions.",
+          "Condition [[A]] has a larger, more targeted test suite that covers edge cases (invalid retryAfterMs values, per-attempt behaviour, no-sleep-before-first-call, exact sleep counts) and uses DI to make assertions precise, so it would catch more regressions."
+        ]
+      },
+      "design_quality": {
+        "verdict": "X",
+        "reasons": [
+          "Condition [[A]] separates concerns (injectable sleep/random), has clearer control flow and better testability/abstractions without clutter, making it easier to maintain.",
+          "[A] shows better design: dependency-injected sleep/random with sensible defaults, clearer control flow and error handling, and no reliance on globals, making the code more testable and maintainable.",
+          "Condition [[A]] is better structured for maintainability (clear option destructuring, injected sleep/random for testability, small default helpers and an index export) making the control flow and dependencies explicit."
+        ]
+      },
+      "spec_adherence": {
+        "verdict": "X",
+        "reasons": [
+          "Condition [[A]] more faithfully follows the spec (calls shouldRetry on each rejection, avoids sleeping after the final attempt, and exercises per-attempt retryAfterMs rules in tests); Condition [A] may skip shouldRetry on the final failure.",
+          "Both implementations satisfy the core spec, but [A] more fully validates spec edge cases (fallback for invalid retryAfterMs, per-attempt decisions, no sleep before first call/after final attempt) and implements the retry/backoff/jitter and server delay rules clearly.",
+          "Both implementations correctly implement retries, exponential backoff with jitter, honor shouldRetry, respect maxAttempts, and use error.retryAfterMs when valid, so they equally satisfy the spec."
+        ]
+      },
+      "restraint": {
+        "verdict": "Y",
+        "reasons": [
+          "Condition [A] implements the required behaviour more narrowly with no extra injection points or exports, whereas Condition [[A]] adds optional hooks and an extra index export beyond the spec.",
+          "[[A]] sticks closely to the requested interface and behavior without adding injection points or extra exports, whereas [A] introduces additional options (sleep/random and an index re-export) beyond the spec. ",
+          "Condition [A] sticks closely to the requested interface and behaviour without adding injection hooks or extra exports, whereas Condition [[A]] adds optional sleep/random parameters and a barrel export beyond the spec."
+        ]
+      }
+    },
+    "raw": [
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "Candidate B's tests are more thorough and precise (dependency-injected sleep/random, checks for no pre-call sleep, per-attempt retryAfterMs behaviour, invalid values, and shouldRetry argument), making them better regression guards.",
+          "design_quality": "B",
+          "design_quality_reason": "Candidate B separates concerns (injectable sleep/random), has clearer control flow and better testability/abstractions without clutter, making it easier to maintain.",
+          "spec_adherence": "B",
+          "spec_adherence_reason": "Candidate B more faithfully follows the spec (calls shouldRetry on each rejection, avoids sleeping after the final attempt, and exercises per-attempt retryAfterMs rules in tests); Candidate A may skip shouldRetry on the final failure.",
+          "restraint": "A",
+          "restraint_reason": "Candidate A implements the required behaviour more narrowly with no extra injection points or exports, whereas Candidate B adds optional hooks and an extra index export beyond the spec."
+        }
+      },
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "B's test suite is broader and more thorough — it exercises per-attempt decisioning, invalid retryAfterMs cases, boundaries (no pre-call sleep, no post-final sleep), jitter bounds, and uses injected sleep/random for deterministic checks, so it would catch more regressions.",
+          "design_quality": "B",
+          "design_quality_reason": "B shows better design: dependency-injected sleep/random with sensible defaults, clearer control flow and error handling, and no reliance on globals, making the code more testable and maintainable.",
+          "spec_adherence": "B",
+          "spec_adherence_reason": "Both implementations satisfy the core spec, but B more fully validates spec edge cases (fallback for invalid retryAfterMs, per-attempt decisions, no sleep before first call/after final attempt) and implements the retry/backoff/jitter and server delay rules clearly.",
+          "restraint": "A",
+          "restraint_reason": "A sticks closely to the requested interface and behavior without adding injection points or extra exports, whereas B introduces additional options (sleep/random and an index re-export) beyond the spec. "
+        }
+      },
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "Candidate B has a larger, more targeted test suite that covers edge cases (invalid retryAfterMs values, per-attempt behaviour, no-sleep-before-first-call, exact sleep counts) and uses DI to make assertions precise, so it would catch more regressions.",
+          "design_quality": "B",
+          "design_quality_reason": "Candidate B is better structured for maintainability (clear option destructuring, injected sleep/random for testability, small default helpers and an index export) making the control flow and dependencies explicit.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement retries, exponential backoff with jitter, honor shouldRetry, respect maxAttempts, and use error.retryAfterMs when valid, so they equally satisfy the spec.",
+          "restraint": "A",
+          "restraint_reason": "Candidate A sticks closely to the requested interface and behaviour without adding injection hooks or extra exports, whereas Candidate B adds optional sleep/random parameters and a barrel export beyond the spec."
+        }
+      }
+    ]
+  },
+  {
+    "pairId": "retry::AvsC::retry-20260511-144230_vs_retry-20260511-144230",
+    "condX": "A",
+    "condY": "C",
+    "results": {
+      "test_quality": {
+        "verdict": "Y",
+        "reasons": [
+          "Condition C's tests cover the full spec including the server-supplied retryAfterMs (valid, invalid, zero), exponential backoff with jitter, boundary cases and final-attempt behaviour, whereas [A]'s suite omits explicit tests for retryAfterMs and some edge permutations.",
+          "Condition C's tests more thoroughly exercise the server-provided retryAfterMs behaviour (including edge cases like 0, negative, non-finite and non-numeric values) and assert concrete numeric bounds on delays, while Condition [C] omits those server-delay edge cases.",
+          "Condition C's tests exercise the full spec extension (server-supplied retryAfterMs including many invalid cases and zero), plus backoff/jitter and no-sleep-after-final-attempt checks, giving broader and more targeted regression coverage."
+        ]
+      },
+      "design_quality": {
+        "verdict": "X",
+        "reasons": [
+          "Condition [C] is more modular and clearer (separates computeDelay, extracts retryAfterMs, uses explicit destructuring and an index export), making the control flow and responsibilities easier to maintain.",
+          "Condition [C] has a clearer, more modular design (separating computeDelay, cleaner option destructuring and an indexed export surface), making the control flow and intent easier to read and maintain.",
+          "Condition [C] has clearer structure and naming (separate computeDelay, extractRetryAfterMs, tidy destructured options and an index re-export), making it easier to read and maintain."
+        ]
+      },
+      "spec_adherence": {
+        "verdict": "tie",
+        "reasons": [
+          "Both implementations correctly implement the retry loop, shouldRetry gating, exponential backoff with jitter, per-attempt fallback, and the server-provided retryAfterMs rules, and neither violates the spec.",
+          "Both implementations correctly implement the required retry loop, shouldRetry gating, exponential backoff with jitter, per-attempt handling of retryAfterMs (no jitter when present), and final-error propagation, so neither is measurably more faithful to the spec.",
+          "Both implementations correctly implement retries, shouldRetry gating, per-attempt delay selection, exponential backoff with jitter, and honoring valid retryAfterMs without adding jitter, matching the spec."
+        ]
+      },
+      "restraint": {
+        "verdict": "Y",
+        "reasons": [
+          "Condition C keeps a smaller public surface and only internal helpers, while [A] introduces an extra exported helper (computeDelay) and re-exports, expanding the API beyond the requested retry function.",
+          "Condition C keeps helpers private and only exports the retry function, whereas Condition [C] adds an extra exported utility (computeDelay) and an index re-export, increasing surface area beyond the spec.",
+          "Condition C sticks closer to a minimal public surface (exports only retry, keeps helpers internal) while still allowing test injection, whereas [A] exposes an extra computeDelay export and an index re-export beyond the core spec."
+        ]
+      }
+    },
+    "raw": [
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "Candidate A's tests cover the full spec including the server-supplied retryAfterMs (valid, invalid, zero), exponential backoff with jitter, boundary cases and final-attempt behaviour, whereas B's suite omits explicit tests for retryAfterMs and some edge permutations.",
+          "design_quality": "B",
+          "design_quality_reason": "Candidate B is more modular and clearer (separates computeDelay, extracts retryAfterMs, uses explicit destructuring and an index export), making the control flow and responsibilities easier to maintain.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement the retry loop, shouldRetry gating, exponential backoff with jitter, per-attempt fallback, and the server-provided retryAfterMs rules, and neither violates the spec.",
+          "restraint": "A",
+          "restraint_reason": "Candidate A keeps a smaller public surface and only internal helpers, while B introduces an extra exported helper (computeDelay) and re-exports, expanding the API beyond the requested retry function."
+        }
+      },
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "Candidate A's tests more thoroughly exercise the server-provided retryAfterMs behaviour (including edge cases like 0, negative, non-finite and non-numeric values) and assert concrete numeric bounds on delays, while Candidate B omits those server-delay edge cases.",
+          "design_quality": "B",
+          "design_quality_reason": "Candidate B has a clearer, more modular design (separating computeDelay, cleaner option destructuring and an indexed export surface), making the control flow and intent easier to read and maintain.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement the required retry loop, shouldRetry gating, exponential backoff with jitter, per-attempt handling of retryAfterMs (no jitter when present), and final-error propagation, so neither is measurably more faithful to the spec.",
+          "restraint": "A",
+          "restraint_reason": "Candidate A keeps helpers private and only exports the retry function, whereas Candidate B adds an extra exported utility (computeDelay) and an index re-export, increasing surface area beyond the spec."
+        }
+      },
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "Candidate A's tests exercise the full spec extension (server-supplied retryAfterMs including many invalid cases and zero), plus backoff/jitter and no-sleep-after-final-attempt checks, giving broader and more targeted regression coverage.",
+          "design_quality": "B",
+          "design_quality_reason": "Candidate B has clearer structure and naming (separate computeDelay, extractRetryAfterMs, tidy destructured options and an index re-export), making it easier to read and maintain.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement retries, shouldRetry gating, per-attempt delay selection, exponential backoff with jitter, and honoring valid retryAfterMs without adding jitter, matching the spec.",
+          "restraint": "A",
+          "restraint_reason": "Candidate A sticks closer to a minimal public surface (exports only retry, keeps helpers internal) while still allowing test injection, whereas B exposes an extra computeDelay export and an index re-export beyond the core spec."
+        }
+      }
+    ]
+  },
+  {
+    "pairId": "retry::AvsC::retry-20260511-144230_vs_retry-20260511-152535",
+    "condX": "A",
+    "condY": "C",
+    "results": {
+      "test_quality": {
+        "verdict": "X",
+        "reasons": [
+          "Condition [C] has a broader, more precise test suite (checks call counts, shouldRetry receives the error, no-sleep-on-success, computeDelay unit tests, deterministic jitter checks) while [C]'s tests cover core flows but are narrower.",
+          "Condition [A]'s tests are more thorough and targeted (unit tests for computeDelay, explicit shouldRetry call assertion, injection of sleep/random for deterministic checks) and would catch regressions more reliably than [C]'s broader but less-specific suite.",
+          "Condition C's tests explicitly cover the server-supplied retry delay and verify concrete timing behaviour with setTimeout mocks, giving stronger end-to-end regression coverage for the full spec extension."
+        ]
+      },
+      "design_quality": {
+        "verdict": "X",
+        "reasons": [
+          "Condition [C] is better structured and more maintainable — clear function decomposition, dependency-injection for sleep/random, and explicit exports improve readability and testability.",
+          "Condition [A] has clearer separation of concerns, better abstractions and testability (injectable sleep/random, exported computeDelay, small helper for retryAfter), making it easier to read and maintain than [C]'s more tightly-coupled implementation.",
+          "Condition [A] is better structured and more testable (injectable sleep/random, exported computeDelay, small helper for retryAfter extraction) which improves readability and maintainability."
+        ]
+      },
+      "spec_adherence": {
+        "verdict": "X",
+        "reasons": [
+          "[A] faithfully follows the spec (including calling shouldRetry on each rejection and honoring server-supplied retryAfterMs), whereas [C] fails to call shouldRetry on the final failed attempt before propagating the error.",
+          "Condition [A] calls shouldRetry on each rejection and respects server-supplied retryAfterMs per attempt as required; Condition C fails to call shouldRetry on the final attempt (checking maxAttempts first), which diverges from the spec.",
+          "Condition [A] more faithfully follows the spec (it always calls shouldRetry on errors and respects server-supplied retryAfterMs without adding jitter), whereas [C] skips calling shouldRetry on the final attempt. "
+        ]
+      },
+      "restraint": {
+        "verdict": "Y",
+        "reasons": [
+          "Condition C is more restrained and implements only the required surface, while [A] adds extras (sleep/random options and extra exports) beyond the spec. ",
+          "Condition C sticks closer to the minimal spec without adding test hooks or extra exports, whereas [A] adds optional sleep/random parameters and extra exports beyond the strict requirements.",
+          "Condition C sticks closely to the requested interface and behaviour without adding testing hooks or extra exports, while [A] introduced additional injection points and exported helpers beyond the minimal spec."
+        ]
+      }
+    },
+    "raw": [
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "Candidate B has a broader, more precise test suite (checks call counts, shouldRetry receives the error, no-sleep-on-success, computeDelay unit tests, deterministic jitter checks) while A's tests cover core flows but are narrower.",
+          "design_quality": "B",
+          "design_quality_reason": "Candidate B is better structured and more maintainable — clear function decomposition, dependency-injection for sleep/random, and explicit exports improve readability and testability.",
+          "spec_adherence": "B",
+          "spec_adherence_reason": "B faithfully follows the spec (including calling shouldRetry on each rejection and honoring server-supplied retryAfterMs), whereas A fails to call shouldRetry on the final failed attempt before propagating the error.",
+          "restraint": "A",
+          "restraint_reason": "Candidate A is more restrained and implements only the required surface, while B adds extras (sleep/random options and extra exports) beyond the spec. "
+        }
+      },
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "Candidate A's tests are more thorough and targeted (unit tests for computeDelay, explicit shouldRetry call assertion, injection of sleep/random for deterministic checks) and would catch regressions more reliably than B's broader but less-specific suite.",
+          "design_quality": "A",
+          "design_quality_reason": "Candidate A has clearer separation of concerns, better abstractions and testability (injectable sleep/random, exported computeDelay, small helper for retryAfter), making it easier to read and maintain than B's more tightly-coupled implementation.",
+          "spec_adherence": "A",
+          "spec_adherence_reason": "Candidate A calls shouldRetry on each rejection and respects server-supplied retryAfterMs per attempt as required; Candidate B fails to call shouldRetry on the final attempt (checking maxAttempts first), which diverges from the spec.",
+          "restraint": "B",
+          "restraint_reason": "Candidate B sticks closer to the minimal spec without adding test hooks or extra exports, whereas A adds optional sleep/random parameters and extra exports beyond the strict requirements."
+        }
+      },
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "Candidate B's tests explicitly cover the server-supplied retry delay and verify concrete timing behaviour with setTimeout mocks, giving stronger end-to-end regression coverage for the full spec extension.",
+          "design_quality": "A",
+          "design_quality_reason": "Candidate A is better structured and more testable (injectable sleep/random, exported computeDelay, small helper for retryAfter extraction) which improves readability and maintainability.",
+          "spec_adherence": "A",
+          "spec_adherence_reason": "Candidate A more faithfully follows the spec (it always calls shouldRetry on errors and respects server-supplied retryAfterMs without adding jitter), whereas B skips calling shouldRetry on the final attempt. ",
+          "restraint": "B",
+          "restraint_reason": "Candidate B sticks closely to the requested interface and behaviour without adding testing hooks or extra exports, while A introduced additional injection points and exported helpers beyond the minimal spec."
+        }
+      }
+    ]
+  },
+  {
+    "pairId": "retry::AvsC::retry-20260511-144230_vs_retry-20260511-154755",
+    "condX": "A",
+    "condY": "C",
+    "results": {
+      "test_quality": {
+        "verdict": "X",
+        "reasons": [
+          "[A]'s tests are more granular and deterministic (injecting sleep/random), cover more edge assertions (shouldRetry receives the error, no sleep on success, exact call counts, computeDelay unit tests) making them better regression guards.",
+          "Condition [C]'s tests are more granular and deterministic (injecting sleep/random), cover finer behaviours (shouldRetry called with the original error, exact attempt counts, no-sleep-on-success, computeDelay unit tests) and would catch regressions more reliably than [C]'s timer-dependent suite.",
+          "Condition C's tests exercise the server-provided retryAfterMs behaviour (including invalid values), use fake timers to assert actual delays and jitter, and therefore give stronger regression coverage of the spec extension that Condition [C]'s suite omits."
+        ]
+      },
+      "design_quality": {
+        "verdict": "X",
+        "reasons": [
+          "[A] has a clearer, more maintainable structure (injections for sleep/random, exported computeDelay, small helper extraction, explicit option defaults and an index export) that aids readability and testability.",
+          "Condition [C] is better structured for maintainability and testability — it injects sleep/random for isolation, separates computeDelay, uses a clear for-loop and small helper, and cleanly organizes exports.",
+          "Condition [C] has a clearer, more maintainable design (explicit for-loop, exported computeDelay, and dependency injection for sleep/random that improves testability and separation of concerns)."
+        ]
+      },
+      "spec_adherence": {
+        "verdict": "X",
+        "reasons": [
+          "[A] more faithfully follows the spec semantics (e.g., always passes the thrown error to shouldRetry and cleanly handles server-supplied retryAfterMs) while [C] skips calling shouldRetry on the final attempt.",
+          "Both implementations correctly implement the retry semantics (maxAttempts, shouldRetry gating, exponential backoff with jitter, and server-provided retryAfterMs taking precedence with no extra jitter) and handle the described boundary cases.",
+          "Condition [C] more faithfully follows the spec semantics (it invokes shouldRetry on each rejection and then decides whether to retry, and correctly applies per-attempt server delays), while [C] skips calling shouldRetry when the attempt count already equals maxAttempts. "
+        ]
+      },
+      "restraint": {
+        "verdict": "Y",
+        "reasons": [
+          "[C] implements the required behaviour minimally without adding optional hooks or extra exports, whereas [A] introduces additional API surface (sleep/random injection and re-exports) beyond the spec.",
+          "Condition C sticks closely to the spec with no extra options or exported helpers, whereas [A] introduces additional injectable options and an extra export surface beyond what was requested.",
+          "Condition C implements just the required surface (no injected hooks or extra exports), whereas Condition [C] added optional sleep/random parameters and an index re-export that go beyond the spec. "
+        ]
+      }
+    },
+    "raw": [
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "B's tests are more granular and deterministic (injecting sleep/random), cover more edge assertions (shouldRetry receives the error, no sleep on success, exact call counts, computeDelay unit tests) making them better regression guards.",
+          "design_quality": "B",
+          "design_quality_reason": "B has a clearer, more maintainable structure (injections for sleep/random, exported computeDelay, small helper extraction, explicit option defaults and an index export) that aids readability and testability.",
+          "spec_adherence": "B",
+          "spec_adherence_reason": "B more faithfully follows the spec semantics (e.g., always passes the thrown error to shouldRetry and cleanly handles server-supplied retryAfterMs) while A skips calling shouldRetry on the final attempt.",
+          "restraint": "A",
+          "restraint_reason": "A implements the required behaviour minimally without adding optional hooks or extra exports, whereas B introduces additional API surface (sleep/random injection and re-exports) beyond the spec."
+        }
+      },
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "Candidate B's tests are more granular and deterministic (injecting sleep/random), cover finer behaviours (shouldRetry called with the original error, exact attempt counts, no-sleep-on-success, computeDelay unit tests) and would catch regressions more reliably than A's timer-dependent suite.",
+          "design_quality": "B",
+          "design_quality_reason": "Candidate B is better structured for maintainability and testability — it injects sleep/random for isolation, separates computeDelay, uses a clear for-loop and small helper, and cleanly organizes exports.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement the retry semantics (maxAttempts, shouldRetry gating, exponential backoff with jitter, and server-provided retryAfterMs taking precedence with no extra jitter) and handle the described boundary cases.",
+          "restraint": "A",
+          "restraint_reason": "Candidate A sticks closely to the spec with no extra options or exported helpers, whereas B introduces additional injectable options and an extra export surface beyond what was requested."
+        }
+      },
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "Candidate A's tests exercise the server-provided retryAfterMs behaviour (including invalid values), use fake timers to assert actual delays and jitter, and therefore give stronger regression coverage of the spec extension that Candidate B's suite omits.",
+          "design_quality": "B",
+          "design_quality_reason": "Candidate B has a clearer, more maintainable design (explicit for-loop, exported computeDelay, and dependency injection for sleep/random that improves testability and separation of concerns).",
+          "spec_adherence": "B",
+          "spec_adherence_reason": "Candidate B more faithfully follows the spec semantics (it invokes shouldRetry on each rejection and then decides whether to retry, and correctly applies per-attempt server delays), while A skips calling shouldRetry when the attempt count already equals maxAttempts. ",
+          "restraint": "A",
+          "restraint_reason": "Candidate A implements just the required surface (no injected hooks or extra exports), whereas Candidate B added optional sleep/random parameters and an index re-export that go beyond the spec. "
+        }
+      }
+    ]
+  },
+  {
+    "pairId": "retry::AvsC::retry-20260511-152535_vs_retry-20260511-144230",
+    "condX": "A",
+    "condY": "C",
+    "results": {
+      "test_quality": {
+        "verdict": "X",
+        "reasons": [
+          "Condition [A] has a much more exhaustive, explicit test suite (exact jitter values, many invalid retryAfterMs cases, per-attempt behaviour, shouldRetry invocation) that would catch more regressions than [C]'s looser/range-based tests.",
+          "Condition [C] has a broader and more precise test suite (explicit jitter math, per-attempt retryAfterMs checks, invalid-value matrix, shouldRetry call assertion and more granular assertions) that would catch more regressions.",
+          "Condition [A] has a larger, more granular test suite that checks exact jitter extremes, per-attempt retryAfterMs behavior, invalid retryAfterMs values, and that the thrown error is passed to shouldRetry, making it more likely to catch regressions."
+        ]
+      },
+      "design_quality": {
+        "verdict": "X",
+        "reasons": [
+          "Condition [A] is slightly better structured and readable (clear helper for retryAfterMs, explicit option destructuring, type exports and an index re-export) making it easier to maintain.",
+          "Condition [C] has clearer structure and naming (destructured options, explicit jitter formula, separate getRetryAfterMs) and slightly cleaner control flow making it easier to read and maintain.",
+          "Condition [A]'s implementation is slightly more explicit and modular (clear helper for retryAfterMs, explicit defaults, and an index export), yielding clearer separation of concerns and readability for maintainers."
+        ]
+      },
+      "spec_adherence": {
+        "verdict": "tie",
+        "reasons": [
+          "Both implementations faithfully implement the core spec and the retryAfterMs extension (per-attempt server delay, fallback to exponential backoff with jitter, shouldRetry gating and maxAttempts behaviour).",
+          "Both implementations correctly implement retries, shouldRetry gating, exponential backoff with jitter, server-supplied retryAfterMs (no extra jitter), and honor maxAttempts, so neither is more faithful to the spec.",
+          "Both implementations correctly implement the required retry semantics (maxAttempts, shouldRetry gating, exponential backoff with jitter, per-attempt server-supplied retryAfterMs without added jitter) with no substantive deviations from the spec."
+        ]
+      },
+      "restraint": {
+        "verdict": "Y",
+        "reasons": [
+          "Condition C is leaner and avoids extra surface area (no top-level re-export file and slightly less auxiliary plumbing) so it stays closer to the spec's surface. ",
+          "Both add test hooks (sleep/random) not requested by the spec, but Condition C introduces less extra surface (no re-export/index file) and otherwise stays closer to the minimal required interface.",
+          "Condition C is a bit slimmer and avoids the small extra surface (an index export) present in [A] while still providing the necessary testing hooks, showing slightly tighter scope control."
+        ]
+      }
+    },
+    "raw": [
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "Candidate A has a much more exhaustive, explicit test suite (exact jitter values, many invalid retryAfterMs cases, per-attempt behaviour, shouldRetry invocation) that would catch more regressions than B's looser/range-based tests.",
+          "design_quality": "A",
+          "design_quality_reason": "Candidate A is slightly better structured and readable (clear helper for retryAfterMs, explicit option destructuring, type exports and an index re-export) making it easier to maintain.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations faithfully implement the core spec and the retryAfterMs extension (per-attempt server delay, fallback to exponential backoff with jitter, shouldRetry gating and maxAttempts behaviour).",
+          "restraint": "B",
+          "restraint_reason": "Candidate B is leaner and avoids extra surface area (no top-level re-export file and slightly less auxiliary plumbing) so it stays closer to the spec's surface. "
+        }
+      },
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "Candidate B has a broader and more precise test suite (explicit jitter math, per-attempt retryAfterMs checks, invalid-value matrix, shouldRetry call assertion and more granular assertions) that would catch more regressions.",
+          "design_quality": "B",
+          "design_quality_reason": "Candidate B has clearer structure and naming (destructured options, explicit jitter formula, separate getRetryAfterMs) and slightly cleaner control flow making it easier to read and maintain.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement retries, shouldRetry gating, exponential backoff with jitter, server-supplied retryAfterMs (no extra jitter), and honor maxAttempts, so neither is more faithful to the spec.",
+          "restraint": "A",
+          "restraint_reason": "Both add test hooks (sleep/random) not requested by the spec, but Candidate A introduces less extra surface (no re-export/index file) and otherwise stays closer to the minimal required interface."
+        }
+      },
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "Candidate A has a larger, more granular test suite that checks exact jitter extremes, per-attempt retryAfterMs behavior, invalid retryAfterMs values, and that the thrown error is passed to shouldRetry, making it more likely to catch regressions.",
+          "design_quality": "A",
+          "design_quality_reason": "Candidate A's implementation is slightly more explicit and modular (clear helper for retryAfterMs, explicit defaults, and an index export), yielding clearer separation of concerns and readability for maintainers.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement the required retry semantics (maxAttempts, shouldRetry gating, exponential backoff with jitter, per-attempt server-supplied retryAfterMs without added jitter) with no substantive deviations from the spec.",
+          "restraint": "B",
+          "restraint_reason": "Candidate B is a bit slimmer and avoids the small extra surface (an index export) present in A while still providing the necessary testing hooks, showing slightly tighter scope control."
+        }
+      }
+    ]
+  },
+  {
+    "pairId": "retry::AvsC::retry-20260511-152535_vs_retry-20260511-152535",
+    "condX": "A",
+    "condY": "C",
+    "results": {
+      "test_quality": {
+        "verdict": "X",
+        "reasons": [
+          "Condition [C]'s test suite is more thorough and targeted — it covers many edge cases (invalid retryAfterMs values, zero, per-attempt behavior, that shouldRetry receives the error, no sleep after final attempt) and uses deterministic injection to make assertions robust.",
+          "Condition [C] has a much more thorough, deterministic test suite (injectable sleep/random) that covers many edge cases (invalid retryAfterMs, zero, per-attempt behaviour) and would catch regressions more reliably than [C]'s smaller and partly non-deterministic tests.",
+          "[A]'s tests are far more comprehensive and deterministic (injecting sleep/random, checking exact delays, many edge cases including invalid retryAfterMs, per-attempt behaviour and shouldRetry calls), giving a much stronger regression net than [C]'s smaller test set."
+        ]
+      },
+      "design_quality": {
+        "verdict": "X",
+        "reasons": [
+          "Condition [C] has clearer modular design and testability (injectable sleep and random, small helper functions, explicit defaults) making the code easier to maintain and reason about.",
+          "Condition [C] is better structured and more maintainable: it cleanly injects dependencies (sleep/random), has small helper functions, clearer control flow and an index export, which aids readability and testing.",
+          "[A] is better structured for maintainability — it cleanly injects dependencies (sleep/random) for testability, exports types and an index, and has clearer separation of concerns compared with [C]'s reliance on globals and tighter coupling."
+        ]
+      },
+      "spec_adherence": {
+        "verdict": "X",
+        "reasons": [
+          "Condition [C] more faithfully follows the spec (it always calls shouldRetry with the thrown error, correctly handles per-attempt server-supplied retryAfterMs and fallbacks, and avoids sleeping after the final attempt).",
+          "Both implementations meet the spec, but [A] exercises and implements the extension more completely (valid/invalid retryAfterMs, zero, per-attempt decisions) and handles delays deterministically when tested.",
+          "Both implementations correctly implement retries, shouldRetry gating, exponential backoff with jitter, server-supplied retryAfterMs (no extra jitter), and maxAttempts semantics, so neither clearly violates the spec."
+        ]
+      },
+      "restraint": {
+        "verdict": "Y",
+        "reasons": [
+          "Condition C sticks closely to the requested interface and behavior without adding extras like injectable sleep/random options or an additional index export file.",
+          "Condition C sticks to the minimal required API and implementation without adding testing hooks or extra options (sleep/random/index), so it stays closer to the spec with less scope creep.",
+          "[C] sticks closely to the requested API and behavior without adding extra options or exports, whereas [A] adds dependency-injection knobs and an index export beyond what the spec required."
+        ]
+      }
+    },
+    "raw": [
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "Candidate B's test suite is more thorough and targeted — it covers many edge cases (invalid retryAfterMs values, zero, per-attempt behavior, that shouldRetry receives the error, no sleep after final attempt) and uses deterministic injection to make assertions robust.",
+          "design_quality": "B",
+          "design_quality_reason": "Candidate B has clearer modular design and testability (injectable sleep and random, small helper functions, explicit defaults) making the code easier to maintain and reason about.",
+          "spec_adherence": "B",
+          "spec_adherence_reason": "Candidate B more faithfully follows the spec (it always calls shouldRetry with the thrown error, correctly handles per-attempt server-supplied retryAfterMs and fallbacks, and avoids sleeping after the final attempt).",
+          "restraint": "A",
+          "restraint_reason": "Candidate A sticks closely to the requested interface and behavior without adding extras like injectable sleep/random options or an additional index export file."
+        }
+      },
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "Candidate B has a much more thorough, deterministic test suite (injectable sleep/random) that covers many edge cases (invalid retryAfterMs, zero, per-attempt behaviour) and would catch regressions more reliably than A's smaller and partly non-deterministic tests.",
+          "design_quality": "B",
+          "design_quality_reason": "Candidate B is better structured and more maintainable: it cleanly injects dependencies (sleep/random), has small helper functions, clearer control flow and an index export, which aids readability and testing.",
+          "spec_adherence": "B",
+          "spec_adherence_reason": "Both implementations meet the spec, but B exercises and implements the extension more completely (valid/invalid retryAfterMs, zero, per-attempt decisions) and handles delays deterministically when tested.",
+          "restraint": "A",
+          "restraint_reason": "Candidate A sticks to the minimal required API and implementation without adding testing hooks or extra options (sleep/random/index), so it stays closer to the spec with less scope creep."
+        }
+      },
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "B's tests are far more comprehensive and deterministic (injecting sleep/random, checking exact delays, many edge cases including invalid retryAfterMs, per-attempt behaviour and shouldRetry calls), giving a much stronger regression net than A's smaller test set.",
+          "design_quality": "B",
+          "design_quality_reason": "B is better structured for maintainability — it cleanly injects dependencies (sleep/random) for testability, exports types and an index, and has clearer separation of concerns compared with A's reliance on globals and tighter coupling.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement retries, shouldRetry gating, exponential backoff with jitter, server-supplied retryAfterMs (no extra jitter), and maxAttempts semantics, so neither clearly violates the spec.",
+          "restraint": "A",
+          "restraint_reason": "A sticks closely to the requested API and behavior without adding extra options or exports, whereas B adds dependency-injection knobs and an index export beyond what the spec required."
+        }
+      }
+    ]
+  },
+  {
+    "pairId": "retry::AvsC::retry-20260511-152535_vs_retry-20260511-154755",
+    "condX": "A",
+    "condY": "C",
+    "results": {
+      "test_quality": {
+        "verdict": "X",
+        "reasons": [
+          "Condition [A]'s tests are broader and more granular (explicit delay arrays, per-attempt retryAfterMs checks, zero-delay, final-attempt no-sleep, and shouldRetry invocation) and would catch more regressions than [C]'s good but slightly narrower timer-based suite.",
+          "Condition [A] has a broader, more precise test suite (exact delay checks, invalid retryAfter values, per-attempt behaviour, shouldRetry call, zero retryAfter, no-final-sleep) that would catch more regressions than [C]'s narrower tests.",
+          "Condition [C]'s test suite is broader and more diagnostic — it injects sleep/random for precise assertions, covers many invalid retryAfterMs values, zero delay, per-attempt decisions, and verifies shouldRetry is called, so it would catch more regressions."
+        ]
+      },
+      "design_quality": {
+        "verdict": "X",
+        "reasons": [
+          "Condition [A]'s implementation is slightly more maintainable and testable (clear control flow, small helpers, and injectable sleep/random for deterministic testing) while remaining simple and readable.",
+          "Condition [A] is better organized and more maintainable (clear helpers, explicit RetryOptions, injectable sleep/random for testability, and an index export) while keeping control flow straightforward.",
+          "Condition [C] is better structured for maintainability (clear separation, dependency injection for sleep/random, explicit defaults and exported types/files), making it easier to read, test, and extend."
+        ]
+      },
+      "spec_adherence": {
+        "verdict": "tie",
+        "reasons": [
+          "Both implementations correctly implement retries, shouldRetry gating, exponential backoff with jitter, server-supplied retryAfterMs handling, and final-error propagation as required by the spec and extension.",
+          "Condition [A] follows the spec closely (always calls shouldRetry and respects server-supplied retryAfterMs without jitter); Condition C fails to call shouldRetry on the final failing attempt because it checks attempt >= maxAttempts before invoking shouldRetry.",
+          "Both implementations correctly implement retries, exponential backoff with jitter, honor server-provided retryAfterMs (without extra jitter), consult shouldRetry, and stop after maxAttempts as the spec requires."
+        ]
+      },
+      "restraint": {
+        "verdict": "Y",
+        "reasons": [
+          "Condition C sticks closely to the spec surface (only the requested options) while Condition [A] adds extra injectable options (sleep/random) and exports beyond the minimal interface, increasing surface area beyond the spec.",
+          "Condition C sticks to the minimal API and implementation required by the spec (no extra injectable hooks or extra exports), whereas [A] adds optional sleep/random injection and an index export beyond the asked-for surface.",
+          "Condition C sticks closely to the requested API and behavior, while Condition [C] adds optional sleep/random injection and an index export beyond the spec, so [C] shows more restraint."
+        ]
+      }
+    },
+    "raw": [
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "Candidate A's tests are broader and more granular (explicit delay arrays, per-attempt retryAfterMs checks, zero-delay, final-attempt no-sleep, and shouldRetry invocation) and would catch more regressions than B's good but slightly narrower timer-based suite.",
+          "design_quality": "A",
+          "design_quality_reason": "Candidate A's implementation is slightly more maintainable and testable (clear control flow, small helpers, and injectable sleep/random for deterministic testing) while remaining simple and readable.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement retries, shouldRetry gating, exponential backoff with jitter, server-supplied retryAfterMs handling, and final-error propagation as required by the spec and extension.",
+          "restraint": "B",
+          "restraint_reason": "Candidate B sticks closely to the spec surface (only the requested options) while Candidate A adds extra injectable options (sleep/random) and exports beyond the minimal interface, increasing surface area beyond the spec."
+        }
+      },
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "Candidate A has a broader, more precise test suite (exact delay checks, invalid retryAfter values, per-attempt behaviour, shouldRetry call, zero retryAfter, no-final-sleep) that would catch more regressions than B's narrower tests.",
+          "design_quality": "A",
+          "design_quality_reason": "Candidate A is better organized and more maintainable (clear helpers, explicit RetryOptions, injectable sleep/random for testability, and an index export) while keeping control flow straightforward.",
+          "spec_adherence": "A",
+          "spec_adherence_reason": "Candidate A follows the spec closely (always calls shouldRetry and respects server-supplied retryAfterMs without jitter); Candidate B fails to call shouldRetry on the final failing attempt because it checks attempt >= maxAttempts before invoking shouldRetry.",
+          "restraint": "B",
+          "restraint_reason": "Candidate B sticks to the minimal API and implementation required by the spec (no extra injectable hooks or extra exports), whereas A adds optional sleep/random injection and an index export beyond the asked-for surface."
+        }
+      },
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "Candidate B's test suite is broader and more diagnostic — it injects sleep/random for precise assertions, covers many invalid retryAfterMs values, zero delay, per-attempt decisions, and verifies shouldRetry is called, so it would catch more regressions.",
+          "design_quality": "B",
+          "design_quality_reason": "Candidate B is better structured for maintainability (clear separation, dependency injection for sleep/random, explicit defaults and exported types/files), making it easier to read, test, and extend.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement retries, exponential backoff with jitter, honor server-provided retryAfterMs (without extra jitter), consult shouldRetry, and stop after maxAttempts as the spec requires.",
+          "restraint": "A",
+          "restraint_reason": "Candidate A sticks closely to the requested API and behavior, while Candidate B adds optional sleep/random injection and an index export beyond the spec, so A shows more restraint."
+        }
+      }
+    ]
+  },
+  {
+    "pairId": "retry::AvsC::retry-20260511-154755_vs_retry-20260511-144230",
+    "condX": "A",
+    "condY": "C",
+    "results": {
+      "test_quality": {
+        "verdict": "X",
+        "reasons": [
+          "Condition [A]'s test suite is noticeably larger and more diagnostic—covering no-delay-before-first-call, jitter differences, bounded jitter windows, shouldRetry call behaviour, and many invalid retryAfterMs cases—whereas [C]'s tests are narrower though correct.",
+          "Condition [A] provides a broader, more diagnostic test suite (checks jitter behavior and bounds, per‑attempt retryAfterMs handling, that sleep isn’t called before first call, shouldRetry is invoked, and many invalid cases), so it would catch more regressions.",
+          "Condition [C]'s test suite is more comprehensive and targeted — it checks pre-call behaviour, per-attempt decisions, jitter variance and bounds, and that shouldRetry is called, making it more likely to catch regressions."
+        ]
+      },
+      "design_quality": {
+        "verdict": "Y",
+        "reasons": [
+          "Condition C's implementation is slightly cleaner and easier to follow (explicit for-loop, small well-named helper readRetryAfterMs, and straightforward control flow) compared with [A]'s catch/increment/while loop and inline logic.",
+          "Condition C’s implementation is simpler and easier to follow (clear for-loop, a small helper to validate server delay, fewer local state variables and branches), making it easier to maintain.",
+          "Condition [C]'s implementation is slightly clearer and better organized (destructured options, explicit control flow, and readable per-attempt logic), making it easier for a maintainer to understand and modify."
+        ]
+      },
+      "spec_adherence": {
+        "verdict": "tie",
+        "reasons": [
+          "Both implementations meet the spec, but [C] more explicitly and robustly handles retryAfterMs parsing and uses a clearer attempt/indexing scheme that reduces off-by-one subtlety.",
+          "Both implementations correctly implement the required retry loop, shouldRetry gating, exponential backoff with jitter, per‑attempt server-supplied retryAfterMs (no extra jitter), and stop after maxAttempts, so neither better matches the spec.",
+          "Both implementations correctly implement retries, exponential backoff with jitter, server-supplied retryAfterMs (without jitter), shouldRetry gating, and no final sleep, so they equally satisfy the spec."
+        ]
+      },
+      "restraint": {
+        "verdict": "Y",
+        "reasons": [
+          "Condition C stays closer to the minimal required surface (concise helper and loop) while [A] introduces extra re-exports and slightly more opinionated jitter logic beyond the spec's needs.",
+          "Condition C stays more minimal and focused (no extra index export and no extraneous state/branches), while [A] adds minor extras like an index wrapper and extra local state not required by the spec.",
+          "Both added small, reasonable testing hooks (sleep/random) beyond the minimal spec and made only minor, sensible extras ([C]: helper, [A]: index re-export) without substantial scope creep."
+        ]
+      }
+    },
+    "raw": [
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "Candidate A's test suite is noticeably larger and more diagnostic—covering no-delay-before-first-call, jitter differences, bounded jitter windows, shouldRetry call behaviour, and many invalid retryAfterMs cases—whereas B's tests are narrower though correct.",
+          "design_quality": "B",
+          "design_quality_reason": "Candidate B's implementation is slightly cleaner and easier to follow (explicit for-loop, small well-named helper readRetryAfterMs, and straightforward control flow) compared with A's catch/increment/while loop and inline logic.",
+          "spec_adherence": "B",
+          "spec_adherence_reason": "Both implementations meet the spec, but B more explicitly and robustly handles retryAfterMs parsing and uses a clearer attempt/indexing scheme that reduces off-by-one subtlety.",
+          "restraint": "B",
+          "restraint_reason": "Candidate B stays closer to the minimal required surface (concise helper and loop) while A introduces extra re-exports and slightly more opinionated jitter logic beyond the spec's needs."
+        }
+      },
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "Candidate A provides a broader, more diagnostic test suite (checks jitter behavior and bounds, per‑attempt retryAfterMs handling, that sleep isn’t called before first call, shouldRetry is invoked, and many invalid cases), so it would catch more regressions.",
+          "design_quality": "B",
+          "design_quality_reason": "Candidate B’s implementation is simpler and easier to follow (clear for-loop, a small helper to validate server delay, fewer local state variables and branches), making it easier to maintain.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement the required retry loop, shouldRetry gating, exponential backoff with jitter, per‑attempt server-supplied retryAfterMs (no extra jitter), and stop after maxAttempts, so neither better matches the spec.",
+          "restraint": "B",
+          "restraint_reason": "Candidate B stays more minimal and focused (no extra index export and no extraneous state/branches), while A adds minor extras like an index wrapper and extra local state not required by the spec."
+        }
+      },
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "Candidate B's test suite is more comprehensive and targeted — it checks pre-call behaviour, per-attempt decisions, jitter variance and bounds, and that shouldRetry is called, making it more likely to catch regressions.",
+          "design_quality": "B",
+          "design_quality_reason": "Candidate B's implementation is slightly clearer and better organized (destructured options, explicit control flow, and readable per-attempt logic), making it easier for a maintainer to understand and modify.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement retries, exponential backoff with jitter, server-supplied retryAfterMs (without jitter), shouldRetry gating, and no final sleep, so they equally satisfy the spec.",
+          "restraint": "tie",
+          "restraint_reason": "Both added small, reasonable testing hooks (sleep/random) beyond the minimal spec and made only minor, sensible extras (A: helper, B: index re-export) without substantial scope creep."
+        }
+      }
+    ]
+  },
+  {
+    "pairId": "retry::AvsC::retry-20260511-154755_vs_retry-20260511-152535",
+    "condX": "A",
+    "condY": "C",
+    "results": {
+      "test_quality": {
+        "verdict": "X",
+        "reasons": [
+          "[A]'s test suite is much more comprehensive and deterministic (injected sleep/random), covering many edge cases (no-sleep-before-first-call, final-attempt behaviour, invalid retryAfterMs, per-attempt decisions, shouldRetry invocation) that [C]'s narrower, partly non-deterministic tests do not.",
+          "[A]'s tests are more thorough and deterministic (injecting sleep/random), cover more edge cases (no pre-call sleep, invalid retryAfterMs, per-attempt behavior, shouldRetry invocation) and make fewer timing assumptions than [C]'s suite.",
+          "Condition [A] has a broader, more deterministic and precise test suite (injection of sleep/random, many edge cases including invalid retryAfterMs values, per-attempt behaviour, sleep-count checks), making it a stronger regression net."
+        ]
+      },
+      "design_quality": {
+        "verdict": "X",
+        "reasons": [
+          "[A] has a clearer, more testable design (injected sleep/random, small well-named variables, explicit exports) that makes the code easier to maintain and reason about than [C]'s minimal but less test-friendly structure.",
+          "[A] has clearer structure and better separation of concerns (injectable sleep and random for testability, explicit defaults, small well-named locals and exports) making it easier for a maintainer to reason about and test.",
+          "Condition C's implementation is slimmer and better separated into small helper functions with a clear control flow and no test-only hooks bled into the public API, making it easier to maintain."
+        ]
+      },
+      "spec_adherence": {
+        "verdict": "tie",
+        "reasons": [
+          "Both implementations correctly implement the retry loop, shouldRetry gating, exponential backoff with jitter, and honor a valid error.retryAfterMs without applying jitter, satisfying the spec.",
+          "Both implementations correctly implement retries, shouldRetry gating, exponential backoff with jitter, honoring server-provided retryAfterMs (no jitter) and proper final-error propagation, matching the spec.",
+          "Both implementations satisfy the functional requirements, but Condition C follows the specified interface more exactly and implements the retry/backoff and server-supplied delay cleanly without adding extra public options."
+        ]
+      },
+      "restraint": {
+        "verdict": "Y",
+        "reasons": [
+          "[C] sticks closely to the requested API and behavior while [A] adds extra options (sleep/random and an index export) beyond the spec, increasing surface area despite improving testability.",
+          "[C] sticks closely to the spec with a minimal API and no extra injection points or re-exports, whereas [A] adds optional sleep/random hooks and an extra index export beyond the requested interface.",
+          "Condition C sticks closely to the requested API and behaviour, while Condition [A] introduces extra optional hooks (sleep/random) and an additional export file beyond the spec's minimal requirements."
+        ]
+      }
+    },
+    "raw": [
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "B's test suite is much more comprehensive and deterministic (injected sleep/random), covering many edge cases (no-sleep-before-first-call, final-attempt behaviour, invalid retryAfterMs, per-attempt decisions, shouldRetry invocation) that A's narrower, partly non-deterministic tests do not.",
+          "design_quality": "B",
+          "design_quality_reason": "B has a clearer, more testable design (injected sleep/random, small well-named variables, explicit exports) that makes the code easier to maintain and reason about than A's minimal but less test-friendly structure.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement the retry loop, shouldRetry gating, exponential backoff with jitter, and honor a valid error.retryAfterMs without applying jitter, satisfying the spec.",
+          "restraint": "A",
+          "restraint_reason": "A sticks closely to the requested API and behavior while B adds extra options (sleep/random and an index export) beyond the spec, increasing surface area despite improving testability."
+        }
+      },
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "B's tests are more thorough and deterministic (injecting sleep/random), cover more edge cases (no pre-call sleep, invalid retryAfterMs, per-attempt behavior, shouldRetry invocation) and make fewer timing assumptions than A's suite.",
+          "design_quality": "B",
+          "design_quality_reason": "B has clearer structure and better separation of concerns (injectable sleep and random for testability, explicit defaults, small well-named locals and exports) making it easier for a maintainer to reason about and test.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement retries, shouldRetry gating, exponential backoff with jitter, honoring server-provided retryAfterMs (no jitter) and proper final-error propagation, matching the spec.",
+          "restraint": "A",
+          "restraint_reason": "A sticks closely to the spec with a minimal API and no extra injection points or re-exports, whereas B adds optional sleep/random hooks and an extra index export beyond the requested interface."
+        }
+      },
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "Candidate A has a broader, more deterministic and precise test suite (injection of sleep/random, many edge cases including invalid retryAfterMs values, per-attempt behaviour, sleep-count checks), making it a stronger regression net.",
+          "design_quality": "B",
+          "design_quality_reason": "Candidate B's implementation is slimmer and better separated into small helper functions with a clear control flow and no test-only hooks bled into the public API, making it easier to maintain.",
+          "spec_adherence": "B",
+          "spec_adherence_reason": "Both implementations satisfy the functional requirements, but Candidate B follows the specified interface more exactly and implements the retry/backoff and server-supplied delay cleanly without adding extra public options.",
+          "restraint": "B",
+          "restraint_reason": "Candidate B sticks closely to the requested API and behaviour, while Candidate A introduces extra optional hooks (sleep/random) and an additional export file beyond the spec's minimal requirements."
+        }
+      }
+    ]
+  },
+  {
+    "pairId": "retry::AvsC::retry-20260511-154755_vs_retry-20260511-154755",
+    "condX": "A",
+    "condY": "C",
+    "results": {
+      "test_quality": {
+        "verdict": "X",
+        "reasons": [
+          "[A]'s tests are more deterministic and comprehensive (injecting sleep/random, checking no-first-call delay, no sleep after final attempt, per-attempt retryAfterMs behavior, and many invalid cases), making them a stronger regression net.",
+          "Condition [C]'s tests are more comprehensive and deterministic (they inject sleep/random to avoid timer flakiness), cover more edge cases (no initial delay, no sleep after final attempt, shouldRetry called with the error, per-attempt retryAfter behavior) and are more likely to catch regressions.",
+          "Condition [A] has a larger, more targeted test suite (dependency-injected sleep/random for fast deterministic tests, checks no pre-call sleep, per-attempt retryAfterMs behaviour, jitter bounds, shouldRetry invocation, and final-attempt behaviour) while [C]'s tests are good but narrower and rely more on timers."
+        ]
+      },
+      "design_quality": {
+        "verdict": "X",
+        "reasons": [
+          "[A] has clearer structure and maintainability (well-named locals, bounded loop, exported types, and dependency injection for sleep/random which improves testability and reuse).",
+          "Condition [C] has a clearer, more maintainable structure (explicit destructuring, dependency injection for sleep/random, a small defaultSleep helper and re-export entrypoint) that improves readability and testability.",
+          "Condition [A]'s implementation is more maintainable/testable thanks to dependency injection (sleep/random), clear control flow, and explicit exports; [C] is simpler and has nice helpers but is less test-friendly due to reliance on globals."
+        ]
+      },
+      "spec_adherence": {
+        "verdict": "tie",
+        "reasons": [
+          "Both implementations correctly implement the retry semantics, exponential backoff with jitter, per-attempt handling of server-supplied retryAfterMs, shouldRetry gating, and maxAttempts behavior as required by the spec.",
+          "Condition [C] more faithfully follows the spec (calls shouldRetry on each rejection and implements per-attempt retryAfterMs handling and proper fallbacks); Condition C skips calling shouldRetry when attempts are already exhausted.",
+          "Condition C sticks to the specified retry<T>(fn, {maxAttempts, baseDelayMs, shouldRetry}) signature and implements the requirements directly, whereas [A] extends the options type with sleep/random (deviating from the exact spec signature)."
+        ]
+      },
+      "restraint": {
+        "verdict": "Y",
+        "reasons": [
+          "[C] sticks closely to the spec surface (no extra options or exports) while [A] adds extra API surface (sleep/random injection and an index export) beyond what was requested.",
+          "Condition C stays closer to the requested API and scope (no extra injection knobs or extra exports), whereas Condition [C] adds optional sleep/random parameters and an index re-export beyond the spec.",
+          "Condition C implements only the requested interface and behaviour; Condition [A] introduces extra optional hooks (sleep, random) and an additional export beyond the spec. "
+        ]
+      }
+    },
+    "raw": [
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "B's tests are more deterministic and comprehensive (injecting sleep/random, checking no-first-call delay, no sleep after final attempt, per-attempt retryAfterMs behavior, and many invalid cases), making them a stronger regression net.",
+          "design_quality": "B",
+          "design_quality_reason": "B has clearer structure and maintainability (well-named locals, bounded loop, exported types, and dependency injection for sleep/random which improves testability and reuse).",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement the retry semantics, exponential backoff with jitter, per-attempt handling of server-supplied retryAfterMs, shouldRetry gating, and maxAttempts behavior as required by the spec.",
+          "restraint": "A",
+          "restraint_reason": "A sticks closely to the spec surface (no extra options or exports) while B adds extra API surface (sleep/random injection and an index export) beyond what was requested."
+        }
+      },
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "Candidate B's tests are more comprehensive and deterministic (they inject sleep/random to avoid timer flakiness), cover more edge cases (no initial delay, no sleep after final attempt, shouldRetry called with the error, per-attempt retryAfter behavior) and are more likely to catch regressions.",
+          "design_quality": "B",
+          "design_quality_reason": "Candidate B has a clearer, more maintainable structure (explicit destructuring, dependency injection for sleep/random, a small defaultSleep helper and re-export entrypoint) that improves readability and testability.",
+          "spec_adherence": "B",
+          "spec_adherence_reason": "Candidate B more faithfully follows the spec (calls shouldRetry on each rejection and implements per-attempt retryAfterMs handling and proper fallbacks); Candidate A skips calling shouldRetry when attempts are already exhausted.",
+          "restraint": "A",
+          "restraint_reason": "Candidate A stays closer to the requested API and scope (no extra injection knobs or extra exports), whereas Candidate B adds optional sleep/random parameters and an index re-export beyond the spec."
+        }
+      },
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "Candidate A has a larger, more targeted test suite (dependency-injected sleep/random for fast deterministic tests, checks no pre-call sleep, per-attempt retryAfterMs behaviour, jitter bounds, shouldRetry invocation, and final-attempt behaviour) while B's tests are good but narrower and rely more on timers.",
+          "design_quality": "A",
+          "design_quality_reason": "Candidate A's implementation is more maintainable/testable thanks to dependency injection (sleep/random), clear control flow, and explicit exports; B is simpler and has nice helpers but is less test-friendly due to reliance on globals.",
+          "spec_adherence": "B",
+          "spec_adherence_reason": "Candidate B sticks to the specified retry<T>(fn, {maxAttempts, baseDelayMs, shouldRetry}) signature and implements the requirements directly, whereas A extends the options type with sleep/random (deviating from the exact spec signature).",
+          "restraint": "B",
+          "restraint_reason": "Candidate B implements only the requested interface and behaviour; Candidate A introduces extra optional hooks (sleep, random) and an additional export beyond the spec. "
+        }
+      }
+    ]
+  },
+  {
+    "pairId": "retry::BvsC::retry-20260511-144230_vs_retry-20260511-144230",
+    "condX": "B",
+    "condY": "C",
+    "results": {
+      "test_quality": {
+        "verdict": "Y",
+        "reasons": [
+          "Condition C's tests exercise more edge cases (invalid retryAfterMs values, zero retryAfterMs, no-sleep-after-final-attempt), use injected sleep/random for deterministic assertions, and check useful properties of delays, making the suite more diagnostic and robust.",
+          "Condition C's tests are more comprehensive and deterministic — they inject sleep/random to precisely assert per-attempt delays, cover many edge cases (invalid retryAfterMs values, zero, no-final-sleep) and the retry semantics, while Condition [C]'s suite is good but relies more on timer mocking and misses some invalid-server-delay scenarios.",
+          "[C]'s tests exercise more edge cases around server-supplied retryAfterMs (invalid values and zero), clearly record delays via injected sleep for deterministic assertions, and check no-sleep-after-final while [[C]]'s suite — though strong on timer-based checks and exact backoff values — misses several invalid-server-delay scenarios."
+        ]
+      },
+      "design_quality": {
+        "verdict": "Y",
+        "reasons": [
+          "Condition C structures concerns cleanly (readRetryAfterMs helper, injectable sleep/random with sensible defaults), improving testability and maintainability compared with [[C]]'s minimal-but-tighter implementation.",
+          "Condition C is better structured and more maintainable: it uses a clear for-loop, separates concerns into readRetryAfterMs/defaultSleep helpers, and supports dependency injection (sleep/random) which improves testability and readability compared with Condition [C]'s more ad-hoc but smaller implementation.",
+          "[C] has clearer, more maintainable structure (for-loop, readRetryAfterMs helper), and sensible dependency injection (sleep/random) that improves testability and separation of concerns compared with [[C]]'s smaller but less flexible design."
+        ]
+      },
+      "spec_adherence": {
+        "verdict": "Y",
+        "reasons": [
+          "Both implementations meet the spec, but [[C]]'s additive backoff+jitter preserves the baseDelayMs as a clear exponential baseline matching the examples, whereas [C]'s multiplicative jitter can produce delays below the base and thus slightly diverges from the common backoff interpretation in the spec.",
+          "Condition C more faithfully implements the spec (calls shouldRetry on each rejection, applies per-attempt server-supplied retryAfterMs without jitter, falls back correctly for invalid values); Condition [C] omits calling shouldRetry when maxAttempts is already reached and has less thorough handling of invalid retryAfterMs cases.",
+          "[C] more faithfully follows the spec semantics (it calls shouldRetry on every rejection and implements per-attempt retryAfterMs validation and fallback consistently); [[C]] skips calling shouldRetry when the attempt count is already exhausted which slightly deviates from the spec wording."
+        ]
+      },
+      "restraint": {
+        "verdict": "X",
+        "reasons": [
+          "Condition [C] sticks closely to the requested API and behavior without adding optional hooks or configuration, while [C] introduces extra injection points (sleep/random) beyond the spec.",
+          "Condition [C] sticks more closely to the minimal spec (no extra injectable options), whereas Condition C introduces additional options (sleep, random) that go beyond the requested interface.}",
+          "[[C]] sticks closely to the requested interface and behaviour, while [C] introduces extra optional options (sleep, random) beyond the spec. "
+        ]
+      }
+    },
+    "raw": [
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "Candidate B's tests exercise more edge cases (invalid retryAfterMs values, zero retryAfterMs, no-sleep-after-final-attempt), use injected sleep/random for deterministic assertions, and check useful properties of delays, making the suite more diagnostic and robust.",
+          "design_quality": "B",
+          "design_quality_reason": "Candidate B structures concerns cleanly (readRetryAfterMs helper, injectable sleep/random with sensible defaults), improving testability and maintainability compared with A's minimal-but-tighter implementation.",
+          "spec_adherence": "A",
+          "spec_adherence_reason": "Both implementations meet the spec, but A's additive backoff+jitter preserves the baseDelayMs as a clear exponential baseline matching the examples, whereas B's multiplicative jitter can produce delays below the base and thus slightly diverges from the common backoff interpretation in the spec.",
+          "restraint": "A",
+          "restraint_reason": "Candidate A sticks closely to the requested API and behavior without adding optional hooks or configuration, while B introduces extra injection points (sleep/random) beyond the spec."
+        }
+      },
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "Candidate B's tests are more comprehensive and deterministic — they inject sleep/random to precisely assert per-attempt delays, cover many edge cases (invalid retryAfterMs values, zero, no-final-sleep) and the retry semantics, while Candidate A's suite is good but relies more on timer mocking and misses some invalid-server-delay scenarios.",
+          "design_quality": "B",
+          "design_quality_reason": "Candidate B is better structured and more maintainable: it uses a clear for-loop, separates concerns into readRetryAfterMs/defaultSleep helpers, and supports dependency injection (sleep/random) which improves testability and readability compared with Candidate A's more ad-hoc but smaller implementation.",
+          "spec_adherence": "B",
+          "spec_adherence_reason": "Candidate B more faithfully implements the spec (calls shouldRetry on each rejection, applies per-attempt server-supplied retryAfterMs without jitter, falls back correctly for invalid values); Candidate A omits calling shouldRetry when maxAttempts is already reached and has less thorough handling of invalid retryAfterMs cases.",
+          "restraint": "A",
+          "restraint_reason": "Candidate A sticks more closely to the minimal spec (no extra injectable options), whereas Candidate B introduces additional options (sleep, random) that go beyond the requested interface.}"
+        }
+      },
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "B's tests exercise more edge cases around server-supplied retryAfterMs (invalid values and zero), clearly record delays via injected sleep for deterministic assertions, and check no-sleep-after-final while A's suite — though strong on timer-based checks and exact backoff values — misses several invalid-server-delay scenarios.",
+          "design_quality": "B",
+          "design_quality_reason": "B has clearer, more maintainable structure (for-loop, readRetryAfterMs helper), and sensible dependency injection (sleep/random) that improves testability and separation of concerns compared with A's smaller but less flexible design.",
+          "spec_adherence": "B",
+          "spec_adherence_reason": "B more faithfully follows the spec semantics (it calls shouldRetry on every rejection and implements per-attempt retryAfterMs validation and fallback consistently); A skips calling shouldRetry when the attempt count is already exhausted which slightly deviates from the spec wording.",
+          "restraint": "A",
+          "restraint_reason": "A sticks closely to the requested interface and behaviour, while B introduces extra optional options (sleep, random) beyond the spec. "
+        }
+      }
+    ]
+  },
+  {
+    "pairId": "retry::BvsC::retry-20260511-144230_vs_retry-20260511-152535",
+    "condX": "B",
+    "condY": "C",
+    "results": {
+      "test_quality": {
+        "verdict": "X",
+        "reasons": [
+          "Condition [C]'s tests are slightly more targeted and varied (fake timers + timer-count checks, deterministic RNG checks, exact-delay assertions) which better exercise timing and edge behaviours for regressions.",
+          "Condition [C]'s tests are more comprehensive and deterministic (use of fake timers, Math.random mocks, exact-delay assertions and timer-count checks) so they better catch regressions in timing/jitter/backoff behaviour.",
+          "Condition [C]'s tests are more thorough and precise (fake timers, Math.random mocking, exact-delay assertions and jitter checks) and would better catch regressions in timing and jitter behaviour."
+        ]
+      },
+      "design_quality": {
+        "verdict": "Y",
+        "reasons": [
+          "Condition C has clearer, more modular structure (separate serverSuppliedDelay and computeDelay, explicit loop with final throw) and a more conventional jitter/backoff calculation, making it easier to read and maintain.",
+          "Condition C has clearer separation of concerns (serverSuppliedDelay helper, separate computeDelay), more defensive checks and slightly clearer control flow, making it easier for a maintainer to understand and change.",
+          "Condition C has clearer control flow (bounded for-loop), better separation of concerns (serverSuppliedDelay helper) and safer type checks, making it easier to read and maintain."
+        ]
+      },
+      "spec_adherence": {
+        "verdict": "tie",
+        "reasons": [
+          "Both implementations correctly implement the retry semantics including shouldRetry gating, exponential backoff with jitter, and honoring a finite non-negative retryAfterMs without added jitter.",
+          "Both implementations correctly implement retries, shouldRetry gating, exponential backoff with jitter, server-supplied retryAfterMs precedence, and final-error propagation according to the spec.",
+          "Both implementations correctly implement retries, shouldRetry gating, exponential backoff with jitter, server-supplied retryAfterMs (without additional jitter), and respect maxAttempts."
+        ]
+      },
+      "restraint": {
+        "verdict": "X",
+        "reasons": [
+          "Condition [C] keeps a simpler implementation surface (fewer small helper abstractions) and avoids adding behavior beyond the spec, whereas [C] introduces extra helper decomposition and slightly different jitter scaling. ",
+          "Condition [C]'s implementation is slightly more minimal and avoids extra abstractions or defensive plumbing beyond the spec, whereas [C] adds small helper layers and extra validation not strictly required.",
+          "Condition [C] is more minimal and focused on the requested behaviour, while [C] adds small extra abstractions and defensive checks beyond the strict spec."
+        ]
+      }
+    },
+    "raw": [
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "Candidate A's tests are slightly more targeted and varied (fake timers + timer-count checks, deterministic RNG checks, exact-delay assertions) which better exercise timing and edge behaviours for regressions.",
+          "design_quality": "B",
+          "design_quality_reason": "Candidate B has clearer, more modular structure (separate serverSuppliedDelay and computeDelay, explicit loop with final throw) and a more conventional jitter/backoff calculation, making it easier to read and maintain.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement the retry semantics including shouldRetry gating, exponential backoff with jitter, and honoring a finite non-negative retryAfterMs without added jitter.",
+          "restraint": "A",
+          "restraint_reason": "Candidate A keeps a simpler implementation surface (fewer small helper abstractions) and avoids adding behavior beyond the spec, whereas B introduces extra helper decomposition and slightly different jitter scaling. "
+        }
+      },
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "Candidate A's tests are more comprehensive and deterministic (use of fake timers, Math.random mocks, exact-delay assertions and timer-count checks) so they better catch regressions in timing/jitter/backoff behaviour.",
+          "design_quality": "B",
+          "design_quality_reason": "Candidate B has clearer separation of concerns (serverSuppliedDelay helper, separate computeDelay), more defensive checks and slightly clearer control flow, making it easier for a maintainer to understand and change.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement retries, shouldRetry gating, exponential backoff with jitter, server-supplied retryAfterMs precedence, and final-error propagation according to the spec.",
+          "restraint": "A",
+          "restraint_reason": "Candidate A's implementation is slightly more minimal and avoids extra abstractions or defensive plumbing beyond the spec, whereas B adds small helper layers and extra validation not strictly required."
+        }
+      },
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "Candidate A's tests are more thorough and precise (fake timers, Math.random mocking, exact-delay assertions and jitter checks) and would better catch regressions in timing and jitter behaviour.",
+          "design_quality": "B",
+          "design_quality_reason": "Candidate B has clearer control flow (bounded for-loop), better separation of concerns (serverSuppliedDelay helper) and safer type checks, making it easier to read and maintain.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement retries, shouldRetry gating, exponential backoff with jitter, server-supplied retryAfterMs (without additional jitter), and respect maxAttempts.",
+          "restraint": "A",
+          "restraint_reason": "Candidate A is more minimal and focused on the requested behaviour, while B adds small extra abstractions and defensive checks beyond the strict spec."
+        }
+      }
+    ]
+  },
+  {
+    "pairId": "retry::BvsC::retry-20260511-144230_vs_retry-20260511-154755",
+    "condX": "B",
+    "condY": "C",
+    "results": {
+      "test_quality": {
+        "verdict": "Y",
+        "reasons": [
+          "Condition C's test suite is more thorough and diagnostic — it checks call counts, verifies fallback behavior for many invalid retryAfterMs values, and explicitly tests jitter differences, so it would catch more regressions.",
+          "Condition C's test suite covers a wider set of edge cases (invalid retryAfterMs values, a thorough sequence of fallback delays) and includes clear assertions that would catch regressions, whereas [B]'s tests are good but slightly less exhaustive.",
+          "tie"
+        ]
+      },
+      "design_quality": {
+        "verdict": "Y",
+        "reasons": [
+          "Condition C has clearer separation of concerns (retryAfterFromError, computeDelay, sleep), more robust type checks, and a more sensible jitter strategy, making the code easier to maintain.",
+          "Condition C separates concerns with a clear retryAfterFromError and computeDelay helpers and uses a more intuitive jitter/backoff calculation, making the control flow and intent easier to read and maintain.",
+          "[C] has clearer, well-factored helpers (retryAfterFromError, computeDelay) and safer error checks, making the control flow and responsibilities easier to read and maintain."
+        ]
+      },
+      "spec_adherence": {
+        "verdict": "Y",
+        "reasons": [
+          "Condition C precisely implements per-attempt server-supplied retryAfterMs (with correct fallbacks for invalid values) and its tests validate those edge cases, so it more fully and explicitly satisfies the spec.",
+          "Both implementations correctly implement retries capped by maxAttempts, respect shouldRetry, apply exponential backoff with jitter, and honour a finite non‑negative error.retryAfterMs without adding jitter.",
+          "[C] more completely exercises and implements the retry-after fallback and its invalid cases (and uses jitter proportional to the exponential backoff, matching expected delay growth), so it aligns better with the spec and extension."
+        ]
+      },
+      "restraint": {
+        "verdict": "X",
+        "reasons": [
+          "Condition [C] stays closer to a minimal implementation of the spec with fewer extra helpers and less additional behavior beyond what was required.",
+          "Neither implementation adds unnecessary features or configuration beyond the spec; both stay narrowly focused on the required retry behaviour ([C] only adds small, reasonable helper extraction).",
+          "[[C]] is slightly more minimal and avoids extra helper indirection and surface area beyond the spec, whereas [C] adds more helpers and test coverage (useful but slightly beyond the simplest implementation)."
+        ]
+      }
+    },
+    "raw": [
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "Candidate B's test suite is more thorough and diagnostic — it checks call counts, verifies fallback behavior for many invalid retryAfterMs values, and explicitly tests jitter differences, so it would catch more regressions.",
+          "design_quality": "B",
+          "design_quality_reason": "Candidate B has clearer separation of concerns (retryAfterFromError, computeDelay, sleep), more robust type checks, and a more sensible jitter strategy, making the code easier to maintain.",
+          "spec_adherence": "B",
+          "spec_adherence_reason": "Candidate B precisely implements per-attempt server-supplied retryAfterMs (with correct fallbacks for invalid values) and its tests validate those edge cases, so it more fully and explicitly satisfies the spec.",
+          "restraint": "A",
+          "restraint_reason": "Candidate A stays closer to a minimal implementation of the spec with fewer extra helpers and less additional behavior beyond what was required."
+        }
+      },
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "Candidate A's test suite covers a wider set of edge cases (invalid retryAfterMs values, a thorough sequence of fallback delays) and includes clear assertions that would catch regressions, whereas B's tests are good but slightly less exhaustive.",
+          "design_quality": "A",
+          "design_quality_reason": "Candidate A separates concerns with a clear retryAfterFromError and computeDelay helpers and uses a more intuitive jitter/backoff calculation, making the control flow and intent easier to read and maintain.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement retries capped by maxAttempts, respect shouldRetry, apply exponential backoff with jitter, and honour a finite non‑negative error.retryAfterMs without adding jitter.",
+          "restraint": "tie",
+          "restraint_reason": "Neither implementation adds unnecessary features or configuration beyond the spec; both stay narrowly focused on the required retry behaviour (A only adds small, reasonable helper extraction)."
+        }
+      },
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "tie",
+          "design_quality": "B",
+          "design_quality_reason": "B has clearer, well-factored helpers (retryAfterFromError, computeDelay) and safer error checks, making the control flow and responsibilities easier to read and maintain.",
+          "spec_adherence": "B",
+          "spec_adherence_reason": "B more completely exercises and implements the retry-after fallback and its invalid cases (and uses jitter proportional to the exponential backoff, matching expected delay growth), so it aligns better with the spec and extension.",
+          "restraint": "A",
+          "restraint_reason": "A is slightly more minimal and avoids extra helper indirection and surface area beyond the spec, whereas B adds more helpers and test coverage (useful but slightly beyond the simplest implementation)."
+        }
+      }
+    ]
+  },
+  {
+    "pairId": "retry::BvsC::retry-20260511-152535_vs_retry-20260511-144230",
+    "condX": "B",
+    "condY": "C",
+    "results": {
+      "test_quality": {
+        "verdict": "Y",
+        "reasons": [
+          "Condition C's tests are more thorough and deterministic (injectable sleep/random), cover more edge cases (invalid retryAfterMs variants, zero, no-sleep-after-final), and assert precise numeric expectations, making them better regression guards.",
+          "Condition C's tests are more comprehensive (covers invalid retryAfterMs variants, zero, no-sleep-on-final-attempt, explicit ordering and bounds) and use injected hooks for deterministic assertions, so they exercise more failure modes and edge cases.",
+          "[C] provides a broader and more targeted test suite (covers retryAfter variations including 0 and invalid values, verifies no sleep after final attempt, injects sleep/random to deterministically observe delays and bounds) while [B]'s tests are good but exercise fewer edge cases."
+        ]
+      },
+      "design_quality": {
+        "verdict": "Y",
+        "reasons": [
+          "Condition C has clearer separation of concerns (readRetryAfterMs helper), a typed RetryOptions, and dependency injection for sleep/random which improves testability and maintainability compared with [[C]]'s direct use of globals.",
+          "Condition C has clearer abstractions (readRetryAfterMs), a typed RetryOptions interface and test-friendly dependency injection (sleep/random), improving readability and maintainability.",
+          "[C] has clearer structure and abstractions (RetryOptions type, readRetryAfterMs helper, and injectable sleep/random for testability) making it easier to maintain, whereas [B] is more ad-hoc and less modular."
+        ]
+      },
+      "spec_adherence": {
+        "verdict": "tie",
+        "reasons": [
+          "Both implementations correctly implement retries, shouldRetry gating, exponential backoff with jitter, respect server-supplied retryAfterMs without additional jitter, and propagate the final error as specified.",
+          "Both implementations correctly implement retries, shouldRetry gating, exponential backoff with per-attempt jitter, honor server-supplied retryAfterMs without jitter, and stop after maxAttempts.",
+          "Both implementations correctly implement the retry semantics, exponential backoff with jitter, per-attempt shouldRetry gating, and the server-supplied retryAfterMs override as specified."
+        ]
+      },
+      "restraint": {
+        "verdict": "X",
+        "reasons": [
+          "Condition [C] sticks closely to the requested signature and behavior without adding extra injectable options or exported types, whereas [C] introduces additional API surface (sleep/random) beyond the spec.",
+          "Condition [B] sticks closely to the spec with no extra injectable hooks or additional API surface, while [C] added optional sleep/random fields beyond the required interface.",
+          "[B] sticks closely to the spec surface without adding test-oriented injection points or extra option fields, while [C] introduces additional options (sleep, random) and helper plumbing beyond the spec."
+        ]
+      }
+    },
+    "raw": [
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "Candidate B's tests are more thorough and deterministic (injectable sleep/random), cover more edge cases (invalid retryAfterMs variants, zero, no-sleep-after-final), and assert precise numeric expectations, making them better regression guards.",
+          "design_quality": "B",
+          "design_quality_reason": "Candidate B has clearer separation of concerns (readRetryAfterMs helper), a typed RetryOptions, and dependency injection for sleep/random which improves testability and maintainability compared with A's direct use of globals.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement retries, shouldRetry gating, exponential backoff with jitter, respect server-supplied retryAfterMs without additional jitter, and propagate the final error as specified.",
+          "restraint": "A",
+          "restraint_reason": "Candidate A sticks closely to the requested signature and behavior without adding extra injectable options or exported types, whereas B introduces additional API surface (sleep/random) beyond the spec."
+        }
+      },
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "Candidate A's tests are more comprehensive (covers invalid retryAfterMs variants, zero, no-sleep-on-final-attempt, explicit ordering and bounds) and use injected hooks for deterministic assertions, so they exercise more failure modes and edge cases.",
+          "design_quality": "A",
+          "design_quality_reason": "Candidate A has clearer abstractions (readRetryAfterMs), a typed RetryOptions interface and test-friendly dependency injection (sleep/random), improving readability and maintainability.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement retries, shouldRetry gating, exponential backoff with per-attempt jitter, honor server-supplied retryAfterMs without jitter, and stop after maxAttempts.",
+          "restraint": "B",
+          "restraint_reason": "Candidate B sticks closely to the spec with no extra injectable hooks or additional API surface, while A added optional sleep/random fields beyond the required interface."
+        }
+      },
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "A provides a broader and more targeted test suite (covers retryAfter variations including 0 and invalid values, verifies no sleep after final attempt, injects sleep/random to deterministically observe delays and bounds) while B's tests are good but exercise fewer edge cases.",
+          "design_quality": "A",
+          "design_quality_reason": "A has clearer structure and abstractions (RetryOptions type, readRetryAfterMs helper, and injectable sleep/random for testability) making it easier to maintain, whereas B is more ad-hoc and less modular.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement the retry semantics, exponential backoff with jitter, per-attempt shouldRetry gating, and the server-supplied retryAfterMs override as specified.",
+          "restraint": "B",
+          "restraint_reason": "B sticks closely to the spec surface without adding test-oriented injection points or extra option fields, while A introduces additional options (sleep, random) and helper plumbing beyond the spec."
+        }
+      }
+    ]
+  },
+  {
+    "pairId": "retry::BvsC::retry-20260511-152535_vs_retry-20260511-152535",
+    "condX": "B",
+    "condY": "C",
+    "results": {
+      "test_quality": {
+        "verdict": "X",
+        "reasons": [
+          "[B]'s test suite is more robust and deterministic (uses fake timers and mocks Math.random where needed) and exercises timing, jitter, and server-supplied delays in a way that will reliably catch regressions.",
+          "[B]'s tests are more robust and deterministic (use of fake timers, explicit Math.random mocking for jitter, and precise assertions including same-error identity), whereas [C]'s jitter test relies on non-deterministic randomness and is slightly more fragile.",
+          "Condition C's tests are more deterministic and precise (they mock setTimeout to drive retries synchronously, assert sensible lower bounds on backoff, and exercise server-supplied delays and jitter in a robust way), while [[C]]'s fake-timer tests are a bit more brittle and contain stricter inequalities that could be flaky."
+        ]
+      },
+      "design_quality": {
+        "verdict": "Y",
+        "reasons": [
+          "[C] has clearer structure and separation of concerns (typed RetryOptions, small helper functions for server delay, delay computation and sleep) which improves readability and maintainability.",
+          "[C] splits responsibilities into small, well-named functions (serverSuppliedDelay, computeDelay, sleep) and provides a typed RetryOptions interface, making the implementation clearer and easier to maintain than [B]'s inline logic.",
+          "Condition C cleanly separates concerns into small, well-named helper functions and a RetryOptions type, improving readability and testability compared with [[C]]'s single large function."
+        ]
+      },
+      "spec_adherence": {
+        "verdict": "tie",
+        "reasons": [
+          "Both implementations correctly implement retries, shouldRetry gating, exponential backoff with jitter, per-attempt server-supplied retryAfterMs handling, and proper maxAttempts behaviour.",
+          "[B] calls shouldRetry on every rejection and clearly distinguishes server-supplied delays vs backoff-with-jitter per attempt, matching the spec more exactly ([C] skips shouldRetry when attempt >= maxAttempts).",
+          "Both implementations correctly implement maxAttempts, shouldRetry gating, exponential backoff with jitter, and the server-provided retryAfterMs override per attempt, so neither is strictly more faithful to the spec."
+        ]
+      },
+      "restraint": {
+        "verdict": "X",
+        "reasons": [
+          "[B] is more compact and stays narrowly focused on the spec without adding exported helper interfaces or extra abstractions beyond the required behavior.",
+          "Neither implementation adds substantial unrelated features or surface area beyond the spec; both implement the required behavior without notable scope creep.",
+          "Condition [C] is more minimal and implements only the required behavior inline, whereas [C] introduces extra abstractions (exported interface and helper functions) beyond the bare spec. "
+        ]
+      }
+    },
+    "raw": [
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "B's test suite is more robust and deterministic (uses fake timers and mocks Math.random where needed) and exercises timing, jitter, and server-supplied delays in a way that will reliably catch regressions.",
+          "design_quality": "A",
+          "design_quality_reason": "A has clearer structure and separation of concerns (typed RetryOptions, small helper functions for server delay, delay computation and sleep) which improves readability and maintainability.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement retries, shouldRetry gating, exponential backoff with jitter, per-attempt server-supplied retryAfterMs handling, and proper maxAttempts behaviour.",
+          "restraint": "B",
+          "restraint_reason": "B is more compact and stays narrowly focused on the spec without adding exported helper interfaces or extra abstractions beyond the required behavior."
+        }
+      },
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "B's tests are more robust and deterministic (use of fake timers, explicit Math.random mocking for jitter, and precise assertions including same-error identity), whereas A's jitter test relies on non-deterministic randomness and is slightly more fragile.",
+          "design_quality": "A",
+          "design_quality_reason": "A splits responsibilities into small, well-named functions (serverSuppliedDelay, computeDelay, sleep) and provides a typed RetryOptions interface, making the implementation clearer and easier to maintain than B's inline logic.",
+          "spec_adherence": "B",
+          "spec_adherence_reason": "B calls shouldRetry on every rejection and clearly distinguishes server-supplied delays vs backoff-with-jitter per attempt, matching the spec more exactly (A skips shouldRetry when attempt >= maxAttempts).",
+          "restraint": "tie",
+          "restraint_reason": "Neither implementation adds substantial unrelated features or surface area beyond the spec; both implement the required behavior without notable scope creep."
+        }
+      },
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "Candidate B's tests are more deterministic and precise (they mock setTimeout to drive retries synchronously, assert sensible lower bounds on backoff, and exercise server-supplied delays and jitter in a robust way), while A's fake-timer tests are a bit more brittle and contain stricter inequalities that could be flaky.",
+          "design_quality": "B",
+          "design_quality_reason": "Candidate B cleanly separates concerns into small, well-named helper functions and a RetryOptions type, improving readability and testability compared with A's single large function.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement maxAttempts, shouldRetry gating, exponential backoff with jitter, and the server-provided retryAfterMs override per attempt, so neither is strictly more faithful to the spec.",
+          "restraint": "A",
+          "restraint_reason": "Candidate A is more minimal and implements only the required behavior inline, whereas B introduces extra abstractions (exported interface and helper functions) beyond the bare spec. "
+        }
+      }
+    ]
+  },
+  {
+    "pairId": "retry::BvsC::retry-20260511-152535_vs_retry-20260511-154755",
+    "condX": "B",
+    "condY": "C",
+    "results": {
+      "test_quality": {
+        "verdict": "Y",
+        "reasons": [
+          "Condition C's tests are more comprehensive and targeted (explicit checks for many invalid retryAfterMs shapes, exact expected delays, and clearer assertions about jitter and backoff), so they better catch regressions.",
+          "Condition C's test suite is broader and more diagnostic — it asserts exact delay values (including many invalid retryAfterMs cases), checks jitter numerically, and covers more edge permutations that would catch regressions.",
+          "[C]'s test suite is more comprehensive and deterministic (explicit checks for many invalid retryAfterMs cases, Math.random mocking for jitter, and precise expected delays), making it a stronger regression net than [[C]]'s slightly flakier/less exhaustive tests."
+        ]
+      },
+      "design_quality": {
+        "verdict": "Y",
+        "reasons": [
+          "Condition C separates concerns into small helpers (sleep, computeDelay, retryAfterFromError) and exposes a clear RetryOptions type, making the implementation easier to read and maintain than [B]'s single large function.",
+          "Condition C has clearer separation of concerns (sleep/computeDelay/retryAfterFromError helpers and an exported RetryOptions type), making the logic easier to read and maintain.",
+          "[C] is better structured and more readable with small, well-named helper functions (sleep, computeDelay, retryAfterFromError) and a clear control flow, whereas [[C]] is a single large function with inline logic."
+        ]
+      },
+      "spec_adherence": {
+        "verdict": "tie",
+        "reasons": [
+          "Both implementations correctly implement retries, shouldRetry gating, exponential backoff with jitter, and the server-provided retryAfterMs rule per attempt, so neither is notably more faithful to the spec.",
+          "Both implementations correctly implement retries, respect shouldRetry and maxAttempts, apply exponential backoff with jitter, and honor a finite non‑negative error.retryAfterMs without adding jitter.",
+          "[[C]] calls shouldRetry on every rejection before deciding to stop or wait (matching the spec requirement to call shouldRetry), while [C] returns on maxAttempts without invoking shouldRetry on that final failure."
+        ]
+      },
+      "restraint": {
+        "verdict": "X",
+        "reasons": [
+          "Condition [B] is more minimal and avoids extra exported types and auxiliary helpers, sticking closer to the core spec without adding extra surface area or utilities.",
+          "Condition [B] is more minimal and avoids extra exported helpers or surface area, sticking closer to a single focused implementation of the spec. ",
+          "[[C]] implements the required behaviour with minimal surface area and no extra exported types or helpers, whereas [C] adds additional abstractions and exports beyond the spec's bare requirements."
+        ]
+      }
+    },
+    "raw": [
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "Candidate A's tests are more comprehensive and targeted (explicit checks for many invalid retryAfterMs shapes, exact expected delays, and clearer assertions about jitter and backoff), so they better catch regressions.",
+          "design_quality": "A",
+          "design_quality_reason": "Candidate A separates concerns into small helpers (sleep, computeDelay, retryAfterFromError) and exposes a clear RetryOptions type, making the implementation easier to read and maintain than B's single large function.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement retries, shouldRetry gating, exponential backoff with jitter, and the server-provided retryAfterMs rule per attempt, so neither is notably more faithful to the spec.",
+          "restraint": "B",
+          "restraint_reason": "Candidate B is more minimal and avoids extra exported types and auxiliary helpers, sticking closer to the core spec without adding extra surface area or utilities."
+        }
+      },
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "Candidate A's test suite is broader and more diagnostic — it asserts exact delay values (including many invalid retryAfterMs cases), checks jitter numerically, and covers more edge permutations that would catch regressions.",
+          "design_quality": "A",
+          "design_quality_reason": "Candidate A has clearer separation of concerns (sleep/computeDelay/retryAfterFromError helpers and an exported RetryOptions type), making the logic easier to read and maintain.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement retries, respect shouldRetry and maxAttempts, apply exponential backoff with jitter, and honor a finite non‑negative error.retryAfterMs without adding jitter.",
+          "restraint": "B",
+          "restraint_reason": "Candidate B is more minimal and avoids extra exported helpers or surface area, sticking closer to a single focused implementation of the spec. "
+        }
+      },
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "B's test suite is more comprehensive and deterministic (explicit checks for many invalid retryAfterMs cases, Math.random mocking for jitter, and precise expected delays), making it a stronger regression net than A's slightly flakier/less exhaustive tests.",
+          "design_quality": "B",
+          "design_quality_reason": "B is better structured and more readable with small, well-named helper functions (sleep, computeDelay, retryAfterFromError) and a clear control flow, whereas A is a single large function with inline logic.",
+          "spec_adherence": "A",
+          "spec_adherence_reason": "A calls shouldRetry on every rejection before deciding to stop or wait (matching the spec requirement to call shouldRetry), while B returns on maxAttempts without invoking shouldRetry on that final failure.",
+          "restraint": "A",
+          "restraint_reason": "A implements the required behaviour with minimal surface area and no extra exported types or helpers, whereas B adds additional abstractions and exports beyond the spec's bare requirements."
+        }
+      }
+    ]
+  },
+  {
+    "pairId": "retry::BvsC::retry-20260511-154755_vs_retry-20260511-144230",
+    "condX": "B",
+    "condY": "C",
+    "results": {
+      "test_quality": {
+        "verdict": "Y",
+        "reasons": [
+          "Condition C has a broader, more precise test suite (covers jitter bounds, no-final-sleep, many invalid retryAfterMs cases, zero delay) that would catch more regressions than [B]'s narrower set.",
+          "Condition C provides a broader, more targeted test suite (covers jitter/backoff bounds, server-supplied retryAfterMs including many invalid cases, no-final-sleep, zero retryAfterMs) and uses DI for deterministic assertions, while [B]'s tests are narrower.",
+          "Condition C's tests cover more edge cases (invalid retryAfterMs values, zero retryAfterMs, no-sleep-after-final-attempt) and include precise assertions, making the suite more likely to catch regressions."
+        ]
+      },
+      "design_quality": {
+        "verdict": "Y",
+        "reasons": [
+          "Condition C is better structured for maintainability (clear helper for retryAfter parsing, DI for sleep/random, default implementations) making the control flow and testability clearer.",
+          "Condition C has clearer structure and abstractions (readRetryAfterMs helper), dependency injection for sleep/random for testability, and well-named options—[B] is simpler but less modular and mixes concerns inline.",
+          "Condition C is better structured (helper to read retryAfterMs, injectable sleep/random, small clear functions) which improves readability and testability without messy control flow."
+        ]
+      },
+      "spec_adherence": {
+        "verdict": "tie",
+        "reasons": [
+          "Both implementations correctly implement the required retry/backoff/jitter and the server-supplied retryAfterMs behaviour and propagate errors as specified.",
+          "Condition C follows the spec closely (always calls shouldRetry, honors finite non-negative retryAfterMs without adding jitter, respects maxAttempts and avoids final sleep); [B] throws on the final attempt before calling shouldRetry, a subtle mismatch with the spec wording.",
+          "Condition [B]'s function signature and options exactly match the spec while Condition C extends the options with test-only knobs (sleep/random), diverging from the required interface."
+        ]
+      },
+      "restraint": {
+        "verdict": "X",
+        "reasons": [
+          "Condition [B] sticks closely to the spec surface and avoids added testing hooks/options, whereas [C] introduced extra options (sleep/random) and helpers beyond the requested API.",
+          "Condition [B] sticks closely to the requested API and behavior, while [C] adds extra options (sleep, random) and helpers beyond the spec, increasing scope. ",
+          "Condition [B] sticks closely to the spec surface and behavior without adding extra options or APIs, whereas Condition C introduced additional optional parameters beyond the spec."
+        ]
+      }
+    },
+    "raw": [
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "Candidate A has a broader, more precise test suite (covers jitter bounds, no-final-sleep, many invalid retryAfterMs cases, zero delay) that would catch more regressions than B's narrower set.",
+          "design_quality": "A",
+          "design_quality_reason": "Candidate A is better structured for maintainability (clear helper for retryAfter parsing, DI for sleep/random, default implementations) making the control flow and testability clearer.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement the required retry/backoff/jitter and the server-supplied retryAfterMs behaviour and propagate errors as specified.",
+          "restraint": "B",
+          "restraint_reason": "Candidate B sticks closely to the spec surface and avoids added testing hooks/options, whereas A introduced extra options (sleep/random) and helpers beyond the requested API."
+        }
+      },
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "Candidate A provides a broader, more targeted test suite (covers jitter/backoff bounds, server-supplied retryAfterMs including many invalid cases, no-final-sleep, zero retryAfterMs) and uses DI for deterministic assertions, while B's tests are narrower.",
+          "design_quality": "A",
+          "design_quality_reason": "Candidate A has clearer structure and abstractions (readRetryAfterMs helper), dependency injection for sleep/random for testability, and well-named options—B is simpler but less modular and mixes concerns inline.",
+          "spec_adherence": "A",
+          "spec_adherence_reason": "Candidate A follows the spec closely (always calls shouldRetry, honors finite non-negative retryAfterMs without adding jitter, respects maxAttempts and avoids final sleep); B throws on the final attempt before calling shouldRetry, a subtle mismatch with the spec wording.",
+          "restraint": "B",
+          "restraint_reason": "Candidate B sticks closely to the requested API and behavior, while A adds extra options (sleep, random) and helpers beyond the spec, increasing scope. "
+        }
+      },
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "Candidate A's tests cover more edge cases (invalid retryAfterMs values, zero retryAfterMs, no-sleep-after-final-attempt) and include precise assertions, making the suite more likely to catch regressions.",
+          "design_quality": "A",
+          "design_quality_reason": "Candidate A is better structured (helper to read retryAfterMs, injectable sleep/random, small clear functions) which improves readability and testability without messy control flow.",
+          "spec_adherence": "B",
+          "spec_adherence_reason": "Candidate B's function signature and options exactly match the spec while Candidate A extends the options with test-only knobs (sleep/random), diverging from the required interface.",
+          "restraint": "B",
+          "restraint_reason": "Candidate B sticks closely to the spec surface and behavior without adding extra options or APIs, whereas Candidate A introduced additional optional parameters beyond the spec."
+        }
+      }
+    ]
+  },
+  {
+    "pairId": "retry::BvsC::retry-20260511-154755_vs_retry-20260511-152535",
+    "condX": "B",
+    "condY": "C",
+    "results": {
+      "test_quality": {
+        "verdict": "X",
+        "reasons": [
+          "[B]'s tests are more robust and deterministic (it mocks Math.random to exercise jitter and asserts the exact final error object), whereas [C]'s jitter test compares two runs non-deterministically and is more likely to flake.",
+          "[B]'s tests are more robust and deterministic (it mocks Math.random to verify jitter, asserts exact error identity on immediate rejection, has a global afterEach to restore mocks) whereas [C]'s jitter test is nondeterministic and slightly more fragile.",
+          "Condition [B]'s test suite is more deterministic (it mocks Math.random), checks exact error identity and covers the same behaviours more precisely, while Condition C's jitter test is non‑deterministic and slightly weaker."
+        ]
+      },
+      "design_quality": {
+        "verdict": "Y",
+        "reasons": [
+          "[C] has clearer structure and separation of concerns (serverSuppliedDelay/computeDelay/sleep helpers and a bounded for-loop), making it easier to read and maintain than [B]'s single long function.",
+          "[C] separates concerns with clear helper functions (serverSuppliedDelay, computeDelay, sleep) and named interface, improving readability and maintainability compared with [B]'s denser inline logic.",
+          "Condition C has clearer separation of concerns (serverSuppliedDelay, computeDelay, sleep) and a straightforward for-loop that improves readability and maintainability."
+        ]
+      },
+      "spec_adherence": {
+        "verdict": "tie",
+        "reasons": [
+          "Both implementations correctly implement retries, shouldRetry gating, exponential backoff with jitter, server-supplied retryAfterMs without added jitter, and final-error propagation per the spec.",
+          "Both implementations correctly implement retries, shouldRetry gating, exponential backoff with jitter, server-supplied retryAfterMs handling, and maxAttempts semantics as specified.",
+          "Both implementations correctly implement retries, shouldRetry gating, exponential backoff with jitter, server-supplied retryAfterMs handling, and respect maxAttempts."
+        ]
+      },
+      "restraint": {
+        "verdict": "X",
+        "reasons": [
+          "[B] is more minimal and stays close to the spec without adding extra helper abstractions or state ([C] introduces additional helper functions and a lastError variable beyond the strict requirements).",
+          "[B] is more minimal and stays narrowly focused on the required behavior without introducing extra helper exports or layered abstractions beyond the core retry loop.",
+          "Condition [B] is leaner and stays closer to the minimal required control flow (no extra stored state or helpers beyond what's necessary), introducing less surface area beyond the spec."
+        ]
+      }
+    },
+    "raw": [
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "B's tests are more robust and deterministic (it mocks Math.random to exercise jitter and asserts the exact final error object), whereas A's jitter test compares two runs non-deterministically and is more likely to flake.",
+          "design_quality": "A",
+          "design_quality_reason": "A has clearer structure and separation of concerns (serverSuppliedDelay/computeDelay/sleep helpers and a bounded for-loop), making it easier to read and maintain than B's single long function.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement retries, shouldRetry gating, exponential backoff with jitter, server-supplied retryAfterMs without added jitter, and final-error propagation per the spec.",
+          "restraint": "B",
+          "restraint_reason": "B is more minimal and stays close to the spec without adding extra helper abstractions or state (A introduces additional helper functions and a lastError variable beyond the strict requirements)."
+        }
+      },
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "B's tests are more robust and deterministic (it mocks Math.random to verify jitter, asserts exact error identity on immediate rejection, has a global afterEach to restore mocks) whereas A's jitter test is nondeterministic and slightly more fragile.",
+          "design_quality": "A",
+          "design_quality_reason": "A separates concerns with clear helper functions (serverSuppliedDelay, computeDelay, sleep) and named interface, improving readability and maintainability compared with B's denser inline logic.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement retries, shouldRetry gating, exponential backoff with jitter, server-supplied retryAfterMs handling, and maxAttempts semantics as specified.",
+          "restraint": "B",
+          "restraint_reason": "B is more minimal and stays narrowly focused on the required behavior without introducing extra helper exports or layered abstractions beyond the core retry loop."
+        }
+      },
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "Candidate B's test suite is more deterministic (it mocks Math.random), checks exact error identity and covers the same behaviours more precisely, while Candidate A's jitter test is non‑deterministic and slightly weaker.",
+          "design_quality": "A",
+          "design_quality_reason": "Candidate A has clearer separation of concerns (serverSuppliedDelay, computeDelay, sleep) and a straightforward for-loop that improves readability and maintainability.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement retries, shouldRetry gating, exponential backoff with jitter, server-supplied retryAfterMs handling, and respect maxAttempts.",
+          "restraint": "B",
+          "restraint_reason": "Candidate B is leaner and stays closer to the minimal required control flow (no extra stored state or helpers beyond what's necessary), introducing less surface area beyond the spec."
+        }
+      }
+    ]
+  },
+  {
+    "pairId": "retry::BvsC::retry-20260511-154755_vs_retry-20260511-154755",
+    "condX": "B",
+    "condY": "C",
+    "results": {
+      "test_quality": {
+        "verdict": "Y",
+        "reasons": [
+          "[C] has a broader, more precise test suite (fake timers, call-count assertions, explicit invalid retryAfterMs cases, and clearer timer inspections) so it would catch regressions more reliably.",
+          "Condition C has a broader, more precise test suite (uses fake timers, inspects exact delays, and covers many invalid retryAfter cases and jitter differences) that would catch more regressions than [[C]]'s smaller set of tests.",
+          "Condition C's tests are more comprehensive and diagnostic—covering many invalid retryAfterMs cases, asserting exact delay values, using fake timers and Math.random mocks to verify jitter and backoff growth—while [B]'s suite is narrower and omits several edge cases."
+        ]
+      },
+      "design_quality": {
+        "verdict": "Y",
+        "reasons": [
+          "[C] has clearer separation of concerns (sleep/computeDelay/retryAfterFromError), better naming and structure, making it easier for a maintainer to reason about and modify.",
+          "Condition C separates concerns into small helper functions (sleep, computeDelay, retryAfterFromError) with clear naming and validation, making the implementation more readable and maintainable than [[C]]'s inline logic.",
+          "Condition C factors logic into small, well-named helpers (sleep, computeDelay, retryAfterFromError) which improves readability and separation of concerns, whereas [B] keeps everything inline and less modular."
+        ]
+      },
+      "spec_adherence": {
+        "verdict": "tie",
+        "reasons": [
+          "Both implementations correctly implement the retry rules (maxAttempts, shouldRetry gating, exponential backoff with jitter, and honoring server-supplied retryAfterMs without added jitter) so neither is superior on correctness.",
+          "Both implementations correctly implement retries, exponential backoff with jitter, honor server-supplied finite non-negative retryAfterMs without added jitter, respect shouldRetry, and stop after maxAttempts, so neither misses spec requirements.",
+          "Both implementations correctly implement the required behavior (shouldRetry gating, maxAttempts cap, exponential backoff with jitter, and honoring a finite non-negative error.retryAfterMs without additional jitter)."
+        ]
+      },
+      "restraint": {
+        "verdict": "X",
+        "reasons": [
+          "[[C]] is more minimal and implements the required behavior inline without adding extra helper abstractions or surface area beyond the spec.",
+          "Condition [C] is more minimal and sticks closely to the core spec, while Condition C adds extra helper abstractions and a wider set of test scenarios beyond the explicit requirements.",
+          "Condition [B] implements the spec with minimal extra machinery, while [C] introduces additional helper functions and a broader test surface (useful but beyond the minimal spec)."
+        ]
+      }
+    },
+    "raw": [
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "B has a broader, more precise test suite (fake timers, call-count assertions, explicit invalid retryAfterMs cases, and clearer timer inspections) so it would catch regressions more reliably.",
+          "design_quality": "B",
+          "design_quality_reason": "B has clearer separation of concerns (sleep/computeDelay/retryAfterFromError), better naming and structure, making it easier for a maintainer to reason about and modify.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement the retry rules (maxAttempts, shouldRetry gating, exponential backoff with jitter, and honoring server-supplied retryAfterMs without added jitter) so neither is superior on correctness.",
+          "restraint": "A",
+          "restraint_reason": "A is more minimal and implements the required behavior inline without adding extra helper abstractions or surface area beyond the spec."
+        }
+      },
+      {
+        "slotAisX": true,
+        "out": {
+          "test_quality": "B",
+          "test_quality_reason": "Candidate B has a broader, more precise test suite (uses fake timers, inspects exact delays, and covers many invalid retryAfter cases and jitter differences) that would catch more regressions than A's smaller set of tests.",
+          "design_quality": "B",
+          "design_quality_reason": "Candidate B separates concerns into small helper functions (sleep, computeDelay, retryAfterFromError) with clear naming and validation, making the implementation more readable and maintainable than A's inline logic.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement retries, exponential backoff with jitter, honor server-supplied finite non-negative retryAfterMs without added jitter, respect shouldRetry, and stop after maxAttempts, so neither misses spec requirements.",
+          "restraint": "A",
+          "restraint_reason": "Candidate A is more minimal and sticks closely to the core spec, while Candidate B adds extra helper abstractions and a wider set of test scenarios beyond the explicit requirements."
+        }
+      },
+      {
+        "slotAisX": false,
+        "out": {
+          "test_quality": "A",
+          "test_quality_reason": "Candidate A's tests are more comprehensive and diagnostic—covering many invalid retryAfterMs cases, asserting exact delay values, using fake timers and Math.random mocks to verify jitter and backoff growth—while B's suite is narrower and omits several edge cases.",
+          "design_quality": "A",
+          "design_quality_reason": "Candidate A factors logic into small, well-named helpers (sleep, computeDelay, retryAfterFromError) which improves readability and separation of concerns, whereas B keeps everything inline and less modular.",
+          "spec_adherence": "tie",
+          "spec_adherence_reason": "Both implementations correctly implement the required behavior (shouldRetry gating, maxAttempts cap, exponential backoff with jitter, and honoring a finite non-negative error.retryAfterMs without additional jitter).",
+          "restraint": "B",
+          "restraint_reason": "Candidate B implements the spec with minimal extra machinery, while A introduces additional helper functions and a broader test surface (useful but beyond the minimal spec)."
+        }
+      }
+    ]
+  }
+]

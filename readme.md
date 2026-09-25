@@ -1,52 +1,38 @@
+# tdd-guard-bench
+
 **Verdict question:** Does mechanical TDD enforcement produce better code, or just compliant code?
 
-**Three conditions** (n=3-5 runs each):
-1. No TDD instruction (control)
-2. CLAUDE.md with TDD rules
-3. tdd-guard hook installed
+Research harness comparing Claude Code under three TDD-enforcement conditions. Not a product — see `CLAUDE.md` for how the harness works and `findings.md` for the write-up.
 
-**Task:** Greenfield, design-rich, tight spec. Lead candidate: rate limiter (multiple valid algorithms — token bucket, sliding window, leaky bucket — design quality differentiates clearly).
+**Results:** [findings.md](findings.md)
 
-**Spec rule:** Functional requirements only. No edge case hints. Let each condition surface its own.
+## Conditions
 
-**Pre-register before running** (commit to repo with timestamp):
-- Spec given to agent
-- Edge case list (your grading rubric — withheld from agent)
-- Expected verdict (your gut prediction)
-- Judge rubric and prompt
-- Versions locked: model, CC, tdd-guard
+1. **A — no-instruction** — bare template, control.
+2. **B — claude-md-tdd** — TDD rules given as `CLAUDE.md` instructions.
+3. **C — tdd-guard** — same rules enforced via the `tdd-guard` PreToolUse hook.
 
-**Harness:** Bash script, ~50 lines. Fresh git worktree per run. CC headless mode, same prompt every time. Parallelize.
+B and C share the same rule set; only the enforcement mechanism differs.
 
-**Per run, capture:**
-- Final source + tests
-- Test pass/fail
-- Wall-clock time, token count
-- Guard intervention count + content (condition 3 only)
+## Running
 
-**Judging:**
-- Direct API, not CC. Temp 0, structured JSON.
-- Cross-family judge (OpenAI or Google), NOT Claude. Optionally run two judges and report agreement.
-- Pairwise comparison, shuffled order to control position bias.
-- Strip condition labels (A1-A5, B1-B5, C1-C5) before judging — blind only.
+```bash
+./harness/run.sh specs/<name>.md                                  # single spec, 3 conditions in parallel
+./harness/run.sh specs/<name>.md --followup followups/<name>.md   # + round-2 extension prompt
+./harness/run-all.sh                                               # every (spec, followup) pair
+npm run judge                                                      # LLM pairwise judging (needs OPENAI_API_KEY)
+```
 
-**Measurement, two layers:**
+Each run writes to `runs/<spec>-<timestamp>/{A,B,C}-*/` with a `summary.json` aggregating cost, wall-clock time, hook-denial counts, and test pass/fail.
 
-Objective (programmatic):
-- Spec adherence (line-by-line)
-- Edge cases independently surfaced vs your pre-registered list
-- Tests passing at end
-- Cyclomatic complexity (radon, complexity-report)
-- Guard intervention count
+## Specs
 
-Judgment (LLM judge):
-- Test quality — behavior vs implementation detail, brittleness
-- Design quality — coupling, separation, simplicity
-- Over-engineering — abstractions justified by spec
+- **rate-limiter** — state-heavy, multiple valid algorithms.
+- **csv-parser** — transformational, character-level state machine.
+- **retry** — control-flow heavy, async backoff with jitter.
 
-Don't measure: test count, coverage %, maintainability, scalability. Snapshot evals can't see those.
+Each spec is functional-requirements-only, with a private grading rubric under `specs/tests/` and `rubric/`, and an optional round-2 followup under `followups/` that demands backwards compatibility.
 
-**Gate before storyboarding:** Lock one of these as the close.
-- Kept: hook produces measurably better code → "earns its place"
-- Conditional: same final quality, different paths → "compliance theatre"
-- Dropped: both fine, hook is friction → "just write good prompts"
+## Judging
+
+Pairwise LLM comparison (`harness/judge.ts`), cross-family judge (not Claude), condition labels stripped before judging, shuffled order to control position bias.

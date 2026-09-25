@@ -235,8 +235,8 @@ async function judgePair(pair: ReturnType<typeof generatePairs>[number]): Promis
           const isX = (v === 'A' && r.slotAisX) || (v === 'B' && !r.slotAisX)
           return { verdict: isX ? ('X' as const) : ('Y' as const), reason }
         })
-      const counts: Record<'X' | 'Y' | 'tie', number> = { X: 0, Y: 0, tie: 0 }
       decoded.forEach((d) => counts[d.verdict]++)
+      const counts: Record<'X' | 'Y' | 'tie', number> = { X: 0, Y: 0, tie: 0 }
       const verdict = (['X', 'Y', 'tie'] as const).reduce((best, k) => (counts[k] > counts[best] ? k : best), 'tie')
       return [d, { verdict, reasons: decoded.map((d) => d.reason) }]
     }),
